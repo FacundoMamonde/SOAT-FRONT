@@ -1,10 +1,12 @@
 <template>
-  
+  <div>
+    <p>ORDER TABLE COMPONENT</p>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'HeaderComponent',
+  name: 'OrderTableComponent',
   props: {
   }
 }
