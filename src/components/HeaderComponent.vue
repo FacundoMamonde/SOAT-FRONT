@@ -1,5 +1,7 @@
 <template>
-  
+  <div id="divHeader">
+    <input id="inputSearch"> <button id="btnSearch">Buscar</button>
+  </div>
 </template>
 
 <script>
@@ -10,6 +12,4 @@ export default {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

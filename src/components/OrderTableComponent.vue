@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="divOrderTable">
     <p>ORDER TABLE COMPONENT</p>
   </div>
 </template>

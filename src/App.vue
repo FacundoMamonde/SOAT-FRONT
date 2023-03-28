@@ -15,20 +15,48 @@
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  color: #252628;
+  max-width: 1200px;
+  margin: auto;
 }
 
 nav {
   padding: 30px;
+  text-align: center;
 }
 
 nav a {
   font-weight: bold;
-  color: #2c3e50;
+  color: #101011;
 }
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+#divOrderContainer {
+  min-width: 360px;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#divOrderDetail, #divOrderTable {
+  min-width: 360px;
+  background-color: rgb(181, 181, 181);
+  flex: 1
+}
+
+p {
+  font-size: 14px;
+}
+
+.row  {
+ --bs-gutter-x: 0 !important;
+ --bs-gutter-y: 0;
+  margin-top: 0px !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
 }
 </style>
