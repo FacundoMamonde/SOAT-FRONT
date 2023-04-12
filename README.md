@@ -1,24 +1,23 @@
-# soat
+# SOAT
 
-## Project setup
+## How to setup server
 ```
 npm install
 ```
-
 ### Compiles and hot-reloads for development
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+## Documentation
 ```
-npm run build
+Proyect Idea: https://docs.google.com/document/d/1_0PNNgC9sU0gOAjPUPrAbTyxQ-xV7EhD5OiWgROxuqI/edit?usp=drivesdk
+
+Figma Design:
+https://drive.google.com/file/d/16QjUwxy2vUQQWbn89HJHuIcHJGXzFzxY/view?usp=drivesdk
+
+Sprints:
+https://docs.google.com/spreadsheets/d/1r3_PQAWB0XchnooKItrCZpi1JJ5eDamv5cqoYyPtH4U/edit?usp=drivesdk
 ```
 
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Proyect Branch Based
