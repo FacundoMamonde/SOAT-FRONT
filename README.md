@@ -11,13 +11,10 @@ npm run serve
 
 ## Documentation
 ```
-Proyect Idea: https://docs.google.com/document/d/1_0PNNgC9sU0gOAjPUPrAbTyxQ-xV7EhD5OiWgROxuqI/edit?usp=drivesdk
+Proyect Idea: (https://docs.google.com/document/d/1_0PNNgC9sU0gOAjPUPrAbTyxQ-xV7EhD5OiWgROxuqI)
 
-Figma Design:
-https://drive.google.com/file/d/16QjUwxy2vUQQWbn89HJHuIcHJGXzFzxY/view?usp=drivesdk
-
-Sprints:
-https://docs.google.com/spreadsheets/d/1r3_PQAWB0XchnooKItrCZpi1JJ5eDamv5cqoYyPtH4U/edit?usp=drivesdk
+Figma Design: (https://drive.google.com/file/d/16QjUwxy2vUQQWbn89HJHuIcHJGXzFzxY)
+Sprints: (https://docs.google.com/spreadsheets/d/1r3_PQAWB0XchnooKItrCZpi1JJ5eDamv5cqoYyPtH4U)
 ```
 
 ## Proyect Branch Based
