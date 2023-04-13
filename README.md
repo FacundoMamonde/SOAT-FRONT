@@ -4,6 +4,10 @@
 ```
 npm install
 ```
+### Switch to folder
+```
+cd FIP2023-C3-Trabajo-Final
+```
 ### Compiles and hot-reloads for development
 ```
 npm run serve
