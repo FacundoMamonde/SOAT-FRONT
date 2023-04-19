@@ -5,6 +5,10 @@
 </template>
 
 <style>
+body{
+  background-color: rgb(32, 32, 32) !important;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -12,6 +16,8 @@
   color: #252628;
   max-width: 1200px;
   margin: auto;
+  height: 100vh;
+  background-color: #252628;
 }
 
 nav {
