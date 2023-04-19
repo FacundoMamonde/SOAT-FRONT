@@ -18,7 +18,7 @@ npm run serve
 
 Project Document: https://docs.google.com/document/d/1Ars7pwqwwOeezB44tyF_3QGbL6VE2nCtQ67Rl3vLhTw/edit#heading=h.6qf4lau11cdb
 
-Figma Design: https://drive.google.com/file/d/1CeWlgYy_1VVxL5zRB69w_cKIjWRIadBP/view?usp=share_link
+Figma Design: https://drive.google.com/file/d/1o8ZdPK1R7F3H7-T7xlfZJHLMQIa5--_f/view?usp=sharing
 
 Sprints: https://docs.google.com/spreadsheets/d/1r3_PQAWB0XchnooKItrCZpi1JJ5eDamv5cqoYyPtH4U
 
