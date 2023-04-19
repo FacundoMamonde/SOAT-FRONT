@@ -6,7 +6,7 @@
       </b-navbar-nav>
    <div class="d-flex align-self-md-center " >
   <b-input-group  >
-    <b-form-input size="sm"></b-form-input>
+    <b-form-input size="sm" ></b-form-input>
       <template #append>
       <b-dropdown text="Buscar por" variant="primary">
         <b-dropdown-item>Cliente</b-dropdown-item>
@@ -14,7 +14,7 @@
       </b-dropdown>
     </template>
      </b-input-group>
-  <b-button  variant="success rounded-pill" class="ms-2 fw-bold">+</b-button>
+ <NewOrderComponent></NewOrderComponent>
 </div>
 <div class=" mt-1 pr-0 ">
   <p class="h5 pr-1 text-light mb-0">Tecnico<b-avatar variant=danger></b-avatar></p>
@@ -25,8 +25,11 @@
 </template>
 
 <script>
+import NewOrderComponent from "@/components/NewOrderComponent.vue";
 export default {
   name: 'HeaderComponent',
+  components: {
+    NewOrderComponent},
   props: {
   }
 }
