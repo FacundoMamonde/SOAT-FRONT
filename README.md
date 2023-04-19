@@ -1,6 +1,11 @@
 # SOAT
 
 ## How to setup server
+
+### In console type:
+```
+git clone https://github.com/FacundoMamonde/FIP2023-C3-Trabajo-Final
+```
 ### Switch to folder
 ```
 cd FIP2023-C3-Trabajo-Final
