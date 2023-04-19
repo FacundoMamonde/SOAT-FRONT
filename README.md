@@ -1,11 +1,11 @@
 # SOAT
 
 ## How to setup server
+### Switch to folder
 ```
 cd FIP2023-C3-Trabajo-Final
-
 ```
-### Switch to folder
+### Installing libreries
 ```
 npm install
 ```
