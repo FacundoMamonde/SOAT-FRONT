@@ -2,11 +2,12 @@
 
 ## How to setup server
 ```
-npm install
+cd FIP2023-C3-Trabajo-Final
+
 ```
 ### Switch to folder
 ```
-cd FIP2023-C3-Trabajo-Final
+npm install
 ```
 ### Compiles and hot-reloads for development
 ```
