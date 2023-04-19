@@ -4,7 +4,7 @@
      <NavComponent></NavComponent>
      <div id="divOrderContainer">
         <OrderTableComponent></OrderTableComponent>
-      <OrderDetailComponent class="px-3"></OrderDetailComponent>
+      <OrderDetailComponent ></OrderDetailComponent>
     </div>
   </div>
 </template>

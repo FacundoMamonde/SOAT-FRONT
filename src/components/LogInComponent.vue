@@ -10,7 +10,8 @@
   
       <div class="col-sm-12 col-md-6 bg-dark text-light d-flex justify-content-center align-items-center">
         <div class="text-center w-100 p-4">
-          <h1 class="mb-3">Bienvenido</h1>
+          <h1 class="d-md-none mb-3 display-1">SOAT</h1>
+          <h2 class="mb-3">Bienvenido</h2>
           <p class="my-3">Por favor ingrese sus datos para iniciar sesión</p>
           <b-form @submit.prevent="onSubmit" class=" w-50 m-auto  ">
             <b-form-input

@@ -39,7 +39,8 @@ nav a.router-link-exact-active {
 #divOrderDetail, #divOrderTable {
   min-width: 360px;
   background-color: rgb(181, 181, 181);
-  flex: 1
+  flex: 1;
+  border-top:none;
 }
 
 p {
