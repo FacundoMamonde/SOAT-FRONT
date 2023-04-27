@@ -1,6 +1,6 @@
 <template>
   <div id="divOrderTable">
-    <b-table responsive :items="items" :striped="striped" :fields="fields" bordered scrollX >
+    <b-table responsive  :items="items" striped :fields="fields"  class="tabla" >
       <template #table-busy>
         <div class="text-center text-danger my-2">
           <b-spinner class="align-middle"></b-spinner>
@@ -52,8 +52,10 @@ export default {
 }
 
 .tabla {
-  max-height:300px;
+  max-height:600px;
+
   overflow-x: scroll !important;
   overflow-y: scroll !important;
+ white-space:nowrap;
 }
 </style>
