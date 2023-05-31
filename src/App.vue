@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <style>
-body{
+body {
   background-color: rgb(32, 32, 32) !important;
 }
 
@@ -40,22 +40,26 @@ nav a.router-link-exact-active {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  background-color: #ededed;
 }
 
-#divOrderDetail, #divOrderTable {
+#divOrderDetail,
+#divOrderTable {
   min-width: 360px;
-  background-color: rgb(181, 181, 181);
+  background-color: #ededed;
   flex: 1;
-  border-top:none;
+  border: none;
+  color: #6a6a6b;
 }
-
+#divOrderTable {
+  background-color: #f3f3f3;
+ }
 p {
   font-size: 14px;
 }
-
-.row  {
- --bs-gutter-x: 0 !important;
- --bs-gutter-y: 0;
+.row {
+  --bs-gutter-x: 0 !important;
+  --bs-gutter-y: 0;
   margin-top: 0px !important;
   margin-right: 0 !important;
   margin-left: 0 !important;
