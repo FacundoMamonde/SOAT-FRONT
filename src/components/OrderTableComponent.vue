@@ -1,36 +1,47 @@
 <template>
-  <div id="divOrderTable">
-    <b-table
-      id="table"
-      responsive
-      :items="itemsFiltrados"
-      striped
-      :fields="fields"
-      class="tabla"
-      :per-page="perPage"
-      :current-page="currentPage"
-      ref="selectableTable"
-      selectable
-      @row-selected="onRowSelected"
-      :select-mode="selectMode"
-      :selected.sync="selectedRow"
-    >
-      <template #table-busy>
-        <div class="text-center text-danger my-2">
-          <b-spinner class="align-middle"></b-spinner>
-          <strong>Loading...</strong>
-        </div>
-      </template>
-    </b-table>
-    <div class="overflow-auto">
-      <b-pagination
-        size="sm"
-        align="center"
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="table"
-      ></b-pagination>
+  <div id="divOrderTable" class="px-md-3">
+    <div class="d-flex flex-column h-100">
+      <div class="flex-grow-1">
+        <b-table
+          id="table"
+          responsive
+          :items="itemsFiltrados"
+          striped
+          :fields="fields"
+          class="text-muted tabla"
+          :per-page="perPage"
+          :current-page="currentPage"
+          ref="selectableTable"
+          selectable
+          @row-selected="onRowSelected"
+          :select-mode="selectMode"
+          :selected.sync="selectedRow"
+          :borderless="true"
+        >
+          <template #head()="data">
+            <span class="text">{{ data.label }}</span>
+          </template>
+          <template #cell()="data">
+            <span class="text-secondary">{{ data.value }}</span>
+          </template>
+          <template #table-busy>
+            <div class="text-center text-danger my-2">
+              <b-spinner class="align-middle"></b-spinner>
+              <strong>Loading...</strong>
+            </div>
+          </template>
+        </b-table>
+      </div>
+      <div class="mt-3">
+        <b-pagination
+          size="sm"
+          align="center"
+          v-model="currentPage"
+          :total-rows="rows"
+          :per-page="perPage"
+          aria-controls="table"
+        ></b-pagination>
+      </div>
     </div>
   </div>
 </template>
@@ -58,6 +69,12 @@ export default {
       selectMode: "range",
       selectedRow: null,
     };
+  },
+  props: {
+    estado: {
+      type: Number,
+      default: null,
+    },
   },
   watch: {
     filtro() {
@@ -143,14 +160,16 @@ export default {
     },
     itemsFiltrados() {
       if (!this.filtro) {
-        return this.mergedItems;
+        return this.mergedItems.filter((item) => item.estado === this.estado);
       }
       const filtroMinusculas = this.filtro.toLowerCase();
-      return this.mergedItems.filter((item) =>
-        this.filtroPor === "cliente"
-          ? item.clienteNombre.toLowerCase().includes(filtroMinusculas)
-          : item.equipoMarca.toLowerCase().includes(filtroMinusculas)
-      );
+      return this.mergedItems.filter((item) => {
+        const cumpleFiltro =
+          this.filtroPor === "cliente"
+            ? item.clienteNombre.toLowerCase().includes(filtroMinusculas)
+            : item.equipoMarca.toLowerCase().includes(filtroMinusculas);
+        return cumpleFiltro && item.estado === this.estado;
+      });
     },
   },
 };
@@ -187,7 +206,8 @@ export default {
   scrollbar-width: thin;
   scrollbar-color: #6c757d transparent;
 }
-.tabla .selected-row {
-  background-color: #cce5ff;
+
+.text {
+  color: #6a6a6b;
 }
 </style>

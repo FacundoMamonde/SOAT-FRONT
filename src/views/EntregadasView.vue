@@ -3,7 +3,7 @@
     <HeaderComponent></HeaderComponent>
     <NavComponent></NavComponent>
     <div id="divOrderContainer">
-      <OrderTableComponent></OrderTableComponent>
+      <OrderTableComponent :estado="2"></OrderTableComponent>
       <OrderDetailComponent></OrderDetailComponent>
     </div>
   </div>
