@@ -104,7 +104,7 @@
                   </b-form-group>
 
                   <b-form-checkbox class="mb-3">Remember me</b-form-checkbox>
-                  <b-button variant="primary" size="sm" @click="onClick"
+                  <b-button variant="primary" size="sm" 
                     >Sign In</b-button
                   >
                 </b-dropdown-form>

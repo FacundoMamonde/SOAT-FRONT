@@ -48,6 +48,7 @@
 
 <script>
 import { bus } from "../main";
+
 export default {
   name: "OrderTableComponent",
   data() {
@@ -64,10 +65,11 @@ export default {
       ],
       filtro: "",
       items: [],
-      dataClient: [],
-      mergedItems: [],
       selectMode: "range",
       selectedRow: null,
+      ordenes: [],
+      clientes: [],
+      equipos: [],
     };
   },
   props: {
@@ -84,16 +86,53 @@ export default {
       this.selectFirstRow();
     },
   },
+  created() {
+    Promise.all([
+      fetch("http://localhost:3000/cliente/"),
+      fetch("http://localhost:3000/equipo/"),
+      fetch("http://localhost:3000/orden/"),
+    ])
+      .then(([response1, response2, response3]) =>
+        Promise.all([response1.json(), response2.json(), response3.json()])
+      )
+      .then(([clientes, equipos, ordenes]) => {
+        this.clientes = clientes;
+        this.equipos = equipos;
+        this.ordenes = ordenes;
+        this.fillTableData();
+        this.selectFirstRow();
+      })
+      .catch((error) => {
+        console.error("Error al obtener los datos:", error);
+      });
+  },
   methods: {
-    onRowSelected(items) {
-      if (items && items.length > 0) {
-        const item = items[0];
-        this.selectedRow = item;
-        const equipo = this.items.find((item2) => item2.id === item.id);
-        const cliente = this.dataClient.find(
-          (item2) => item2.id === String(item.clientID)
+    fillTableData() {
+      this.items = this.ordenes.map((orden) => {
+        const orderData = this.ordenes.find((order) => order.id === orden.id);
+        const cliente = this.clientes.find(
+          (c) => c.id === String(orderData.clienteID)
         );
-        bus.$emit("row-selected", cliente, equipo);
+        const equipo = this.equipos.find((e) => e.id === orderData.equipoID);
+        return {
+          id: orden.id,
+          clienteNombre: cliente ? cliente.name : "nombre",
+          equipoMarca: equipo ? equipo.marca : "marca de equipo",
+          equipoModelo: equipo ? equipo.modelo : "modelo de equipo",
+          falla: orden.falla,
+          estado: orden.estado,
+          equipoID:equipo.id,
+          clienteID:cliente.id
+        };
+      });
+    },
+    onRowSelected(items) {
+      if (items.length > 0) {
+         const orderID = items[0].id;
+         const equipoID = items[0].equipoID;
+         const clienteID = items[0].clienteID;
+         bus.$emit("row-selected", orderID, equipoID, clienteID);
+        
       }
     },
     selectFirstRow() {
@@ -101,53 +140,11 @@ export default {
         this.$refs.selectableTable.selectRow(0);
       });
     },
-    async loadData() {
-      this.toggleBusy();
-      await Promise.all([this.loadAPI(), this.loadAPIClient()]);
-      this.toggleBusy();
-    },
-    async loadAPI() {
-      this.toggleBusy();
-      const response = await fetch(
-        "https://635088ad3e9fa1244e483b3c.mockapi.io/OrderList"
-      );
-      const jsonData = await response.json();
-      this.items = jsonData;
-      this.toggleBusy();
-      this.mergeItems();
-    },
-    async loadAPIClient() {
-      fetch("https://635088ad3e9fa1244e483b3c.mockapi.io/clients/")
-        .then((response) => response.json())
-        .then((data) => {
-          this.dataClient = data;
-          this.mergeItems();
-        });
-    },
     toggleBusy() {
       this.isBusy = !this.isBusy;
     },
-    mergeItems() {
-      if (this.items.length > 0 && this.dataClient.length > 0) {
-        this.mergedItems = this.items.map((item1) => {
-          const matchingItem = this.dataClient.find(
-            (item2) => item2.id === String(item1.clientID)
-          );
-          if (matchingItem) {
-            item1.clienteNombre = matchingItem.name;
-          } else {
-            item1.clienteNombre = "Sin datos";
-          }
-
-          return item1;
-        });
-      }
-    },
   },
   async beforeMount() {
-    this.loadAPI();
-    this.loadAPIClient();
-    await this.loadData();
     this.selectFirstRow();
     bus.$on("filtro-cambiado", (filtro) => {
       this.filtro = filtro.filtro;
@@ -160,15 +157,14 @@ export default {
     },
     itemsFiltrados() {
       if (!this.filtro) {
-        return this.mergedItems.filter((item) => item.estado === this.estado);
+        return this.items.filter((item) => item.estado === this.estado);
       }
-      const filtroMinusculas = this.filtro.toLowerCase();
-      return this.mergedItems.filter((item) => {
-        const cumpleFiltro =
+      return this.items.filter((item) => {
+        const inputFiltro =
           this.filtroPor === "cliente"
-            ? item.clienteNombre.toLowerCase().includes(filtroMinusculas)
-            : item.equipoMarca.toLowerCase().includes(filtroMinusculas);
-        return cumpleFiltro && item.estado === this.estado;
+            ? item.clienteNombre.toLowerCase().includes(this.filtro.toLowerCase())
+            : item.equipoMarca.toLowerCase().includes(this.filtro.toLowerCase());
+        return inputFiltro && item.estado === this.estado;
       });
     },
   },
@@ -187,6 +183,28 @@ export default {
 .tabla::-webkit-scrollbar {
   width: 8px;
   height: 8px;
+}
+
+.tabla::-webkit-scrollbar-thumb {
+  background-color: #6c757d;
+  border-radius: 5px;
+}
+
+.tabla::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.tabla {
+  max-height: 600px;
+  overflow-x: scroll !important;
+
+  white-space: nowrap;
+  scrollbar-width: thin;
+  scrollbar-color: #6c757d transparent;
+}
+
+.text {
+  color: #6a6a6b;
 }
 
 .tabla::-webkit-scrollbar-thumb {
