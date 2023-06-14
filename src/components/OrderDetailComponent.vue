@@ -4,8 +4,8 @@
       <div class="row pt-2">
         <!-- DIV NUMERO Y FECHA DE ORDEN -->
         <div class="col-6 p-0">
-          <p class="h2 ml-1 mb-0 pt-1">Orden # {{ equipo.id }}</p>
-          <p class="badge bg-secondary"><i class="bi bi-calendar3"></i> {{ equipo.fechaIngreso }}</p>
+          <p class="h2 ml-1 mb-0 pt-1">Orden # {{ orderData.id }}</p>
+          <p class="badge bg-secondary"><i class="bi bi-calendar3"></i> {{ orderData.fechaIngreso }}</p>
         </div>
         <div class="col-6">
           <!-- DIV DATOS CLIENTE -->
@@ -32,10 +32,10 @@
               <i class="bi bi-laptop col-md-8" style="font-size: 40px;"></i> <!-- Icono de Equipo-->
             </div>
             <div class="col-md-8">
-              <p v-if="equipo.equipoTipo" class="m-0 pt-2"> {{ equipo.equipoTipo }} - {{equipo.equipoMarca }}</p>
+              <p v-if="equipo.marca" class="m-0 pt-2">  {{equipo.marca }}</p>
               <p v-else class="m-0 pt-2">Tipo de Equipo - Marca</p>
 
-              <p v-if="equipo.equipoModelo" class="m-0">{{equipo.equipoModelo }}</p>
+              <p v-if="equipo.marca" class="m-0">{{equipo.modelo }}</p>
               <p v-else class="m-0">Modelo</p>
             </div>
           </div>
@@ -47,9 +47,9 @@
               <i class="bi bi-clipboard2-check col-md-8" style="font-size: 40px;"></i> <!-- Icono de Accesorios-->
             </div>
             <div class="col-md-8">
-              <p v-if="equipo.accesorio" class="m-0 pt-2 "> {{ equipo.accesorio }}</p>
+              <p v-if="orderData.accesorio" class="m-0 pt-2 "> {{ orderData.accesorio }}</p>
               <p v-else class="m-0 pt-2 ">Sin Accesorios</p>
-              <p v-if="equipo.pass" class="m-0"> Pass: {{ equipo.equipoPass }}</p>
+              <p v-if="orderData.pass" class="m-0"> Pass: {{ orderData.equipoPass }}</p>
               <p v-else class="m-0">Sin contraseña</p>
 </div>
 </div>
@@ -57,19 +57,19 @@
 </div>
 <div>
 <h5 class="mt-3">Descripción de la falla</h5>
-<textarea v-model="equipo.falla" class="col-11 p-0 m-0"
+<textarea v-model="orderData.falla" class="col-11 p-0 m-0"
   style="height: 100px; min-height:80px; max-height: 120px; width: 95%" name="" id="" cols="30"
   rows="10"> </textarea>
 </div>
 <div>
 <h5 class="mt-3">Informe</h5>
-<textarea v-model="equipo.informe" class="col-11 p-0 m-0"
+<textarea v-model="orderData.informe" class="col-11 p-0 m-0"
   style="height: 100px; min-height:80px; max-height: 120px; width: 95%" name="" id="" cols="30"
   rows="10"></textarea>
 <div class="d-flex flex-row" style="width: 97%">
   <div class="p-2 w-100">
     <span class="align-middle">$ </span>
-    <input v-model="equipo.importe" type="text" style="width:100px">
+    <input v-model="orderData.importe" type="text" style="width:100px">
   </div>
   <div class="p-2 flex-shrink-1">
     <button  class="btn btn-primary btn-sm m-0"  style="width:100px"> <i
@@ -87,22 +87,58 @@
 
 <script>
 import { bus } from "../main";
+
 export default {
-name: 'OrderDetailComponent',
-data() {
-return {
-  cliente: null,
-  equipo: null
+  name: 'OrderDetailComponent',
+  data() {
+    return {
+      orderData: null,
+      equipo: null,
+      cliente: null,
+    };
+  },
+  beforeMount() {
+    bus.$on("row-selected", (orderID, equipoID, clienteID) => {
+      this.getOrderById(orderID);
+      this.getEquipoById(equipoID);
+      this.getClienteById(clienteID);
+    });
+  },
+  methods: {
+    getOrderById(orderId) {
+      fetch(`http://localhost:3000/orden/${orderId}`)
+        .then(response => response.json())
+        .then(order => {
+          this.orderData = order;
+        })
+        .catch(error => {
+          console.error('Error al obtener la orden:', error);
+        });
+    },
+    getEquipoById(equipoId) {
+      fetch(`http://localhost:3000/equipo/${equipoId}`)
+        .then(response => response.json())
+        .then(equipo => {
+          this.equipo= equipo;
+        })
+        .catch(error => {
+          console.error('Error al obtener el equipo:', error);
+        });
+    },
+    getClienteById(clienteId) {
+      fetch(`http://localhost:3000/cliente/${clienteId}`)
+        .then(response => response.json())
+        .then(cliente => {
+          this.cliente = cliente;
+        })
+        .catch(error => {
+          console.error('Error al obtener el cliente:', error);
+        });
+    },
+  },
 };
-},
-beforeMount() {
-bus.$on('row-selected', (cliente, equipo) => {
-  this.cliente = cliente;
-  this.equipo = equipo;
-});
-},
-}
 </script>
+
 
 <style scoped></style>
 
