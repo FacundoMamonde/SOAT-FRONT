@@ -109,11 +109,9 @@ export default {
   methods: {
     fillTableData() {
       this.items = this.ordenes.map((orden) => {
-        const orderData = this.ordenes.find((order) => order.id === orden.id);
-        const cliente = this.clientes.find(
-          (c) => c.id === String(orderData.clienteID)
-        );
-        const equipo = this.equipos.find((e) => e.id === orderData.equipoID);
+        let orderData = this.ordenes.find((order) => order.id === orden.id);
+        let cliente = this.clientes.find( (c) => c.id === orderData.clienteID);
+        let equipo = this.equipos.find((e) => e.id === orderData.equipoID);
         return {
           id: orden.id,
           clienteNombre: cliente ? cliente.name : "nombre",

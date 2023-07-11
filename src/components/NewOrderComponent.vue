@@ -95,6 +95,7 @@
                     v-for="modelo in modelosEquipos"
                     :key="modelo"
                     :value="modelo"
+                    v-on:click="getIdEquipo()"
                   >
                     {{ modelo }}
                   </option>
@@ -237,6 +238,18 @@ export default {
           console.error("Error al obtener las marcas de equipo", error);
         });
     },
+    getIdEquipo() {
+      fetch(`http://localhost:3000/equipo/findid/${this.selectedModelo}/${this.selectedMarca}/${this.selectedTipoEquipo}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.newEquipoID = parseInt(data);
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error("Error al obtener la id del equipo", error);
+        });
+    },
+
     addNewOrder(orden) {
       fetch("http://localhost:3000/orden", {
         method: "POST",
