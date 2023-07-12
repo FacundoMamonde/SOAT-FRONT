@@ -85,6 +85,7 @@
               <!-- Seleccion de Modelo -->
               <form action="#" style="width: 260px">
                 <select
+                  @change="getIdEquipo"
                   v-model="selectedModelo"
                   name="equiposType"
                   id="eModel"
@@ -95,7 +96,7 @@
                     v-for="modelo in modelosEquipos"
                     :key="modelo"
                     :value="modelo"
-                    v-on:click="getIdEquipo()"
+                    @change="getIdEquipo()"
                   >
                     {{ modelo }}
                   </option>
@@ -118,6 +119,7 @@
             <NewEquipoComponent
               ref="newOrderComponent"
               @enviarID="getnewEquipoID"
+              @change="getIdEquipo"
             ></NewEquipoComponent>
           </div>
         </div>
@@ -162,6 +164,7 @@
 </template>
 
 <script>
+import { bus } from "../main";
 import NewClientComponent from "./NewClientComponent.vue";
 import NewEquipoComponent from "./NewEquipoComponent.vue";
 export default {
@@ -208,8 +211,17 @@ export default {
       this.selectedMarca = marcaEquipo;
       this.$refs.newOrderComponent.abrirModal(tipoEquipo, marcaEquipo);
     },
-    getnewEquipoID(newEquipoID) {
+    getnewEquipoID(
+      newEquipoID,
+      newTipoEquipo,
+      newMarcaEquipo,
+      newModeloEquipo
+    ) {
       this.newEquipoID = Number(newEquipoID);
+      console.log(newTipoEquipo);
+      this.selectedTipoEquipo = newTipoEquipo;
+      this.selectedMarca = newMarcaEquipo;
+      this.selectedModelo = newModeloEquipo;
       console.log("el id es " + Number(this.newEquipoID));
     },
     manejarVariableEnviada(variable) {
@@ -239,10 +251,12 @@ export default {
         });
     },
     getIdEquipo() {
-      fetch(`http://localhost:3000/equipo/findid/${this.selectedModelo}/${this.selectedMarca}/${this.selectedTipoEquipo}`)
+      fetch(
+        `http://localhost:3000/equipo/findid/${this.selectedModelo}/${this.selectedMarca}/${this.selectedTipoEquipo}`
+      )
         .then((response) => response.json())
         .then((data) => {
-          this.newEquipoID = parseInt(data);
+          this.newEquipoID = parseInt(data[0]);
           console.log(data);
         })
         .catch((error) => {
@@ -265,12 +279,15 @@ export default {
             throw new Error("Error al agregar la orden");
           }
         })
-
+        .then((data) => {
+          console.log(data);
+          bus.$emit("orden-agregada");
+        })
         .catch((error) => {
           console.error("Error al agregar el cliente:", error);
         });
     },
-    submitForm() {
+    async submitForm() {
       const newOrder = {
         accesorio: this.accesorios,
         falla: this.falla,

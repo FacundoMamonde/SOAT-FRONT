@@ -86,31 +86,44 @@ export default {
       this.selectFirstRow();
     },
   },
+
   created() {
-    Promise.all([
-      fetch("http://localhost:3000/cliente/"),
-      fetch("http://localhost:3000/equipo/"),
-      fetch("http://localhost:3000/orden/"),
-    ])
-      .then(([response1, response2, response3]) =>
-        Promise.all([response1.json(), response2.json(), response3.json()])
-      )
-      .then(([clientes, equipos, ordenes]) => {
-        this.clientes = clientes;
-        this.equipos = equipos;
-        this.ordenes = ordenes;
-        this.fillTableData();
-        this.selectFirstRow();
-      })
-      .catch((error) => {
-        console.error("Error al obtener los datos:", error);
-      });
+    bus.$on("cambiar-estado", () => {
+      this.fetchData();
+      this.fillTableData();
+    });
+    bus.$on("orden-agregada", () => {
+      this.fetchData();
+      this.fillTableData();
+    });
+
+    this.fetchData();
   },
   methods: {
+    fetchData() {
+      Promise.all([
+        fetch("http://localhost:3000/cliente/"),
+        fetch("http://localhost:3000/equipo/"),
+        fetch("http://localhost:3000/orden/"),
+      ])
+        .then(([response1, response2, response3]) =>
+          Promise.all([response1.json(), response2.json(), response3.json()])
+        )
+        .then(([clientes, equipos, ordenes]) => {
+          this.clientes = clientes;
+          this.equipos = equipos;
+          this.ordenes = ordenes;
+          this.fillTableData();
+          this.selectFirstRow();
+        })
+        .catch((error) => {
+          console.error("Error al obtener los datos:", error);
+        });
+    },
     fillTableData() {
       this.items = this.ordenes.map((orden) => {
         let orderData = this.ordenes.find((order) => order.id === orden.id);
-        let cliente = this.clientes.find( (c) => c.id === orderData.clienteID);
+        let cliente = this.clientes.find((c) => c.id === orderData.clienteID);
         let equipo = this.equipos.find((e) => e.id === orderData.equipoID);
         return {
           id: orden.id,
@@ -119,18 +132,17 @@ export default {
           equipoModelo: equipo ? equipo.modelo : "modelo de equipo",
           falla: orden.falla,
           estado: orden.estado,
-          equipoID:equipo.id,
-          clienteID:cliente.id
+          equipoID: equipo.id,
+          clienteID: cliente.id,
         };
       });
     },
     onRowSelected(items) {
       if (items.length > 0) {
-         const orderID = items[0].id;
-         const equipoID = items[0].equipoID;
-         const clienteID = items[0].clienteID;
-         bus.$emit("row-selected", orderID, equipoID, clienteID);
-        
+        const orderID = items[0].id;
+        const equipoID = items[0].equipoID;
+        const clienteID = items[0].clienteID;
+        bus.$emit("row-selected", orderID, equipoID, clienteID);
       }
     },
     selectFirstRow() {
@@ -160,8 +172,12 @@ export default {
       return this.items.filter((item) => {
         const inputFiltro =
           this.filtroPor === "cliente"
-            ? item.clienteNombre.toLowerCase().includes(this.filtro.toLowerCase())
-            : item.equipoMarca.toLowerCase().includes(this.filtro.toLowerCase());
+            ? item.clienteNombre
+                .toLowerCase()
+                .includes(this.filtro.toLowerCase())
+            : item.equipoMarca
+                .toLowerCase()
+                .includes(this.filtro.toLowerCase());
         return inputFiltro && item.estado === this.estado;
       });
     },
