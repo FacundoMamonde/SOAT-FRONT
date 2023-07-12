@@ -104,7 +104,7 @@ export default {
         .then((response) => {
           this.equipoID = response.newID;
           console.log("el id es " + this.equipoID);
-          this.$emit("enviarID", this.equipoID);
+          this.$emit("enviarID", this.equipoID,this.tipoEquipoSeleccionado,this.marcaSeleccionada,this.modeloSeleccionado);
         })
         .catch((error) => {
           console.error("Error al agregar el cliente:", error);
