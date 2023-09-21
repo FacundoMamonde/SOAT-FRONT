@@ -8,7 +8,7 @@ git clone https://github.com/FacundoMamonde/SOAT-FRONT
 ```
 ### Switch to folder
 ```
-cd FIP2023-C3-Trabajo-Final
+cd SOAT-FRONT
 ```
 ### Installing libreries
 ```
