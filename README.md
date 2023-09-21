@@ -4,7 +4,7 @@
 
 ### In console type:
 ```
-git clone https://github.com/FacundoMamonde/FIP2023-C3-Trabajo-Final
+git clone https://github.com/FacundoMamonde/SOAT-FRONT
 ```
 ### Switch to folder
 ```
