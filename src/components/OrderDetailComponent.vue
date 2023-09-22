@@ -4,11 +4,7 @@
     class="card"
     style="min-width: 360px; max-width: 1000px; border-radius: 0% !important"
   >
-    <div
-      id="orderDetailContainer"
-      style="padding-left: 15px"
-      v-if="cliente && equipo"
-    >
+    <div id="orderDetailContainer" style="padding-left: 15px" v-if="orderData">
       <div class="row pt-2">
         <!-- DIV NUMERO Y FECHA DE ORDEN -->
         <div class="col-6 p-0">
@@ -28,10 +24,14 @@
               <!-- Icono de Cliente-->
             </div>
             <div class="col-md-8">
-              <p v-if="cliente.name" class="m-0 pt-2">{{ cliente.name }}</p>
+              <p v-if="orderData.cliente.nombre" class="m-0 pt-2">
+                {{ orderData.cliente.nombre }}
+              </p>
               <p v-else class="m-0 pt-2">Nombre de Cliente</p>
 
-              <p v-if="cliente.phone" class="mt-0">{{ cliente.phone }}</p>
+              <p v-if="orderData.cliente.telefono" class="mt-0">
+                {{ orderData.cliente.telefono }}
+              </p>
               <p v-else class="mt-0">Celular del cliente</p>
             </div>
           </div>
@@ -46,12 +46,12 @@
               <!-- Icono de Equipo-->
             </div>
             <div class="col-md-8">
-              <p v-if="equipo.marca" class="m-0 pt-2">{{ equipo.marca }}</p>
+              <p v-if="orderData.equipo.modelo.marca" class="m-0 pt-2">{{ orderData.equipo.modelo.marca.nombre }}</p>
               <p v-else class="m-0 pt-2">Tipo de Equipo - Marca</p>
 
-              <p v-if="equipo.marca" class="m-0">{{ equipo.modelo }}</p>
+              <p v-if="orderData.equipo.modelo" class="m-0">{{ orderData.equipo.modelo.nombre }}</p>
               <p v-else class="m-0">Modelo</p>
-              <p v-if="equipo.nSerie" class="m-0">{{ equipo.nSerie }}</p>
+              <p v-if="orderData.cliente.nombre" class="m-0">sad</p>
               <p v-else class="m-0">n de serie</p>
             </div>
           </div>
@@ -134,17 +134,18 @@ export default {
   data() {
     return {
       orderData: null,
-      equipo: null,
-      cliente: null,
       typingTimer: null,
     };
   },
   beforeMount() {
-    bus.$on("row-selected", (orderID, equipoID, clienteID) => {
+    bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
-      this.getEquipoById(equipoID);
-      this.getClienteById(clienteID);
     });
+  },
+  watch: {
+    orderID(newOrderID) {
+      this.getOrderById(newOrderID);
+    },
   },
   methods: {
     changeInforme() {
@@ -198,28 +199,8 @@ export default {
           console.error("Error al obtener la orden:", error);
         });
     },
-    getEquipoById(equipoId) {
-      fetch(`http://localhost:3000/equipo/${equipoId}`)
-        .then((response) => response.json())
-        .then((equipo) => {
-          this.equipo = equipo;
-        })
-        .catch((error) => {
-          console.error("Error al obtener el equipo:", error);
-        });
-    },
-    getClienteById(clienteId) {
-      fetch(`http://localhost:3000/cliente/${clienteId}`)
-        .then((response) => response.json())
-        .then((cliente) => {
-          this.cliente = cliente;
-        })
-        .catch((error) => {
-          console.error("Error al obtener el cliente:", error);
-        });
-    },
     changeStatus(orderId) {
-      fetch(`http://localhost:3000/orden/${orderId}`, {
+      fetch(`http://localhost:3000/orden/${orderId}/estado`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -228,13 +209,12 @@ export default {
         .then((response) => {
           if (response.ok) {
             console.log("La orden se actualizó correctamente");
-            bus.$emit('cambiar-estado');
-           
+            bus.$emit("cambiar-estado");
           } else {
             console.error("Error al actualizar la orden:", response.status);
           }
         })
-        
+
         .catch((error) => {
           console.error("Error en la llamada a la API:", error);
         });
@@ -243,5 +223,6 @@ export default {
 };
 </script>
 <style scoped></style>
+
 
 
