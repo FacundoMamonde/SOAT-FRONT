@@ -5,7 +5,7 @@
         <b-table
           id="table"
           responsive
-          :items="itemsFiltrados"
+          :items="ordenes"
           striped
           :fields="fields"
           class="text-muted tabla"
@@ -58,9 +58,9 @@ export default {
       isBusy: false,
       fields: [
         { key: "id", label: "ID" },
-        { key: "clienteNombre", label: "Cliente" },
-        { key: "equipoMarca", label: "Equipo Marca" },
-        { key: "equipoModelo", label: "Equipo Modelo" },
+        { key: "nombre", label: "Cliente" },
+        { key: "marca", label: "Equipo Marca" },
+        { key: "", label: "Equipo Modelo" },
         { key: "falla", label: "Falla" },
       ],
       filtro: "",
@@ -100,49 +100,33 @@ export default {
     this.fetchData();
   },
   methods: {
-    fetchData() {
-      Promise.all([
-        fetch("http://localhost:3000/cliente/"),
-        fetch("http://localhost:3000/equipo/"),
-        fetch("http://localhost:3000/orden/"),
-      ])
-        .then(([response1, response2, response3]) =>
-          Promise.all([response1.json(), response2.json(), response3.json()])
-        )
-        .then(([clientes, equipos, ordenes]) => {
-          this.clientes = clientes;
-          this.equipos = equipos;
+    async fetchData() {
+      fetch(`http://localhost:3000/ordenes/${this.estado}`)
+        .then((response) => response.json())
+        .then((ordenes) => {
           this.ordenes = ordenes;
           this.fillTableData();
           this.selectFirstRow();
         })
         .catch((error) => {
-          console.error("Error al obtener los datos:", error);
+          console.error("Error al obtener las ordenes:", error);
         });
     },
     fillTableData() {
-      this.items = this.ordenes.map((orden) => {
-        let orderData = this.ordenes.find((order) => order.id === orden.id);
-        let cliente = this.clientes.find((c) => c.id === orderData.clienteID);
-        let equipo = this.equipos.find((e) => e.id === orderData.equipoID);
-        return {
-          id: orden.id,
-          clienteNombre: cliente ? cliente.name : "nombre",
-          equipoMarca: equipo ? equipo.marca : "marca de equipo",
-          equipoModelo: equipo ? equipo.modelo : "modelo de equipo",
-          falla: orden.falla,
-          estado: orden.estado,
-          equipoID: equipo.id,
-          clienteID: cliente.id,
-        };
-      });
+      this.items = this.ordenes.map((orden) => ({
+        id: orden.id,
+        falla: orden.falla,
+        nombre: orden.nombre,
+        modelo: orden.modelo,
+        marca: orden.marca,
+        estado: orden.estado,
+      }));
     },
-    onRowSelected(items) {
-      if (items.length > 0) {
-        const orderID = items[0].id;
-        const equipoID = items[0].equipoID;
-        const clienteID = items[0].clienteID;
-        bus.$emit("row-selected", orderID, equipoID, clienteID);
+
+    onRowSelected(ordenes) {
+      if (ordenes.length > 0) {
+        const orderID = ordenes[0].id;
+        bus.$emit("row-selected", orderID);
       }
     },
     selectFirstRow() {
@@ -161,9 +145,10 @@ export default {
       this.filtroPor = filtro.filtroPor;
     });
   },
+
   computed: {
     rows() {
-      return this.itemsFiltrados.length;
+      return this.ordenes.length;
     },
     itemsFiltrados() {
       if (!this.filtro) {
