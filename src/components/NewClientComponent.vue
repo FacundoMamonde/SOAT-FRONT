@@ -15,16 +15,18 @@
         <b-form-input
           list="my-list-id"
           v-model="selectedClientName"
+          placeholder="Selecciona un cliente"
         ></b-form-input>
 
         <datalist id="my-list-id">
-          <option>Manual Option</option>
+          
           <option
             v-for="cliente in clientes"
-            :key="cliente.id + cliente.name"
-            :value="cliente.name"
+            :key="cliente.id + cliente.nombre"
+            :value="cliente.nombre"
           ></option>
         </datalist>
+      
         <button @click="openForm" class="btn btn-success btn-sm ms-2">
           <i class="bi bi-plus-lg"></i>
         </button>
@@ -38,17 +40,24 @@
             label="Nombre y apellido"
             label-for="nameInput"
           >
-            <b-form-input id="nameInput" v-model="name" required></b-form-input>
+            <b-form-input id="nameInput" v-model="nombre" required></b-form-input>
           </b-form-group>
 
           <b-form-group id="phoneGroup" label="Teléfono" label-for="phoneInput">
             <b-form-input
               id="phoneInput"
-              v-model="phone"
+              v-model="telefono"
               required
             ></b-form-input>
           </b-form-group>
 
+          <b-form-group id="dniGroup" label="dni" label-for="dniInput">
+            <b-form-input
+              id="dniInput"
+              v-model="dni"
+              required
+            ></b-form-input>
+          </b-form-group>
           <b-form-group
             id="descriptionGroup"
             label="Descripción"
@@ -67,21 +76,23 @@
 </template>
 
 <script>
+import { backendData} from "../main";
 export default {
   name: "NewClientComponent",
   data() {
     return {
       clientes: [],
       showForm: false,
-      name: "",
-      phone: "",
-      description: "",
+      nombre: "",
+      telefono: "",
+      dni: "",
+      description:"",
       selectedClientName: "",
       selectedClientId: null,
     };
   },
   created() {
-    fetch("http://localhost:3000/cliente")
+    fetch(`${backendData}/cliente`)
       .then((response) => response.json())
       .then((clientes) => {
         this.clientes = clientes;
@@ -94,24 +105,25 @@ export default {
     submitForm() {
       if (this.selectedClientName !== "") {
         const selectedClient = this.clientes.find(
-          (cliente) => cliente.name == this.selectedClientName
+          (cliente) => cliente.nombre == this.selectedClientName
         );
         this.selectedClientId = selectedClient.id;
         this.$emit("variable-enviada", this.selectedClientId);
       } else {
-        if (this.name && this.phone && this.description) {
+        if (this.nombre && this.telefono && this.dni && this.description) {
           this.showForm = false;
-          const newClient = {
-            name: this.name,
-            phone: this.phone,
-            info: this.description,
+          const createClientDto = {
+            nombre: this.nombre,
+            telefono: this.telefono,
+            dni: this.dni,
+            descripcion:this.description
           };
-          this.addClient(newClient);
+          this.addClient(createClientDto);
         }
       }
     },
     addClient(client) {
-      fetch("http://localhost:3000/cliente", {
+      fetch(`${backendData}/cliente`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,7 +138,8 @@ export default {
           }
         })
         .then((response) => {
-          this.selectedClientId = response.newID;
+          console.log(response)
+          this.selectedClientId = response.id;
           this.$emit("variable-enviada", this.selectedClientId);
         })
         .catch((error) => {
@@ -134,15 +147,15 @@ export default {
         });
     },
     resetForm() {
-      this.name = "";
-      this.phone = "";
-      this.description = "";
+      this.nombre= "";
+      this.telefono = "";
+      this.dni = "";
       this.showForm = false;
       this.selectedClientName = "";
       this.selectedClientId = null;
     },
     openForm() {
-      this.name = "";
+      this.nombre = "";
       this.selectedClientName = "";
       this.selectedClientId = null;
       this.showForm = true;

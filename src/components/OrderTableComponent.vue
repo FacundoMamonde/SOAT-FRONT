@@ -37,7 +37,7 @@
           size="sm"
           align="center"
           v-model="currentPage"
-          :total-rows="rows"
+          :total-rows="totalRows"
           :per-page="perPage"
           aria-controls="table"
         ></b-pagination>
@@ -47,7 +47,8 @@
 </template>
 
 <script>
-import { bus } from "../main";
+import { backendData, bus } from "../main";
+
 
 export default {
   name: "OrderTableComponent",
@@ -60,7 +61,7 @@ export default {
         { key: "id", label: "ID" },
         { key: "nombre", label: "Cliente" },
         { key: "marca", label: "Equipo Marca" },
-        { key: "", label: "Equipo Modelo" },
+        { key: "modelo", label: "Equipo Modelo" },
         { key: "falla", label: "Falla" },
       ],
       filtro: "",
@@ -68,8 +69,7 @@ export default {
       selectMode: "range",
       selectedRow: null,
       ordenes: [],
-      clientes: [],
-      equipos: [],
+      totalRows: 0,
     };
   },
   props: {
@@ -80,11 +80,18 @@ export default {
   },
   watch: {
     filtro() {
-      this.selectFirstRow();
+      bus.$on("filtro-cambiado", (filtro) => {
+        this.filtro = filtro.filtro;
+        this.filtroPor = filtro.filtroPor;
+      });
+      this.itemsFiltrados();
+     
     },
     currentPage() {
+      this.fetchData();
       this.selectFirstRow();
     },
+  
   },
 
   created() {
@@ -94,48 +101,91 @@ export default {
     });
     bus.$on("orden-agregada", () => {
       this.fetchData();
-      this.fillTableData();
     });
 
     this.fetchData();
   },
+
   methods: {
+    updateTotalRows() {
+      this.totalRows = this.ordenes.length;
+    },
     async fetchData() {
-      fetch(`http://localhost:3000/ordenes/${this.estado}`)
+      fetch(`${backendData}/ordenes/getall/${this.estado}`)
         .then((response) => response.json())
         .then((ordenes) => {
           this.ordenes = ordenes;
           this.fillTableData();
-          this.selectFirstRow();
+        
         })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
         });
+
+      // const page = this.currentPage;
+      // const pageSize = this.perPage;
+
+      // const estado = this.estado;
+
+      // Realiza una solicitud al servidor para obtener datos paginados
+      /*    fetch(`http://localhost:3000/ordenes/getpaged/${estado}?page=${page}&pageSize=${pageSize}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.ordenes = data.orders;
+          this.totalRows = data.totalRows;
+          this.fillTableData()
+        })
+        .catch((error) => {
+          console.error("Error al obtener las ordenes paginadas:", error);
+        });*/
     },
     fillTableData() {
-      this.items = this.ordenes.map((orden) => ({
-        id: orden.id,
-        falla: orden.falla,
-        nombre: orden.nombre,
-        modelo: orden.modelo,
-        marca: orden.marca,
-        estado: orden.estado,
-      }));
+      if (this.ordenes) {
+        this.ordenes = this.ordenes.map((orden) => ({
+          id: orden.id,
+          falla: orden.falla,
+          nombre: orden.nombre,
+          modelo: orden.modelo,
+          marca: orden.marca,
+          estado: orden.estado,
+        }));
+  this.selectFirstRow();
+      }
     },
 
     onRowSelected(ordenes) {
-      if (ordenes.length > 0) {
+       if (ordenes.length > 0) {
         const orderID = ordenes[0].id;
         bus.$emit("row-selected", orderID);
+       }
+   },
+
+    selectFirstRow() {
+      if (this.$refs.selectableTable && this.ordenes.length > 0) {
+        this.$nextTick(() => {
+          this.$refs.selectableTable.selectRow(0);
+        });
       }
     },
-    selectFirstRow() {
-      this.$nextTick(() => {
-        this.$refs.selectableTable.selectRow(0);
-      });
-    },
+
     toggleBusy() {
       this.isBusy = !this.isBusy;
+    },
+
+    async itemsFiltrados() {
+      fetch(
+        `${backendData}/ordenes/filter/${this.estado}?filtro=${this.filtro}&filtroPor=${this.filtroPor}`
+      )
+        .then((response) => response.json())
+        .then((ordenes) => {
+          this.ordenes = ordenes;
+          this.totalRows = this.ordenes.length;
+          this.currentPage = 1;
+          this.fillTableData();
+        })
+        .catch((error) => {
+          console.error("Error al obtener las ordenes:", error);
+        });
     },
   },
   async beforeMount() {
@@ -148,23 +198,7 @@ export default {
 
   computed: {
     rows() {
-      return this.ordenes.length;
-    },
-    itemsFiltrados() {
-      if (!this.filtro) {
-        return this.items.filter((item) => item.estado === this.estado);
-      }
-      return this.items.filter((item) => {
-        const inputFiltro =
-          this.filtroPor === "cliente"
-            ? item.clienteNombre
-                .toLowerCase()
-                .includes(this.filtro.toLowerCase())
-            : item.equipoMarca
-                .toLowerCase()
-                .includes(this.filtro.toLowerCase());
-        return inputFiltro && item.estado === this.estado;
-      });
+      return this.ordenes;
     },
   },
 };

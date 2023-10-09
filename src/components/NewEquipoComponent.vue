@@ -3,34 +3,18 @@
     <b-modal
       id="equiposModal"
       v-model="modalShow"
-      title="Nuevo Equipo"
+      :title="`Nuevo ${this.equipoProp}`"
       @ok="submitForm"
     >
       <div class="modal-body d-flex flex-column">
-        <label for="tipoEquipo">Tipo de Equipo:</label>
+        <label for="newData">
+          {{ this.equipoProp }}
+        </label>
         <input
-          id="tipoEquipo"
+          id="equipoProp"
+          v-model="propName"
           type="text"
-          v-model="tipoEquipoSeleccionado"
-          :placeholder="selectTipoEquipo ? selectTipoEquipo : 'Tipo de Equipo'"
-          :readonly="equipoSeleccionado"
-        />
-
-        <label for="marcaEquipo">Marca del Equipo:</label>
-        <input
-          id="marcaEquipo"
-          type="text"
-          v-model="marcaSeleccionada"
-          :placeholder="selectMarca ? selectMarca : 'Marca del Equipo'"
-          :readonly="marcaSeleccion"
-        />
-
-        <label for="modeloEquipo">Modelo del Equipo:</label>
-        <input
-          id="modeloEquipo"
-          type="text"
-          v-model="modeloSeleccionado"
-          :placeholder="selectModelo ? selectModelo : 'Modelo del Equipo'"
+          :placeholder="this.equipoProp"
         />
       </div>
     </b-modal>
@@ -38,61 +22,45 @@
 </template>
 
 <script>
+import { backendData} from "../main";
 export default {
   name: "NewEquipoComponent",
   props: {
-    selectTipoEquipo: {
-      type: String,
-      default: "",
-    },
-    selectMarca: {
-      type: String,
-      default: "",
-    },
-    selectModelo: {
-      type: String,
-      default: "",
-    },
+    campo: { type: String, default: "" },
   },
   data() {
     return {
       modalShow: false,
-      tipoEquipoSeleccionado: "",
-      marcaSeleccionada: "",
-      modeloSeleccionado: "",
-      equipoSeleccionado: false,
-      marcaSeleccion: false,
-      equipoID: null,
+      propNombre: "",
+      equipoProp: "",
+      propName: "",
+      selectedMarca: "",
+      selectedTipoEquipo: "",
     };
   },
   mounted() {
-    this.tipoEquipoSeleccionado = this.selectTipoEquipo;
-    this.marcaSeleccionada = this.selectMarca;
-    this.modeloSeleccionado = this.selectModelo;
+    this.equipoProp = this.campo;
   },
   methods: {
-    abrirModal(tipoEquipo, marcaEquipo) {
+    abrirModal(campo) {
+      this.equipoProp = campo;
       this.modalShow = true;
-      this.tipoEquipoSeleccionado = tipoEquipo;
-      this.marcaSeleccionada = marcaEquipo;
-      this.modeloSeleccionado = "";
-      this.readStatus(tipoEquipo, marcaEquipo);
     },
-    readStatus(tipoEquipo, marcaEquipo) {
-      if (tipoEquipo !== "") {
-        this.equipoSeleccionado = true;
-      }
-      if (marcaEquipo !== "") {
-        this.marcaSeleccion = true;
-      }
+
+    addProp(propName) {
+      console.log(this.equipoProp);
+      if (this.equipoProp == "Tipo de equipo") this.addTipoEquipo(propName);
+      if (this.equipoProp == "Marca") this.addMarca(propName);
+      if (this.equipoProp == "Modelo") this.addModelo(propName);
     },
-    addEquipo(equipo) {
-      fetch("http://localhost:3000/equipo", {
+
+    addTipoEquipo(propName) {
+      fetch(`${backendData}/tipo-equipo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(equipo),
+        body: JSON.stringify(propName),
       })
         .then((response) => {
           if (response.ok) {
@@ -102,22 +70,77 @@ export default {
           }
         })
         .then((response) => {
-          this.equipoID = response.newID;
-          console.log("el id es " + this.equipoID);
-          this.$emit("enviarID", this.equipoID,this.tipoEquipoSeleccionado,this.marcaSeleccionada,this.modeloSeleccionado);
+          this.tipoEquipoId = response.id;
+          this.$emit("tipo-equipo-agregado", this.tipoEquipoId);
         })
         .catch((error) => {
           console.error("Error al agregar el cliente:", error);
         });
     },
-    submitForm() {
-      const newEquipo = {
-        nSerie: "",
-        tipoEquipo: this.tipoEquipoSeleccionado,
-        marca: this.marcaSeleccionada,
-        modelo: this.modeloSeleccionado,
+
+    actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
+      this.selectedTipoEquipo = selectedTipoEquipo;
+      this.selectedMarca = selectedMarca;
+    },
+
+    addMarca(propName) {
+      fetch(`${backendData}/marca`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(propName),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Error al agregar el equipo");
+          }
+        })
+        .then((response) => {
+          this.marcaId = response.id;
+          this.$emit("marca-agregada", this.marcaId);
+        })
+        .catch((error) => {
+          console.error("Error al agregar el cliente:", error);
+        });
+    },
+
+    addModelo(propName) {
+      const createModeloDto = {
+        nombre: propName.nombre,
+        marcaID: this.selectedMarca.id,
+        tipoEquipoID: this.selectedTipoEquipo.id,
       };
-      this.addEquipo(newEquipo);
+      fetch(`${backendData}/modelo`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(createModeloDto),
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error("Error al agregar el equipo");
+          }
+        })
+        .then((response) => {
+          this.modeloId = response.id;
+          this.$emit("modelo-agregado", this.modeloId);
+        })
+        .catch((error) => {
+          console.error("Error al agregar el cliente:", error);
+        });
+    },
+
+    submitForm() {
+      const propiedadName = {
+        nombre: this.propName,
+      };
+      this.addProp(propiedadName);
       this.modalShow = false;
     },
   },
