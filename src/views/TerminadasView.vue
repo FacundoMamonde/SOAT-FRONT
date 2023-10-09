@@ -1,7 +1,7 @@
 <template>
   <div>
-    <!-- <HeaderComponent></HeaderComponent>
-     -->
+    <HeaderComponent></HeaderComponent>
+    
      <NavComponent></NavComponent>
     <div id="divOrderContainer">
       <OrderTableComponent :estado="1"></OrderTableComponent>
@@ -15,9 +15,10 @@
 import OrderTableComponent from '@/components/OrderTableComponent.vue';
 import NavComponent from '@/components/NavComponent.vue';
 import OrderDetailComponent from '@/components/OrderDetailComponent.vue';
+import HeaderComponent from '@/components/HeaderComponent.vue';
 export default {
   name: 'TerminadasView',
-  components: {OrderTableComponent,NavComponent,OrderDetailComponent}
+  components: {OrderTableComponent,NavComponent,OrderDetailComponent, HeaderComponent}
   // components: { OrderDetailComponent, OrderTableComponent, HeaderComponent,NavComponent }
 }
 </script>

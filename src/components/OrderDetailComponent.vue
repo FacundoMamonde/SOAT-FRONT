@@ -28,7 +28,6 @@
                 {{ orderData.cliente.nombre }}
               </p>
               <p v-else class="m-0 pt-2">Nombre de Cliente</p>
-
               <p v-if="orderData.cliente.telefono" class="mt-0">
                 {{ orderData.cliente.telefono }}
               </p>
@@ -46,12 +45,17 @@
               <!-- Icono de Equipo-->
             </div>
             <div class="col-md-8">
-              <p v-if="orderData.equipo.modelo.marca" class="m-0 pt-2">{{ orderData.equipo.modelo.marca.nombre }}</p>
+              <p v-if="orderData.equipo.modelo.marca" class="m-0 pt-2">
+                {{ orderData.equipo.modelo.marca.nombre }}
+              </p>
               <p v-else class="m-0 pt-2">Tipo de Equipo - Marca</p>
-
-              <p v-if="orderData.equipo.modelo" class="m-0">{{ orderData.equipo.modelo.nombre }}</p>
+              <p v-if="orderData.equipo.modelo" class="m-0">
+                {{ orderData.equipo.modelo.nombre }}
+              </p>
               <p v-else class="m-0">Modelo</p>
-              <p v-if="orderData.cliente.nombre" class="m-0">sad</p>
+              <p v-if="orderData.equipo.n_serie" class="m-0">
+                {{ orderData.equipo.n_serie }}
+              </p>
               <p v-else class="m-0">n de serie</p>
             </div>
           </div>
@@ -127,7 +131,7 @@
 </template>
 
 <script>
-import { bus } from "../main";
+import { bus,backendData} from "../main";
 
 export default {
   name: "OrderDetailComponent",
@@ -154,6 +158,7 @@ export default {
         this.changeOrderData(this.orderData.informe, "informe");
       }, 2000);
     },
+
     changePrice() {
       clearTimeout(this.typingTimer);
       this.typingTimer = setTimeout(() => {
@@ -164,14 +169,14 @@ export default {
     changeOrderData(value, section) {
       const orderId = this.orderData.id;
       const newData = {
-        dato: value,
+        [section]: value,
       };
-      fetch(`http://localhost:3000/orden/${orderId}/${section}/`, {
+      fetch(`${backendData}/orden/${orderId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: `["${value}"]`,
+        body: JSON.stringify(newData),
       })
         .then((response) => {
           console.log(newData);
@@ -190,17 +195,20 @@ export default {
     },
 
     getOrderById(orderId) {
-      fetch(`http://localhost:3000/orden/${orderId}`)
+      fetch(`${backendData}/orden/${orderId}`)
         .then((response) => response.json())
         .then((order) => {
           this.orderData = order;
+          console.log("order");
+          console.log(this.orderData);
         })
         .catch((error) => {
           console.error("Error al obtener la orden:", error);
         });
     },
+
     changeStatus(orderId) {
-      fetch(`http://localhost:3000/orden/${orderId}/estado`, {
+      fetch(`${backendData}/orden/${orderId}/estado`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -214,7 +222,6 @@ export default {
             console.error("Error al actualizar la orden:", response.status);
           }
         })
-
         .catch((error) => {
           console.error("Error en la llamada a la API:", error);
         });
@@ -223,6 +230,3 @@ export default {
 };
 </script>
 <style scoped></style>
-
-
-

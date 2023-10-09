@@ -18,14 +18,16 @@
             <input
               class="m-0"
               :placeholder="
-                cliente && cliente.name ? cliente.name : 'Nombre de cliente'
+                cliente && cliente.nombre ? cliente.nombre : 'Nombre de cliente'
               "
               readonly
             />
             <input
               class="mt-0"
               :placeholder="
-                cliente && cliente.phone ? cliente.phone : 'Celular del cliente'
+                cliente && cliente.telefono
+                  ? cliente.telefono
+                  : 'Celular del cliente'
               "
               readonly
             />
@@ -35,8 +37,8 @@
           ></NewClientComponent>
         </div>
         <!-- Div Equipo -->
-        <div class="d-flex flex-row mt-2">
-          <div class="col-md-1" style="width: 50px">
+        <div class="d-flex flex-row mt-1">
+          <div class="col-md-1 mt-3" style="width: 50px">
             <i class="bi bi-laptop col-md-8" style="font-size: 40px"></i>
             <!-- Icono de Equipo-->
           </div>
@@ -46,14 +48,18 @@
               <form action="#" style="width: 260px">
                 <select v-model="selectedTipoEquipo" style="width: 100%">
                   <option value="">---Tipo de Equipo---</option>
-                  <option v-for="tipo in tipoEquipos" :key="tipo" :value="tipo">
-                    {{ tipo }}
+                  <option
+                    v-for="tipo in tipoEquipos"
+                    :key="tipo.id"
+                    :value="tipo"
+                  >
+                    {{ tipo.nombre }}
                   </option>
                 </select>
               </form>
               <button
                 v-if="selectedTipoEquipo === ''"
-                @click="abrirModal('', '')"
+                @click="abrirModal('Tipo de equipo', '', '')"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>
@@ -66,16 +72,16 @@
                   <option value="">---Marca del equipo---</option>
                   <option
                     v-for="marca in marcasEquipo"
-                    :key="marca"
+                    :key="marca.id"
                     :value="marca"
                   >
-                    {{ marca }}
+                    {{ marca.nombre }}
                   </option>
                 </select>
               </form>
               <button
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
-                @click="abrirModal(selectedTipoEquipo, '')"
+                @click="abrirModal('Marca', selectedTipoEquipo, '')"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>
@@ -84,21 +90,14 @@
             <div class="d-flex">
               <!-- Seleccion de Modelo -->
               <form action="#" style="width: 260px">
-                <select
-                  @change="getIdEquipo"
-                  v-model="selectedModelo"
-                  name="equiposType"
-                  id="eModel"
-                  style="width: 100%"
-                >
-                  <option value="">---Modelo equipo---</option>
+                <select v-model="selectedModelo" style="width: 100%">
+                  <option value="">---Modelo del equipo---</option>
                   <option
                     v-for="modelo in modelosEquipos"
-                    :key="modelo"
-                    :value="modelo"
-                    @change="getIdEquipo()"
+                    :key="modelo.id"
+                    :value="modelo.id"
                   >
-                    {{ modelo }}
+                    {{ modelo.nombre }}
                   </option>
                 </select>
               </form>
@@ -108,18 +107,26 @@
                   selectedMarca !== '' &&
                   selectedModelo == ''
                 "
-                @click="abrirModal(selectedTipoEquipo, selectedMarca)"
+                @click="abrirModal('Modelo', selectedTipoEquipo, selectedMarca)"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>
               </button>
             </div>
+            <div class="d-flex flex-column mt-1" style="width: 260px">
+              <input
+                class="m-0"
+                placeholder="Numero de serie "
+                v-model="selectedNroSerie"
+              />
+            </div>
           </div>
           <div class="d-flex flex-column">
             <NewEquipoComponent
               ref="newOrderComponent"
-              @enviarID="getnewEquipoID"
-              @change="getIdEquipo"
+              @tipo-equipo-agregado="updateSelectedTipoEquipo"
+              @marca-agregada="updateSelectedMarca"
+              @modelo-agregado="updateSelectedModelo"
             ></NewEquipoComponent>
           </div>
         </div>
@@ -164,7 +171,7 @@
 </template>
 
 <script>
-import { bus } from "../main";
+import { bus,backendData } from "../main";
 import NewClientComponent from "./NewClientComponent.vue";
 import NewEquipoComponent from "./NewEquipoComponent.vue";
 export default {
@@ -183,54 +190,67 @@ export default {
       accesorios: "",
       falla: "",
       newEquipoID: null,
+      campo: "",
+      selectedNroSerie: "",
+      equipo: {},
     };
   },
   components: { NewClientComponent, NewEquipoComponent },
+
   created() {
-    fetch("http://localhost:3000/equipo/tipo")
-      .then((response) => response.json())
-      .then((data) => {
-        this.tipoEquipos = data;
-        console.log(data);
-      })
-      .catch((error) => {
-        console.error("Error al obtener los tipos de equipo", error);
-      });
+    this.getTiposEquipo();
+    this.getMarcasEquipo();
   },
+
   watch: {
     selectedTipoEquipo() {
-      this.getMarcasEquipo();
+      this.getTiposEquipo();
+      this.getModelosEquipo();
+      this.selectedModelo = "";
     },
+
     selectedMarca() {
+      this.getMarcasEquipo();
+      this.getModelosEquipo();
+      this.selectedModelo = "";
+    },
+
+    selectedModelo() {
       this.getModelosEquipo();
     },
   },
+
   methods: {
-    abrirModal(tipoEquipo, marcaEquipo) {
-      this.selectedTipoEquipo = tipoEquipo;
-      this.selectedMarca = marcaEquipo;
-      this.$refs.newOrderComponent.abrirModal(tipoEquipo, marcaEquipo);
+    updateSelectedTipoEquipo(tipoEquipoId) {
+      this.getTipoEquipoById(tipoEquipoId);
     },
-    getnewEquipoID(
-      newEquipoID,
-      newTipoEquipo,
-      newMarcaEquipo,
-      newModeloEquipo
-    ) {
-      this.newEquipoID = Number(newEquipoID);
-      console.log(newTipoEquipo);
-      this.selectedTipoEquipo = newTipoEquipo;
-      this.selectedMarca = newMarcaEquipo;
-      this.selectedModelo = newModeloEquipo;
-      console.log("el id es " + Number(this.newEquipoID));
+
+    updateSelectedMarca(marcaId) {
+      this.getMarcaById(marcaId);
     },
+
+    updateSelectedModelo(modeloId) {
+      this.getModeloById(modeloId);
+    },
+
+    abrirModal(campo) {
+      this.campo = campo;
+      this.$refs.newOrderComponent.abrirModal(campo);
+      if (campo === "Modelo") {
+        this.$refs.newOrderComponent.actualizarSeleccion(
+          this.selectedTipoEquipo,
+          this.selectedMarca
+        );
+      }
+    },
+
     manejarVariableEnviada(variable) {
       this.clientID = Number(variable);
       this.getClientById(variable);
-      console.log(variable);
     },
+
     getClientById(clientId) {
-      fetch(`http://localhost:3000/cliente/${clientId}`)
+      fetch(`${backendData}/cliente/${clientId}`)
         .then((response) => response.json())
         .then((cliente) => {
           this.cliente = cliente;
@@ -239,77 +259,144 @@ export default {
           console.error("Error al obtener el cliente:", error);
         });
     },
+    getTiposEquipo() {
+      
+      fetch(`${backendData}/tipo-equipo`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.tipoEquipos = data;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los tipos de equipo", error);
+        });
+    },
+    getTipoEquipoById(id) {
+      fetch(`${backendData}/tipo-equipo/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.selectedTipoEquipo = data;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los tipos de equipo", error);
+        });
+    },
+
+    getMarcaById(id) {
+      fetch(`${backendData}/marca/${id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          this.selectedMarca = data;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los tipos de equipo", error);
+        });
+    },
+
+    getModeloById(id) {
+      return fetch(`${backendData}/modelo/${id}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error al obtener los tipos de equipo");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          this.selectedModelo = data.id;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los tipos de equipo", error);
+        });
+    },
+
     getMarcasEquipo() {
-      fetch(`http://localhost:3000/equipo/marca/${this.selectedTipoEquipo}`)
+      fetch(`${backendData}/marca`)
         .then((response) => response.json())
         .then((data) => {
           this.marcasEquipo = data;
-          console.log(data);
+          this.getModelosEquipo();
         })
         .catch((error) => {
           console.error("Error al obtener las marcas de equipo", error);
         });
     },
-    getIdEquipo() {
-      fetch(
-        `http://localhost:3000/equipo/findid/${this.selectedModelo}/${this.selectedMarca}/${this.selectedTipoEquipo}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          this.newEquipoID = parseInt(data[0]);
-          console.log(data);
-        })
-        .catch((error) => {
-          console.error("Error al obtener la id del equipo", error);
-        });
+
+    getModelosEquipo() {
+      if (this.selectedTipoEquipo != "" && this.selectedMarca != "") {
+        fetch(
+          `${backendData}/modelo/search?id_tipo_equipo=${this.selectedTipoEquipo.id}&id_marca=${this.selectedMarca.id}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.modelosEquipos = data;
+          })
+          .catch((error) => {
+            console.error("Error al obtener los modelos de equipo", error);
+          });
+      }
     },
 
-    addNewOrder(orden) {
-      fetch("http://localhost:3000/orden", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orden),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar la orden");
-          }
-        })
-        .then((data) => {
-          console.log(data);
-          bus.$emit("orden-agregada");
-        })
-        .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
+    async addNewEquipo() {
+      try {
+        const equipo = {
+          n_serie: this.selectedNroSerie,
+          modeloID: this.selectedModelo,
+          tipoEquipoID: this.selectedTipoEquipo.id,
+        };
+        const response = await fetch(`${backendData}/equipo`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(equipo),
         });
+
+        if (!response.ok) {
+          throw new Error("Error al agregar el equipo");
+        }
+        const data = await response.json();
+        this.equipo = data;
+      } catch (error) {
+        console.error("Error al agregar el equipo:", error);
+        throw error;
+      }
     },
-    async submitForm() {
-      const newOrder = {
+
+    async addNewOrder() {
+      const orden = {
         accesorio: this.accesorios,
         falla: this.falla,
-        clienteID: this.clientID,
-        equipoID: this.newEquipoID,
+        id_cliente: this.cliente.id,
+        id_equipo: this.equipo.id,
       };
-      console.log("este es el id del ciente " + this.clientID);
-      this.addNewOrder(newOrder);
-      console.log(newOrder);
-    },
-    getModelosEquipo() {
-      fetch(
-        `http://localhost:3000/equipo/modelo/${this.selectedMarca}/${this.selectedTipoEquipo}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          this.modelosEquipos = data;
-          console.log(data);
-        })
-        .catch((error) => {
-          console.error("Error al obtener los modelos del equipo:", error);
+      try {
+        const response = await fetch(`${backendData}/orden/new`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orden),
         });
+
+        if (!response.ok) {
+          throw new Error("Error al agregar la orden");
+        }
+
+        const data = await response.json();
+        console.log(data);
+        bus.$emit("orden-agregada");
+      } catch (error) {
+        console.error("Error al agregar la orden:", error);
+        throw error;
+      }
+    },
+
+    async submitForm() {
+      try {
+        await this.addNewEquipo();
+        await this.addNewOrder();
+      } catch (error) {
+        console.error("Error al agregar equipo u orden:", error);
+      }
     },
   },
 };
