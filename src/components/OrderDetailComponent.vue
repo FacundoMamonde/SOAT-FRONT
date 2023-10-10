@@ -2,9 +2,10 @@
   <div
     id="divOrderDetail"
     class="card"
-    style="min-width: 360px; max-width: 1000px; border-radius: 0% !important"
+    style="min-width: 360px; max-width: 1000px; border-radius: 0% !important "
   >
-    <div id="orderDetailContainer" style="padding-left: 15px" v-if="orderData">
+  <div v-if="orderData">
+    <div id="orderDetailContainer" style="padding-left: 15px" >
       <div class="row pt-2">
         <!-- DIV NUMERO Y FECHA DE ORDEN -->
         <div class="col-6 p-0">
@@ -122,11 +123,17 @@
         </div>
       </div>
     </div>
+    
     <div class="w-100 d-flex justify-content-end card-footer">
       <button class="btn btn-success" @click="changeStatus(orderData.id)">
         Finalizar
       </button>
     </div>
+  </div>
+    <div v-else class="h-100 d-flex align-items-center justify-content-center ">
+        <!-- Contenido cuando orderData es nulo -->
+        <p class="text-center ">No se ha seleccionado ninguna orden.</p>
+      </div>
   </div>
 </template>
 
@@ -144,6 +151,9 @@ export default {
   beforeMount() {
     bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
+    });
+    bus.$on("no-order-selected", () => {
+      this.orderData=null;
     });
   },
   watch: {

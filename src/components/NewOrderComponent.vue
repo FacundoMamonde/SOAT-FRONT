@@ -340,7 +340,6 @@ export default {
         const equipo = {
           n_serie: this.selectedNroSerie,
           modeloID: this.selectedModelo,
-          tipoEquipoID: this.selectedTipoEquipo.id,
         };
         const response = await fetch(`${backendData}/equipo`, {
           method: "POST",
