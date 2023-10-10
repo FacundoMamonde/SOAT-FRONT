@@ -1,8 +1,9 @@
 <template>
   <div id="divOrderTable" class="px-md-3">
-    <div class="d-flex flex-column h-100">
-      <div class="flex-grow-1">
-        <b-table
+    <div class="d-flex flex-column h-100" >
+      <div class="flex-grow-1" v-show="ordenes.length > 0">
+        
+        <b-table 
           id="table"
           responsive
           :items="ordenes"
@@ -31,7 +32,9 @@
             </div>
           </template>
         </b-table>
-      </div>
+       
+ 
+    
       <div class="mt-3">
         <b-pagination
           size="sm"
@@ -41,8 +44,15 @@
           :per-page="perPage"
           aria-controls="table"
         ></b-pagination>
-      </div>
+     
     </div>
+ 
+    </div>
+    <div v-if="ordenes.length <= 0" class="h-100 d-flex align-items-center justify-content-center">
+          <p >No se ha encontrado ninguna orden.</p>
+        </div>
+  </div>
+ 
   </div>
 </template>
 
@@ -116,8 +126,7 @@ export default {
         .then((ordenes) => {
           this.ordenes = ordenes;
           this.fillTableData();
-        
-        })
+       })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
         });
@@ -154,10 +163,12 @@ export default {
     },
 
     onRowSelected(ordenes) {
-       if (ordenes.length > 0) {
-        const orderID = ordenes[0].id;
-        bus.$emit("row-selected", orderID);
-       }
+      if (ordenes.length > 0) {
+    const orderID = ordenes[0].id;
+    bus.$emit("row-selected", orderID);
+  } else {
+    bus.$emit("no-order-selected");
+  }
    },
 
     selectFirstRow() {
@@ -180,6 +191,7 @@ export default {
         .then((ordenes) => {
           this.ordenes = ordenes;
           this.totalRows = this.ordenes.length;
+          console.log(this.totalRows)
           this.currentPage = 1;
           this.fillTableData();
         })
@@ -262,3 +274,4 @@ export default {
   color: #6a6a6b;
 }
 </style>
+

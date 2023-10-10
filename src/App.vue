@@ -50,6 +50,7 @@ nav a.router-link-exact-active {
   flex: 1;
   border: none;
   color: #6a6a6b;
+  min-height: 600px;
 }
 #divOrderTable {
   background-color: #f3f3f3;
