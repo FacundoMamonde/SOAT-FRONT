@@ -171,7 +171,7 @@
 </template>
 
 <script>
-import { bus,backendData } from "../main";
+import { bus, backendData } from "../main";
 import NewClientComponent from "./NewClientComponent.vue";
 import NewEquipoComponent from "./NewEquipoComponent.vue";
 export default {
@@ -260,7 +260,6 @@ export default {
         });
     },
     getTiposEquipo() {
-      
       fetch(`${backendData}/tipo-equipo`)
         .then((response) => response.json())
         .then((data) => {
@@ -321,18 +320,16 @@ export default {
     },
 
     getModelosEquipo() {
-      if (this.selectedTipoEquipo != "" && this.selectedMarca != "") {
-        fetch(
-          `${backendData}/modelo/search?id_tipo_equipo=${this.selectedTipoEquipo.id}&id_marca=${this.selectedMarca.id}`
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            this.modelosEquipos = data;
-          })
-          .catch((error) => {
-            console.error("Error al obtener los modelos de equipo", error);
-          });
-      }
+      fetch(
+        `${backendData}/modelo/search?id_tipo_equipo=${this.selectedTipoEquipo.id}&id_marca=${this.selectedMarca.id}`
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          this.modelosEquipos = data;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los modelos de equipo", error);
+        });
     },
 
     async addNewEquipo() {
