@@ -4,8 +4,8 @@
      
      <NavComponent></NavComponent>
      <div id="divOrderContainer">
-        <OrderTableComponent :estado="0"></OrderTableComponent>
-       <OrderDetailComponent ></OrderDetailComponent>
+        <OrderTableComponent :estado="3"></OrderTableComponent>
+       <OrderDetailComponent :nextButton="'A terminada'" ></OrderDetailComponent>
     </div> 
   </div>
 </template>

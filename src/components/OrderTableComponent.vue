@@ -1,9 +1,8 @@
 <template>
   <div id="divOrderTable" class="px-md-3">
-    <div class="d-flex flex-column h-100" >
-      <div class="flex-grow-1" v-show="ordenes.length > 0">
-        
-        <b-table 
+    <div class="d-flex flex-column h-100 ">
+      <div class="flex-grow-1 container  " v-show="ordenes.length > 0">
+        <b-table
           id="table"
           responsive
           :items="ordenes"
@@ -32,33 +31,30 @@
             </div>
           </template>
         </b-table>
-       
- 
-    
-      <div class="mt-3">
-        <b-pagination
-          size="sm"
-          align="center"
-          v-model="currentPage"
-          :total-rows="totalRows"
-          :per-page="perPage"
-          aria-controls="table"
-        ></b-pagination>
-     
-    </div>
- 
-    </div>
-    <div v-if="ordenes.length <= 0" class="h-100 d-flex align-items-center justify-content-center">
-          <p >No se ha encontrado ninguna orden.</p>
+        <div class="d-flex justify-content-center " >
+          <b-pagination 
+            size="sm"
+            
+            v-model="currentPage"
+            :total-rows="totalRows"
+            :per-page="perPage"
+            aria-controls="table"
+           
+          ></b-pagination>
         </div>
-  </div>
- 
+      </div>
+      <div
+        v-if="ordenes.length <= 0"
+        class="h-100 d-flex align-items-center justify-content-center"
+      >
+        <p>No se ha encontrado ninguna orden.</p>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { backendData, bus } from "../main";
-
 
 export default {
   name: "OrderTableComponent",
@@ -95,13 +91,11 @@ export default {
         this.filtroPor = filtro.filtroPor;
       });
       this.itemsFiltrados();
-     
     },
     currentPage() {
       this.fetchData();
       this.selectFirstRow();
     },
-  
   },
 
   created() {
@@ -126,7 +120,7 @@ export default {
         .then((ordenes) => {
           this.ordenes = ordenes;
           this.fillTableData();
-       })
+        })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
         });
@@ -158,18 +152,18 @@ export default {
           marca: orden.marca,
           estado: orden.estado,
         }));
-  this.selectFirstRow();
+        this.selectFirstRow();
       }
     },
 
     onRowSelected(ordenes) {
       if (ordenes.length > 0) {
-    const orderID = ordenes[0].id;
-    bus.$emit("row-selected", orderID);
-  } else {
-    bus.$emit("no-order-selected");
-  }
-   },
+        const orderID = ordenes[0].id;
+        bus.$emit("row-selected", orderID);
+      } else {
+        bus.$emit("no-order-selected");
+      }
+    },
 
     selectFirstRow() {
       if (this.$refs.selectableTable && this.ordenes.length > 0) {
@@ -191,7 +185,7 @@ export default {
         .then((ordenes) => {
           this.ordenes = ordenes;
           this.totalRows = this.ordenes.length;
-          console.log(this.totalRows)
+          console.log(this.totalRows);
           this.currentPage = 1;
           this.fillTableData();
         })
@@ -264,7 +258,6 @@ export default {
 .tabla {
   max-height: 600px;
   overflow-x: scroll !important;
-
   white-space: nowrap;
   scrollbar-width: thin;
   scrollbar-color: #6c757d transparent;
@@ -273,5 +266,5 @@ export default {
 .text {
   color: #6a6a6b;
 }
-</style>
 
+</style>
