@@ -3,12 +3,27 @@
     <b-navbar class="p-0">
       <b-navbar-nav>
         <router-link
-          to="/pendientes"
+          to="/ingresadas"
           class-active="active"
-          class="p-2 nav-link col-md-mx-3 col-sm-4"
+          class="p-2 nav-link "
+          >INGRESADAS</router-link
+        >
+        <router-link
+          to="/diagnosticadas"
+          class="p-2 nav-link "
+          >DIAGNOSTICADAS</router-link
+        >
+        <router-link
+          to="/presupuestadas"
+          class="p-2 nav-link "
+          >PRESUPUESTADAS</router-link
+        >
+        <router-link
+          to="/pendientes"
+          class="p-2 nav-link "
           >PENDIENTES</router-link
         >
-        <router-link to="/terminadas" class="p-2 nav-link col-md-mx-3"
+        <router-link to="/terminadas" class="p-2 nav-link "
           >TERMINADAS</router-link
         >
         <router-link to="/entregadas" class="p-2 nav-link col-md-mx-3"

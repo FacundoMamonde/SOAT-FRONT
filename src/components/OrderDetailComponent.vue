@@ -93,7 +93,7 @@
         >
         </textarea>
       </div>
-      <div>
+      <div v-if="orderData.estado !=0" >
         <h5 class="mt-3">Informe</h5>
         <textarea
           v-model="orderData.informe"
@@ -125,8 +125,11 @@
     </div>
     
     <div class="w-100 d-flex justify-content-end card-footer">
-      <button class="btn btn-success" @click="changeStatus(orderData.id)">
-        Finalizar
+      <button v-if="orderData.estado ==2" class="btn btn-danger me-3" @click="changeStatus(orderData.id)">
+       A terminada
+      </button>
+      <button  v-if="orderData.estado !=5" class="btn btn-success" @click="changeStatus(orderData.id)">
+        {{ nextButton }}
       </button>
     </div>
   </div>
@@ -148,9 +151,16 @@ export default {
       typingTimer: null,
     };
   },
+  props: {
+nextButton: {
+      type: String,
+      default: '',
+    },
+  },
   beforeMount() {
     bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
+      console.log(this.orderData)
     });
     bus.$on("no-order-selected", () => {
       this.orderData=null;
@@ -166,14 +176,14 @@ export default {
       clearTimeout(this.typingTimer);
       this.typingTimer = setTimeout(() => {
         this.changeOrderData(this.orderData.informe, "informe");
-      }, 2000);
+      }, 1000);
     },
 
     changePrice() {
       clearTimeout(this.typingTimer);
       this.typingTimer = setTimeout(() => {
         this.changeOrderData(this.orderData.importe, "importe");
-      }, 2000);
+      }, 1000);
     },
 
     changeOrderData(value, section) {
@@ -239,4 +249,8 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+#orderDetailContainer{
+  min-height: 520px !important;
+}
+</style>
