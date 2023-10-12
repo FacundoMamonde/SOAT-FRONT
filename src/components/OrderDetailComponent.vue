@@ -125,7 +125,7 @@
     </div>
     
     <div class="w-100 d-flex justify-content-end card-footer">
-      <button v-if="orderData.estado ==2" class="btn btn-danger me-3" @click="changeStatus(orderData.id)">
+      <button v-if="orderData.estado ==2" class="btn btn-danger me-3" @click="changeStatusNA(orderData.id)">
        A terminada
       </button>
       <button  v-if="orderData.estado !=5" class="btn btn-success" @click="changeStatus(orderData.id)">
@@ -229,6 +229,26 @@ nextButton: {
 
     changeStatus(orderId) {
       fetch(`${backendData}/orden/${orderId}/estado`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("La orden se actualizó correctamente");
+            bus.$emit("cambiar-estado");
+          } else {
+            console.error("Error al actualizar la orden:", response.status);
+          }
+        })
+        .catch((error) => {
+          console.error("Error en la llamada a la API:", error);
+        });
+    },
+    //':id/presupuestoNA'
+    changeStatusNA(orderId) {
+      fetch(`${backendData}/orden/${orderId}/presupuestoNA`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
