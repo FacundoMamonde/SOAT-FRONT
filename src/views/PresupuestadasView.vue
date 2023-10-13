@@ -4,7 +4,7 @@
       <NavComponent></NavComponent>
       <div id="divOrderContainer">
         <OrderTableComponent :estado="2"></OrderTableComponent>
-         <OrderDetailComponent :nextButton="'A pendiente'"></OrderDetailComponent> 
+         <OrderDetailComponent :nextButton="'Aprobado'"></OrderDetailComponent> 
       </div>
     </div>
   </template>
