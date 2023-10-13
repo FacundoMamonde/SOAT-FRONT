@@ -1,23 +1,10 @@
 <template>
-  <div id="divOrderTable" class="px-md-3">
+  <div id="divOrderTable" class="px-md-0">
     <div class="d-flex flex-column h-100 ">
-      <div class="flex-grow-1 container  " v-show="ordenes.length > 0">
-        <b-table
-          id="table"
-          responsive
-          :items="ordenes"
-          striped
-          :fields="fields"
-          class="text-muted tabla"
-          :per-page="perPage"
-          :current-page="currentPage"
-          ref="selectableTable"
-          selectable
-          @row-selected="onRowSelected"
-          :select-mode="selectMode"
-          :selected.sync="selectedRow"
-          :borderless="true"
-        >
+      <div class="flex-grow-1 container pe-0" v-show="ordenes.length > 0">
+        <b-table id="table" responsive :items="ordenes" striped :fields="fields" class="text-muted tabla"
+          :per-page="perPage" :current-page="currentPage" ref="selectableTable" selectable @row-selected="onRowSelected"
+          :select-mode="selectMode" :selected.sync="selectedRow" :borderless="true">
           <template #head()="data">
             <span class="text">{{ data.label }}</span>
           </template>
@@ -31,22 +18,12 @@
             </div>
           </template>
         </b-table>
-        <div class="d-flex justify-content-center " >
-          <b-pagination 
-            size="sm"
-            
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            aria-controls="table"
-           
-          ></b-pagination>
+        <div class="d-flex justify-content-center ">
+          <b-pagination size="sm" v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+            aria-controls="table"></b-pagination>
         </div>
       </div>
-      <div
-        v-if="ordenes.length <= 0"
-        class="h-100 d-flex align-items-center justify-content-center"
-      >
+      <div v-if="ordenes.length <= 0" class="h-100 d-flex align-items-center justify-content-center">
         <p>No se ha encontrado ninguna orden.</p>
       </div>
     </div>
@@ -64,10 +41,10 @@ export default {
       currentPage: 1,
       isBusy: false,
       fields: [
-        { key: "id", label: "ID" },
+        { key: "id", label: "#" },
         { key: "nombre", label: "Cliente" },
-        { key: "marca", label: "Equipo Marca" },
-        { key: "modelo", label: "Equipo Modelo" },
+        { key: "marca", label: "Marca" },
+        { key: "modelo", label: "Modelo" },
         { key: "falla", label: "Falla" },
       ],
       filtro: "",
@@ -115,10 +92,13 @@ export default {
       this.totalRows = this.ordenes.length;
     },
     async fetchData() {
+      this.toggleBusy() // TESTEANDO
       fetch(`${backendData}/ordenes/getall/${this.estado}`)
         .then((response) => response.json())
         .then((ordenes) => {
+          this.toggleBusy() // TESTEANDO
           this.ordenes = ordenes;
+          
           this.fillTableData();
         })
         .catch((error) => {
@@ -178,11 +158,11 @@ export default {
     },
 
     async itemsFiltrados() {
-      fetch(
-        `${backendData}/ordenes/filter/${this.estado}?filtro=${this.filtro}&filtroPor=${this.filtroPor}`
-      )
+      this.toggleBusy() // TESTEANDO
+      fetch(`${backendData}/ordenes/filter/${this.estado}?filtro=${this.filtro}&filtroPor=${this.filtroPor}`)
         .then((response) => response.json())
         .then((ordenes) => {
+          this.toggleBusy() // TESTEANDO
           this.ordenes = ordenes;
           this.totalRows = this.ordenes.length;
           console.log(this.totalRows);
@@ -219,6 +199,7 @@ export default {
   max-height: 600px;
   white-space: nowrap;
 }
+
 .tabla::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -267,4 +248,7 @@ export default {
   color: #6a6a6b;
 }
 
+#divOrderTable {
+  border-right: 2px solid #cecece;
+}
 </style>

@@ -5,7 +5,7 @@
      <NavComponent></NavComponent>
      <div id="divOrderContainer">
         <OrderTableComponent :estado="3"></OrderTableComponent>
-       <OrderDetailComponent :nextButton="'A terminada'" ></OrderDetailComponent>
+       <OrderDetailComponent :nextButton="'Terminar'" ></OrderDetailComponent>
     </div> 
   </div>
 </template>

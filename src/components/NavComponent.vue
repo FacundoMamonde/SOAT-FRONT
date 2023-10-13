@@ -1,34 +1,20 @@
 <template>
   <div class="nav d-flex justify-content-center w-100">
     <b-navbar class="p-0">
-      <b-navbar-nav>
-        <router-link
-          to="/ingresadas"
-          class-active="active"
-          class="p-2 nav-link "
-          >INGRESADAS</router-link
-        >
-        <router-link
-          to="/diagnosticadas"
-          class="p-2 nav-link "
-          >DIAGNOSTICADAS</router-link
-        >
-        <router-link
-          to="/presupuestadas"
-          class="p-2 nav-link "
-          >PRESUPUESTADAS</router-link
-        >
-        <router-link
-          to="/pendientes"
-          class="p-2 nav-link "
-          >PENDIENTES</router-link
-        >
-        <router-link to="/terminadas" class="p-2 nav-link "
-          >TERMINADAS</router-link
-        >
-        <router-link to="/entregadas" class="p-2 nav-link col-md-mx-3"
-          >ENTREGADAS</router-link
-        >
+       <b-navbar-nav>
+        
+        <router-link to="/ingresadas" class-active="active" class="p-2 nav-link"> INGRESADAS </router-link>
+          
+        <router-link to="/diagnosticadas" class="p-2 nav-link">DIAGNOSTICADAS</router-link>
+
+        <router-link to="/presupuestadas" class="p-2 nav-link">PRESUPUESTADAS</router-link>
+
+        <router-link to="/pendientes" class="p-2 nav-link">PENDIENTES</router-link>
+
+        <router-link to="/terminadas" class="p-2 nav-link">TERMINADAS</router-link>
+
+        <router-link to="/entregadas" class="p-2 nav-link col-md-mx-3">ENTREGADAS</router-link>
+
       </b-navbar-nav>
     </b-navbar>
   </div>
@@ -47,7 +33,14 @@ export default {
   color: rgba(0, 0, 0, 0.575);
 }
 
-.router-link-active,
+.router-link-active{
+  background-color: rgb(240, 240, 240);
+  color: rgb(3, 3, 3) !important;
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+
+}
+
 .router-link-exact-active {
   color: rgb(50, 50, 50);
   cursor: pointer;
