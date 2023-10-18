@@ -5,6 +5,7 @@
       v-model="modalShow"
       :title="`Nuevo ${this.equipoProp}`"
       @ok="submitForm"
+      @hidden="resetModal()"
     >
       <div class="modal-body d-flex flex-column">
         <label for="newData">
@@ -26,16 +27,16 @@ import { backendData} from "../main";
 export default {
   name: "NewEquipoComponent",
   props: {
-    campo: { type: String, default: "" },
+    campo: { type: String, default: null },
   },
   data() {
     return {
       modalShow: false,
-      propNombre: "",
-      equipoProp: "",
-      propName: "",
-      selectedMarca: "",
-      selectedTipoEquipo: "",
+      propNombre: null,
+      equipoProp: null,
+      propName: null,
+      selectedMarca: null,
+      selectedTipoEquipo: null,
     };
   },
   mounted() {
@@ -48,7 +49,6 @@ export default {
     },
 
     addProp(propName) {
-      console.log(this.equipoProp);
       if (this.equipoProp == "Tipo de equipo") this.addTipoEquipo(propName);
       if (this.equipoProp == "Marca") this.addMarca(propName);
       if (this.equipoProp == "Modelo") this.addModelo(propName);
@@ -143,6 +143,11 @@ export default {
       this.addProp(propiedadName);
       this.modalShow = false;
     },
+    resetModal() {
+    this.propName=null
+  }
   },
+
+
 };
 </script>
