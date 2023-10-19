@@ -1,6 +1,6 @@
 <template>
   <div id="divOrderDetail" class="card" style="min-width: 360px; max-width: 1000px; border-radius: 0% !important ">
-    <div v-if="orderData">
+    <div v-if="orderData !=null">
       <div id="orderDetailContainer" style="padding-left: 15px">
         <div class="row pt-2">
           <!-- DIV NUMERO Y FECHA DE ORDEN -->
@@ -95,9 +95,7 @@
               <input v-model="orderData.importe" type="text" style="width: 100px" @input="changePrice()" />
             </div>
             <div class="p-2 flex-shrink-1">
-              <button class="btn btn-primary btn-sm m-0" style="width: 100px">
-                <i class="bi bi-printer"></i> Imprimir
-              </button>
+              <PDFGenerator :orderData="orderData" />
             </div>
           </div>
         </div>
@@ -121,13 +119,22 @@
 
 <script>
 import { bus, backendData } from "../main";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import PDFGenerator from "@/components/PDFGenerator.vue";
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
+  components: {
+    PDFGenerator,
+  },
   name: "OrderDetailComponent",
+  
   data() {
     return {
       orderData: null,
       typingTimer: null,
+      
     };
   },
   props: {
@@ -139,7 +146,6 @@ export default {
   beforeMount() {
     bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
-      console.log(this.orderData)
     });
     bus.$on("no-order-selected", () => {
       this.orderData = null;
@@ -149,12 +155,23 @@ export default {
     orderID(newOrderID) {
       this.getOrderById(newOrderID);
     },
+    orderData(){
+      this.orderData
+    }
   },
   methods: {
+
+    generatePDF() {},
     changeInforme() {
       clearTimeout(this.typingTimer);
       this.typingTimer = setTimeout(() => {
         this.changeOrderData(this.orderData.informe, "informe");
+      }, 1000);
+    },
+    changePresupuesto() {
+      clearTimeout(this.typingTimer);
+      this.typingTimer = setTimeout(() => {
+        this.changeOrderData(this.orderData.presupuesto, "presupuesto");
       }, 1000);
     },
 
@@ -169,6 +186,8 @@ export default {
       const orderId = this.orderData.id;
       const newData = {
         [section]: value,
+        id_cliente:this.orderData.cliente.id,
+        id_equipo:this.orderData.equipo.id
       };
       fetch(`${backendData}/orden/${orderId}`, {
         method: "PATCH",
@@ -178,9 +197,7 @@ export default {
         body: JSON.stringify(newData),
       })
         .then((response) => {
-          console.log(newData);
           if (response.ok) {
-            console.log("Informe actualizado correctamente");
             return response.text();
           } else {
             throw new Error(
@@ -198,8 +215,6 @@ export default {
         .then((response) => response.json())
         .then((order) => {
           this.orderData = order;
-          console.log("order");
-          console.log(this.orderData);
         })
         .catch((error) => {
           console.error("Error al obtener la orden:", error);
@@ -215,7 +230,6 @@ export default {
       })
         .then((response) => {
           if (response.ok) {
-            console.log("La orden se actualizó correctamente");
             bus.$emit("cambiar-estado");
           } else {
             console.error("Error al actualizar la orden:", response.status);
@@ -253,3 +267,4 @@ export default {
   min-height: 520px !important;
 }
 </style>
+

@@ -6,7 +6,12 @@
       class="ms-2 fw-bold"
       >+</b-button
     >
-    <b-modal v-model="modalShow" title="Nueva Orden" @ok="submitForm">
+    <b-modal
+      v-model="modalShow"
+      title="Nueva Orden"
+      @ok="submitForm"
+      @cancel="resetModal()"
+    >
       <div class="modal-body">
         <!-- Div Cliente -->
         <div class="d-flex flex-row">
@@ -33,7 +38,7 @@
             />
           </div>
           <NewClientComponent
-            @variable-enviada="manejarVariableEnviada"
+            @cliente-agregado="getClient"
           ></NewClientComponent>
         </div>
         <!-- Div Equipo -->
@@ -95,7 +100,7 @@
                   <option
                     v-for="modelo in modelosEquipos"
                     :key="modelo.id"
-                    :value="modelo.id"
+                    :value="modelo"
                   >
                     {{ modelo.nombre }}
                   </option>
@@ -187,11 +192,11 @@ export default {
       selectedMarca: "",
       modelosEquipos: [],
       selectedModelo: "",
-      accesorios: "",
-      falla: "",
+      accesorios: null,
+      falla: null,
       newEquipoID: null,
       campo: "",
-      selectedNroSerie: "",
+      selectedNroSerie: null,
       equipo: {},
     };
   },
@@ -217,6 +222,7 @@ export default {
 
     selectedModelo() {
       this.getModelosEquipo();
+      this.selectedModelo;
     },
   },
 
@@ -244,9 +250,9 @@ export default {
       }
     },
 
-    manejarVariableEnviada(variable) {
-      this.clientID = Number(variable);
-      this.getClientById(variable);
+    getClient(clientID) {
+      this.clientID = clientID;
+      this.getClientById(clientID);
     },
 
     getClientById(clientId) {
@@ -276,7 +282,7 @@ export default {
           this.selectedTipoEquipo = data;
         })
         .catch((error) => {
-          console.error("Error al obtener los tipos de equipo", error);
+          console.error("Error al obtener el tipo de equipo", error);
         });
     },
 
@@ -287,7 +293,7 @@ export default {
           this.selectedMarca = data;
         })
         .catch((error) => {
-          console.error("Error al obtener los tipos de equipo", error);
+          console.error("Error al obtener la marca de equipo", error);
         });
     },
 
@@ -295,15 +301,15 @@ export default {
       return fetch(`${backendData}/modelo/${id}`)
         .then((response) => {
           if (!response.ok) {
-            throw new Error("Error al obtener los tipos de equipo");
+            throw new Error("Error al obtener el modelo de equipo");
           }
           return response.json();
         })
         .then((data) => {
-          this.selectedModelo = data.id;
+          this.selectedModelo = data;
         })
         .catch((error) => {
-          console.error("Error al obtener los tipos de equipo", error);
+          console.error("Error al obtener el de equipo", error);
         });
     },
 
@@ -333,10 +339,11 @@ export default {
     },
 
     async addNewEquipo() {
+      this.getModeloById(this.selectedModelo.id);
       try {
         const equipo = {
           n_serie: this.selectedNroSerie,
-          modeloID: this.selectedModelo,
+          modeloID: this.selectedModelo.id,
         };
         const response = await fetch(`${backendData}/equipo`, {
           method: "POST",
@@ -376,9 +383,8 @@ export default {
         if (!response.ok) {
           throw new Error("Error al agregar la orden");
         }
+        await response.json();
 
-        const data = await response.json();
-        console.log(data);
         bus.$emit("orden-agregada");
       } catch (error) {
         console.error("Error al agregar la orden:", error);
@@ -390,9 +396,22 @@ export default {
       try {
         await this.addNewEquipo();
         await this.addNewOrder();
+        this.resetModal()
       } catch (error) {
         console.error("Error al agregar equipo u orden:", error);
       }
+    },
+    resetModal() {
+      this.modalShow = false;
+      this.clientID = null;
+      this.cliente = null;
+      this.selectedTipoEquipo = "";
+      this.selectedMarca = "";
+      this.selectedModelo = "";
+      this.accesorios = null;
+      this.falla = null;
+      this.selectedNroSerie = null;
+      this.equipo = {};
     },
   },
 };

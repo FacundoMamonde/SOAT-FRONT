@@ -85,8 +85,8 @@ export default {
       showForm: false,
       nombre: "",
       telefono: "",
-      dni: "",
-      description:"",
+      dni: null,
+      description:null,
       selectedClientName: "",
       selectedClientId: null,
     };
@@ -108,9 +108,9 @@ export default {
           (cliente) => cliente.nombre == this.selectedClientName
         );
         this.selectedClientId = selectedClient.id;
-        this.$emit("variable-enviada", this.selectedClientId);
+        this.$emit("cliente-agregado", this.selectedClientId);
       } else {
-        if (this.nombre && this.telefono && this.dni && this.description) {
+        if (this.nombre && this.telefono) {
           this.showForm = false;
           const createClientDto = {
             nombre: this.nombre,
@@ -138,9 +138,8 @@ export default {
           }
         })
         .then((response) => {
-          console.log(response)
           this.selectedClientId = response.id;
-          this.$emit("variable-enviada", this.selectedClientId);
+          this.$emit("cliente-agregado", this.selectedClientId);
         })
         .catch((error) => {
           console.error("Error al agregar el cliente:", error);
@@ -150,6 +149,7 @@ export default {
       this.nombre= "";
       this.telefono = "";
       this.dni = "";
+      this.description=""
       this.showForm = false;
       this.selectedClientName = "";
       this.selectedClientId = null;
@@ -159,6 +159,7 @@ export default {
       this.selectedClientName = "";
       this.selectedClientId = null;
       this.showForm = true;
+
     },
     hideForm() {
       this.showForm = false;
