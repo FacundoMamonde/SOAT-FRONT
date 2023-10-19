@@ -85,8 +85,8 @@ export default {
       showForm: false,
       nombre: "",
       telefono: "",
-      dni: "",
-      description:"",
+      dni: null,
+      description:null,
       selectedClientName: "",
       selectedClientId: null,
     };
@@ -110,7 +110,7 @@ export default {
         this.selectedClientId = selectedClient.id;
         this.$emit("cliente-agregado", this.selectedClientId);
       } else {
-        if (this.nombre && this.telefono && this.dni && this.description) {
+        if (this.nombre && this.telefono) {
           this.showForm = false;
           const createClientDto = {
             nombre: this.nombre,

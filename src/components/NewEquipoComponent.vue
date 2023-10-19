@@ -5,7 +5,7 @@
       v-model="modalShow"
       :title="`Nuevo ${this.equipoProp}`"
       @ok="submitForm"
-      @hidden="resetModal()"
+      @cancel="resetModal()"
     >
       <div class="modal-body d-flex flex-column">
         <label for="newData">
@@ -124,7 +124,7 @@ export default {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error("Error al agregar el equipo");
+            throw new Error("Error al agregar el modelo");
           }
         })
         .then((response) => {
