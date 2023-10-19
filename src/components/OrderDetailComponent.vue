@@ -77,7 +77,7 @@
         </textarea>
         </div>
         <div v-if="orderData.estado != 0">
-          <h5 class="mt-3">Informe</h5>
+          <h5 class="mt-3">Diagnóstico</h5>
           <textarea v-model="orderData.informe" class="col-11 p-0 m-0"
             style="height: 100px; min-height: 80px; max-height: 120px; width: 95%" name="" id="" cols="30" rows="10"
             @input="changeInforme"></textarea>

@@ -5,7 +5,7 @@
         
         <router-link to="/ingresadas" class-active="active" class="p-2 nav-link"> INGRESADAS </router-link>
           
-        <router-link to="/diagnosticadas" class="p-2 nav-link">DIAGNOSTICADAS</router-link>
+        <router-link to="/diagnosticadas" class="p-2 nav-link">EN DIAGNOSTICO</router-link>
 
         <router-link to="/presupuestadas" class="p-2 nav-link">PRESUPUESTADAS</router-link>
 
