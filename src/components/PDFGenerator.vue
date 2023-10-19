@@ -141,7 +141,7 @@
           style: "total",
         });
         docDefinition.content.push({
-          text: this.orderData.importe || "$",
+          text:`$ ${ this.orderData.importe }`,
           style: "totalValue",
         });
   
