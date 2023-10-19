@@ -142,6 +142,7 @@ export default {
       };
       this.addProp(propiedadName);
       this.modalShow = false;
+      this.resetModal();
     },
     resetModal() {
     this.propName=null
