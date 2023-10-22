@@ -1,21 +1,21 @@
 <template>
   <div id="divOrderTable" class="px-md-0">
-    <div class="d-flex flex-column h-100 ">
-      <div class="flex-grow-1 container pe-0" v-show="ordenes.length > 0">
-        <b-table id="table"  responsive :items="ordenes" striped :fields="fields" class="text-muted tabla"
+    <div v-if="isBusy">
+      <div class="text-center">
+        <b-spinner class ="mt-5" variant="primary"></b-spinner>
+      </div>
+    </div>
+    <div v-else class="d-flex flex-column h-100 ">
+      <div class="flex-grow-1 container pe-0 ps-0" v-show="ordenes.length > 0">
+        <b-table id="table" class="text-muted tabla" responsive :items="ordenes" striped :fields="fields" 
           :per-page="perPage" :current-page="currentPage" ref="selectableTable" selectable @row-selected="onRowSelected"
-          :select-mode="selectMode" :selected.sync="selectedRow" :borderless="true" >
+          :select-mode="selectMode" :selected.sync="selectedRow"  label-sort-asc="" label-sort-desc=""
+          label-sort-clear="" > <!-- borderless="true" -->
           <template #head()="data">
             <span class="text">{{ data.label }}</span>
           </template>
           <template #cell()="data">
             <span class="text-secondary">{{ data.value }}</span>
-          </template>
-          <template #table-busy>
-            <div class="text-center text-danger my-2">
-              <b-spinner class="align-middle"></b-spinner>
-              <strong>Loading...</strong>
-            </div>
           </template>
         </b-table>
         <div class="d-flex justify-content-center ">
@@ -41,11 +41,11 @@ export default {
       currentPage: 1,
       isBusy: false,
       fields: [
-        { key: "id", label: "#" },
-        { key: "nombre", label: "Cliente" },
-        { key: "marca", label: "Marca" },
-        { key: "modelo", label: "Modelo" },
-        { key: "falla", label: "Falla" },
+        { key: "id", label: " #" ,sortable: true},
+        { key: "nombre", label: "Cliente" ,sortable: true},
+        { key: "marca", label: "Marca" ,sortable: true},
+        { key: "modelo", label: "Modelo" ,sortable: true},
+        { key: "falla", label: "Falla" ,sortable: true},
       ],
       filtro: "",
       items: [],
@@ -97,7 +97,7 @@ export default {
         .then((ordenes) => {
           this.toggleBusy() // TESTEANDO
           this.ordenes = ordenes;
-          this.totalRows=this.ordenes.length
+          this.totalRows = this.ordenes.length
           this.selectFirstRow();
         })
         .catch((error) => {
@@ -124,9 +124,9 @@ export default {
 
     onRowSelected(ordenes) {
       if (ordenes.length == 0) {
-        this.selectedRow=null
-        bus.$emit("no-order-selected",this.orderData=null);
-       
+        this.selectedRow = null
+        bus.$emit("no-order-selected", this.orderData = null);
+
       } else {
         const orderID = ordenes[0].id;
         bus.$emit("row-selected", orderID);
@@ -155,8 +155,8 @@ export default {
           this.totalRows = this.ordenes.length;
           // this.currentPage = 1;
           if (ordenes.length > 0) {
-        this.selectFirstRow();
-      }
+            this.selectFirstRow();
+          }
         })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
@@ -213,11 +213,15 @@ export default {
 }
 
 .text {
-  color: #6a6a6b;
+  color: #161616;
+}
+
+.text-secondary {
+  color: rgb(36, 36, 36)
 }
 
 .tabla::-webkit-scrollbar-thumb {
-  background-color: #6c757d;
+  background-color: #505050;
   border-radius: 5px;
 }
 
@@ -233,12 +237,9 @@ export default {
   scrollbar-color: #6c757d transparent;
 }
 
-.text {
-  color: #6a6a6b;
-}
-
 #divOrderTable {
   border-right: 2px solid #cecece;
+  color: blacks
 }
 </style>
 
