@@ -1,9 +1,16 @@
 <template>
-  <div id="divOrderDetail" class="card" style="min-width: 360px; max-width: 1000px; border-radius: 0% !important ">
-    <div v-if="isBusy" class="text-center h-100 d-flex align-items-center justify-content-center ">
-     <b-spinner variant="primary" ></b-spinner>
-   </div >
-   <div v-else class="h-100" >
+  <div
+    id="divOrderDetail"
+    class="card"
+    style="min-width: 360px; max-width: 1000px; border-radius: 0% !important"
+  >
+    <div
+      v-if="isBusy"
+      class="text-center h-100 d-flex align-items-center justify-content-center"
+    >
+      <b-spinner variant="primary"></b-spinner>
+    </div>
+    <div v-else class="h-100">
       <div v-if="orderData != null">
         <div id="orderDetailContainer" style="padding-left: 15px">
           <div class="row pt-2">
@@ -18,7 +25,10 @@
               <!-- DIV DATOS CLIENTE -->
               <div class="d-flex flex-row">
                 <div class="col-md-1" style="width: 50px">
-                  <i class="bi bi-person-circle col-md-8" style="font-size: 40px"></i>
+                  <i
+                    class="bi bi-person-circle col-md-8"
+                    style="font-size: 40px"
+                  ></i>
                   <!-- Icono de Cliente-->
                 </div>
                 <div class="col-md-8">
@@ -62,41 +72,94 @@
               <!-- DIV ACCESORIOS -->
               <div class="d-flex flex-row">
                 <div class="col-md-1" style="width: 50px">
-                  <i class="bi bi-clipboard2-check col-md-8" style="font-size: 40px"></i>
+                  <i
+                    class="bi bi-clipboard2-check col-md-8"
+                    style="font-size: 40px"
+                  ></i>
                   <!-- Icono de Accesorios-->
                 </div>
                 <div class="col-md-8">
-                  <p v-if="orderData.accesorio" class="m-0 pt-2">
-                    {{ orderData.accesorio }}
-                  </p>
-                  <p v-else class="m-0 pt-2">Sin Accesorios</p>
+                  <div class="d-flex">
+                    <p v-if="orderData.accesorio" class="m-0 pt-2">
+                      {{ orderData.accesorio }}
+                    </p>
+                    <p v-else class="m-0 pt-2">Sin Accesorios</p>
+                    <ChangeAccesories v-if="this.orderData.estado<4"
+                      :orden="this.orderData" @accesorioCambiado="actualizarAccesorio"
+                    ></ChangeAccesories>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div v-if="orderData.estado < 2">
             <h5 class="mt-3">Descripción de la falla</h5>
-            <textarea v-model="orderData.falla" class="col-11 p-0 m-0"
-              style="height: 100px; min-height: 80px; max-height: 120px; width: 95%" name="" id="" cols="30" rows="10">
-        </textarea>
+            <textarea
+              v-model="orderData.falla"
+              class="col-11 p-0 m-0"
+              style="
+                height: 100px;
+                min-height: 80px;
+                max-height: 120px;
+                width: 95%;
+              "
+              name=""
+              id=""
+              cols="30"
+              rows="10"
+            >
+            </textarea>
           </div>
           <div v-if="orderData.estado != 0">
             <h5 class="mt-3">Diagnóstico</h5>
-            <textarea v-model="orderData.informe" class="col-11 p-0 m-0"
-              style="height: 100px; min-height: 80px; max-height: 120px; width: 95%" name="" id="" cols="30" rows="10"
-              @input="changeInforme"></textarea>
+            <textarea
+              v-model="orderData.informe"
+              class="col-11 p-0 m-0"
+              style="
+                height: 100px;
+                min-height: 80px;
+                max-height: 120px;
+                width: 95%;
+              "
+              name=""
+              id=""
+              cols="30"
+              rows="10"
+              @input="changeInforme"
+            ></textarea>
 
             <div v-if="orderData.estado >= 2">
               <h5 class="mt-3">Presupuesto</h5>
-              <textarea v-model="orderData.presupuesto" class="col-11 p-0 m-0"
-                style="height: 100px; min-height: 80px; max-height: 120px; width: 95%" name="" id="" cols="30" rows="10"
-                @input="changePresupuesto"></textarea>
+              <textarea
+                v-model="orderData.presupuesto"
+                class="col-11 p-0 m-0"
+                style="
+                  height: 100px;
+                  min-height: 80px;
+                  max-height: 120px;
+                  width: 95%;
+                "
+                name=""
+                id=""
+                cols="30"
+                rows="10"
+                @input="changePresupuesto"
+              ></textarea>
             </div>
 
-            <div v-if="orderData.estado >= 2" class="d-flex flex-row" style="width: 97%">
+            <div
+              v-if="orderData.estado >= 2"
+              class="d-flex flex-row"
+              style="width: 97%"
+            >
               <div class="p-2 w-100">
                 <span class="align-middle">$ </span>
-                <input v-model="orderData.importe" type="text" style="width: 100px" @input="changePrice()" />
+                <input
+                  v-model="orderData.importe"
+                  type="text"
+                  style="width: 100px"
+                  @input="changePrice()"
+                />
               </div>
               <div class="p-2 flex-shrink-1">
                 <PDFGenerator :orderData="orderData" />
@@ -105,18 +168,36 @@
           </div>
         </div>
 
-        <div class="w-100 d-flex justify-content-end card-footer ">
-          <button v-if="orderData.estado == 2" class="btn btn-danger me-3" @click="changeStatusNA(orderData.id)">
+        <div class="w-100 d-flex justify-content-end card-footer">
+          <button
+            v-if="orderData.estado == 4 || orderData.estado == 3 "
+            class="btn btn-secondary me-3"
+            @click="rebudget(orderData.id)"
+          >
+            Presupuestar
+          </button>
+          <button
+            v-if="orderData.estado == 2"
+            class="btn btn-danger me-3"
+            @click="changeStatusNA(orderData.id)"
+          >
             No aprobado
           </button>
-          <button v-if="orderData.estado != 5" class="btn btn-success" @click="changeStatus(orderData.id)">
+          <button
+            v-if="orderData.estado != 5"
+            class="btn btn-success"
+            @click="changeStatus(orderData.id)"
+          >
             {{ nextButton }}
           </button>
         </div>
       </div>
-      <div v-else class="h-100 d-flex align-items-center justify-content-center ">
+      <div
+        v-else
+        class="h-100 d-flex align-items-center justify-content-center"
+      >
         <!-- Contenido cuando orderData es nulo -->
-        <p class="text-center ">No se ha seleccionado ninguna orden.</p>
+        <p class="text-center">No se ha seleccionado ninguna orden.</p>
       </div>
     </div>
   </div>
@@ -127,11 +208,13 @@ import { bus, backendData } from "../main";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import PDFGenerator from "@/components/PDFGenerator.vue";
+import ChangeAccesories from "@/components/ChangeAccesories.vue";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
   components: {
     PDFGenerator,
+    ChangeAccesories,
   },
   name: "OrderDetailComponent",
 
@@ -139,13 +222,13 @@ export default {
     return {
       orderData: null,
       typingTimer: null,
-      isBusy: false
+      isBusy: false,
     };
   },
   props: {
     nextButton: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   beforeMount() {
@@ -157,23 +240,24 @@ export default {
     });
   },
   mounted() {
-  bus.$emit("order-data-loaded");
-},
-updated() {
-  if (!this.isBusy)bus.$emit("order-data-loaded");
-},
+    bus.$emit("order-data-loaded");
+  },
+  updated() {
+    if (!this.isBusy) bus.$emit("order-data-loaded");
+  },
   watch: {
     orderID(newOrderID) {
       this.getOrderById(newOrderID);
     },
     orderData() {
-      this.orderData
-    }
+      this.orderData;
+    },
   },
   methods: {
-  
-
-    generatePDF() { },
+    actualizarAccesorio(nuevoValor) {
+      this.orderData.accesorio = nuevoValor;
+    },
+    generatePDF() {},
     changeInforme() {
       clearTimeout(this.typingTimer);
       this.typingTimer = setTimeout(() => {
@@ -188,7 +272,7 @@ updated() {
     },
 
     toggleBusy() {
-      this.isBusy = !this.isBusy
+      this.isBusy = !this.isBusy;
     },
 
     changePrice() {
@@ -203,7 +287,7 @@ updated() {
       const newData = {
         [section]: value,
         id_cliente: this.orderData.cliente.id,
-        id_equipo: this.orderData.equipo.id
+        id_equipo: this.orderData.equipo.id,
       };
       fetch(`${backendData}/orden/${orderId}`, {
         method: "PATCH",
@@ -227,15 +311,14 @@ updated() {
     },
 
     getOrderById(orderId) {
-      this.toggleBusy()
+      this.toggleBusy();
       fetch(`${backendData}/orden/${orderId}`)
         .then((response) => response.json())
         .then((order) => {
           this.orderData = order;
-       this.toggleBusy()
-      
+          this.toggleBusy();
         })
-        
+
         .catch((error) => {
           console.error("Error al obtener la orden:", error);
         });
@@ -279,6 +362,25 @@ updated() {
           console.error("Error en la llamada a la API:", error);
         });
     },
+    rebudget(orderId) {
+      fetch(`${backendData}/orden/${orderId}/presupuestarA`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (response.ok) {
+            console.log("La orden se actualizó correctamente");
+            bus.$emit("cambiar-estado");
+          } else {
+            console.error("Error al actualizar la orden:", response.status);
+          }
+        })
+        .catch((error) => {
+          console.error("Error en la llamada a la API:", error);
+        });
+    },
   },
 };
 </script>
@@ -287,4 +389,3 @@ updated() {
   min-height: 520px !important;
 }
 </style>
-
