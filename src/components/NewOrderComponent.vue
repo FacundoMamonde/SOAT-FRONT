@@ -23,7 +23,7 @@
           <!-- <b-icon id="errorIconClient" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
           <div class="d-flex flex-column" style="width: 260px">
             <input
-              :class="{ 'border-danger': selectedClientError }"
+              :class="{ 'border-danger': !cliente && showError }"
               class="m-0"
               :placeholder="
                 cliente && cliente.nombre ? cliente.nombre : 'Nombre de cliente'
@@ -31,7 +31,7 @@
               readonly
             />
             <input
-              :class="{ 'border-danger': selectedClientError }"
+              :class="{ 'border-danger': !cliente && showError }"
               class="mt-0"
               :placeholder="
                 cliente && cliente.telefono
@@ -58,7 +58,7 @@
               <form action="#" style="width: 260px">
                 <select
                   v-model="selectedTipoEquipo"
-                  :class="{ 'border-danger': selectedTipoEquipoError  }"
+                  :class="{ 'border-danger': !selectedTipoEquipo && showError }"
                   style="width: 100%"
                 >
                   <option value="">---Tipo de Equipo---</option>
@@ -85,7 +85,7 @@
               <form action="#" style="width: 260px">
                 <select
                   v-model="selectedMarca"
-                  :class="{ 'border-danger': selectedModeloError }"
+                  :class="{ 'border-danger': !selectedMarca && showError }"
                   style="width: 100%"
                   required
                 >
@@ -112,7 +112,7 @@
               <form action="#" style="width: 260px">
                 <select
                   v-model="selectedModelo"
-                  :class="{ 'border-danger': selectedModeloError }"
+                  :class="{ 'border-danger': !selectedModelo && showError }"
                   style="width: 100%"
                   required
                 >
@@ -176,7 +176,7 @@
         <div>
           <h5 class="mt-3">Descripción de la falla</h5>
           <textarea
-            :class="{ 'border-danger': faltaFallaError }"
+            :class="{ 'border-danger': !this.falla && showError }"
             v-model="falla"
             class="col-11 p-0 m-0"
             style="
@@ -219,11 +219,7 @@ export default {
       campo: "",
       selectedNroSerie: null,
       equipo: {},
-      selectedModeloError: false,
-      selectedTipoEquipoError: false,
-      selectedMarcaError: false,
-      faltaFallaError: false,
-      selectedClientError: false,
+      showError: false,
     };
   },
   components: { NewClientComponent, NewEquipoComponent },
@@ -254,64 +250,41 @@ export default {
 
   methods: {
     async addNewOrder() {
-    if (this.cliente && this.equipo && this.falla) {
-      const orden = {
-        accesorio: this.accesorios,
-        falla: this.falla,
-        id_cliente: this.cliente.id,
-        id_equipo: this.equipo.id,
-      };
-      try {
-        const response = await fetch(`${backendData}/orden/new`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orden),
-        });
+     
+        const orden = {
+          accesorio: this.accesorios,
+          falla: this.falla,
+          id_cliente: this.cliente.id,
+          id_equipo: this.equipo.id,
+        };
+        try {
+          const response = await fetch(`${backendData}/orden/new`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(orden),
+          });
 
-        if (!response.ok) {
-          throw new Error("Error al agregar la orden");
+          if (!response.ok) {
+            throw new Error("Error al agregar la orden");
+          }
+          await response.json();
+          this.$bvModal.hide("newOrderModal");
+          bus.$emit("orden-agregada");
+        } catch (error) {
+          console.error("Error al agregar la orden:", error);
+          throw error;
         }
-        await response.json();
-        this.$bvModal.hide("newOrderModal");
-        bus.$emit("orden-agregada");
-      } catch (error) {
-        console.error("Error al agregar la orden:", error);
-        throw error;
-      }
-    }
-  },
+      
+    },
+
     async submitForm(bvModalEvent) {
-      if (!this.selectedModelo) {
-        this.selectedModeloError = true;
+      if (!this.selectedModelo || !this.falla || !this.cliente) {
+        this.showError = true;
         bvModalEvent.preventDefault();
       } else {
-        this.selectedModeloError = false;
-      }
-      if (!this.cliente) {
-        this.selectedClientError = true;
-        bvModalEvent.preventDefault();
-      } else {
-        this.selectedClientError = false;
-      }
-      if (!this.falla) {
-        this.faltaFallaError = true;
-        bvModalEvent.preventDefault();
-      } else {
-        this.faltaFallaError = false;
-      }
-      if (!this.selectedMarca) {
-        this.selectedModeloError = true;
-      } else {
-        this.selectedModeloError = false;
-      }
-      if (!this.selectedTipoEquipo) {
-        this.selectedTipoEquipoError = true;
-      } else {
-        this.selectedTipoEquipoError = false;
-      }
-      if (this.cliente && this.selectedModelo && this.falla)
+        this.showError = false;
         try {
           await this.addNewEquipo();
           await this.addNewOrder();
@@ -319,7 +292,9 @@ export default {
         } catch (error) {
           console.error("Error al agregar equipo u orden:", error);
         }
+      }
     },
+
     updateSelectedTipoEquipo(tipoEquipoId) {
       this.getTipoEquipoById(tipoEquipoId);
     },
@@ -358,6 +333,7 @@ export default {
           console.error("Error al obtener el cliente:", error);
         });
     },
+
     getTiposEquipo() {
       fetch(`${backendData}/tipo-equipo`)
         .then((response) => response.json())
@@ -368,6 +344,7 @@ export default {
           console.error("Error al obtener los tipos de equipo", error);
         });
     },
+
     getTipoEquipoById(id) {
       fetch(`${backendData}/tipo-equipo/${id}`)
         .then((response) => response.json())
@@ -456,27 +433,21 @@ export default {
         throw error;
       }
     },
- 
 
-
-  resetModal() {
-    this.modalShow = false;
-    this.clientID = null;
-    this.cliente = null;
-    this.selectedTipoEquipo = "";
-    this.selectedMarca = "";
-    this.selectedModelo = "";
-    this.accesorios = null;
-    this.falla = null;
-    this.selectedNroSerie = null;
-    this.equipo = {};
-    this.selectedMarcaError = false;
-    this.selectedTipoEquipoError = false;
-    this.selectedModeloError = false;
-    this.selectedClientError = false;
-    this.faltaFallaError = false;
+    resetModal() {
+      this.modalShow = false;
+      this.clientID = null;
+      this.cliente = null;
+      this.selectedTipoEquipo = "";
+      this.selectedMarca = "";
+      this.selectedModelo = "";
+      this.accesorios = null;
+      this.falla = null;
+      this.selectedNroSerie = null;
+      this.equipo = {};
+      this.showError = false;
+    },
   },
-  }
 };
 </script>
 
