@@ -7,6 +7,7 @@
       >+</b-button
     >
     <b-modal
+      id="newOrderModal"
       v-model="modalShow"
       title="Nueva Orden"
       @ok="submitForm"
@@ -19,8 +20,10 @@
             <i class="bi bi-person-circle col-md-8" style="font-size: 40px"></i>
             <!-- Icono de Cliente-->
           </div>
+          <!-- <b-icon id="errorIconClient" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
           <div class="d-flex flex-column" style="width: 260px">
             <input
+              :class="{ 'border-danger': selectedClientError }"
               class="m-0"
               :placeholder="
                 cliente && cliente.nombre ? cliente.nombre : 'Nombre de cliente'
@@ -28,6 +31,7 @@
               readonly
             />
             <input
+              :class="{ 'border-danger': selectedClientError }"
               class="mt-0"
               :placeholder="
                 cliente && cliente.telefono
@@ -50,8 +54,13 @@
           <div class="d-flex flex-column">
             <div class="d-flex">
               <!-- Seleccion de tipo de Equipo -->
+              <!-- <b-icon id="errorIconEquipment" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
               <form action="#" style="width: 260px">
-                <select v-model="selectedTipoEquipo" style="width: 100%">
+                <select
+                  v-model="selectedTipoEquipo"
+                  :class="{ 'border-danger': selectedTipoEquipoError  }"
+                  style="width: 100%"
+                >
                   <option value="">---Tipo de Equipo---</option>
                   <option
                     v-for="tipo in tipoEquipos"
@@ -70,10 +79,16 @@
                 <i class="bi bi-plus-lg"></i>
               </button>
             </div>
+
             <div class="d-flex">
               <!-- Seleccion de Marca -->
               <form action="#" style="width: 260px">
-                <select v-model="selectedMarca" style="width: 100%">
+                <select
+                  v-model="selectedMarca"
+                  :class="{ 'border-danger': selectedModeloError }"
+                  style="width: 100%"
+                  required
+                >
                   <option value="">---Marca del equipo---</option>
                   <option
                     v-for="marca in marcasEquipo"
@@ -95,7 +110,12 @@
             <div class="d-flex">
               <!-- Seleccion de Modelo -->
               <form action="#" style="width: 260px">
-                <select v-model="selectedModelo" style="width: 100%">
+                <select
+                  v-model="selectedModelo"
+                  :class="{ 'border-danger': selectedModeloError }"
+                  style="width: 100%"
+                  required
+                >
                   <option value="">---Modelo del equipo---</option>
                   <option
                     v-for="modelo in modelosEquipos"
@@ -156,6 +176,7 @@
         <div>
           <h5 class="mt-3">Descripción de la falla</h5>
           <textarea
+            :class="{ 'border-danger': faltaFallaError }"
             v-model="falla"
             class="col-11 p-0 m-0"
             style="
@@ -198,6 +219,11 @@ export default {
       campo: "",
       selectedNroSerie: null,
       equipo: {},
+      selectedModeloError: false,
+      selectedTipoEquipoError: false,
+      selectedMarcaError: false,
+      faltaFallaError: false,
+      selectedClientError: false,
     };
   },
   components: { NewClientComponent, NewEquipoComponent },
@@ -227,6 +253,73 @@ export default {
   },
 
   methods: {
+    async addNewOrder() {
+    if (this.cliente && this.equipo && this.falla) {
+      const orden = {
+        accesorio: this.accesorios,
+        falla: this.falla,
+        id_cliente: this.cliente.id,
+        id_equipo: this.equipo.id,
+      };
+      try {
+        const response = await fetch(`${backendData}/orden/new`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orden),
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al agregar la orden");
+        }
+        await response.json();
+        this.$bvModal.hide("newOrderModal");
+        bus.$emit("orden-agregada");
+      } catch (error) {
+        console.error("Error al agregar la orden:", error);
+        throw error;
+      }
+    }
+  },
+    async submitForm(bvModalEvent) {
+      if (!this.selectedModelo) {
+        this.selectedModeloError = true;
+        bvModalEvent.preventDefault();
+      } else {
+        this.selectedModeloError = false;
+      }
+      if (!this.cliente) {
+        this.selectedClientError = true;
+        bvModalEvent.preventDefault();
+      } else {
+        this.selectedClientError = false;
+      }
+      if (!this.falla) {
+        this.faltaFallaError = true;
+        bvModalEvent.preventDefault();
+      } else {
+        this.faltaFallaError = false;
+      }
+      if (!this.selectedMarca) {
+        this.selectedModeloError = true;
+      } else {
+        this.selectedModeloError = false;
+      }
+      if (!this.selectedTipoEquipo) {
+        this.selectedTipoEquipoError = true;
+      } else {
+        this.selectedTipoEquipoError = false;
+      }
+      if (this.cliente && this.selectedModelo && this.falla)
+        try {
+          await this.addNewEquipo();
+          await this.addNewOrder();
+          this.resetModal();
+        } catch (error) {
+          console.error("Error al agregar equipo u orden:", error);
+        }
+    },
     updateSelectedTipoEquipo(tipoEquipoId) {
       this.getTipoEquipoById(tipoEquipoId);
     },
@@ -363,57 +456,27 @@ export default {
         throw error;
       }
     },
+ 
 
-    async addNewOrder() {
-      const orden = {
-        accesorio: this.accesorios,
-        falla: this.falla,
-        id_cliente: this.cliente.id,
-        id_equipo: this.equipo.id,
-      };
-      try {
-        const response = await fetch(`${backendData}/orden/new`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(orden),
-        });
 
-        if (!response.ok) {
-          throw new Error("Error al agregar la orden");
-        }
-        await response.json();
-
-        bus.$emit("orden-agregada");
-      } catch (error) {
-        console.error("Error al agregar la orden:", error);
-        throw error;
-      }
-    },
-
-    async submitForm() {
-      try {
-        await this.addNewEquipo();
-        await this.addNewOrder();
-        this.resetModal()
-      } catch (error) {
-        console.error("Error al agregar equipo u orden:", error);
-      }
-    },
-    resetModal() {
-      this.modalShow = false;
-      this.clientID = null;
-      this.cliente = null;
-      this.selectedTipoEquipo = "";
-      this.selectedMarca = "";
-      this.selectedModelo = "";
-      this.accesorios = null;
-      this.falla = null;
-      this.selectedNroSerie = null;
-      this.equipo = {};
-    },
+  resetModal() {
+    this.modalShow = false;
+    this.clientID = null;
+    this.cliente = null;
+    this.selectedTipoEquipo = "";
+    this.selectedMarca = "";
+    this.selectedModelo = "";
+    this.accesorios = null;
+    this.falla = null;
+    this.selectedNroSerie = null;
+    this.equipo = {};
+    this.selectedMarcaError = false;
+    this.selectedTipoEquipoError = false;
+    this.selectedModeloError = false;
+    this.selectedClientError = false;
+    this.faltaFallaError = false;
   },
+  }
 };
 </script>
 

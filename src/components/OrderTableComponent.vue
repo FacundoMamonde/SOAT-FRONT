@@ -1,21 +1,23 @@
 <template>
   <div id="divOrderTable" class="px-md-0">
-    <div v-if="isBusy">
-      <div class="text-center">
-        <b-spinner class ="mt-5" variant="primary"></b-spinner>
-      </div>
+    
+      <div v-if="isBusy" class="text-center h-100 d-flex align-items-center justify-content-center">
+        <b-spinner  variant="primary"></b-spinner>
+      
     </div>
     <div v-else class="d-flex flex-column h-100 ">
       <div class="flex-grow-1 container pe-0 ps-0" v-show="ordenes.length > 0">
         <b-table id="table" class="text-muted tabla" responsive :items="ordenes" striped :fields="fields" 
-          :per-page="perPage" :current-page="currentPage" ref="selectableTable" selectable @row-selected="onRowSelected"
+          :per-page="perPage" :current-page="currentPage" ref="selectableTable" :selectable="selectable" @row-selected="onRowSelected"
           :select-mode="selectMode" :selected.sync="selectedRow"  label-sort-asc="" label-sort-desc=""
           label-sort-clear="" > <!-- borderless="true" -->
           <template #head()="data">
             <span class="text">{{ data.label }}</span>
           </template>
           <template #cell()="data">
-            <span class="text-secondary">{{ data.value }}</span>
+            <td :class="{ 'selected-row': data.item === selectedRow }">
+        <span class="text-secondary">{{ data.value }}</span>
+      </td>
           </template>
         </b-table>
         <div class="d-flex justify-content-center ">
@@ -31,6 +33,7 @@
 </template>
 
 <script>
+
 import { backendData, bus } from "../main";
 
 export default {
@@ -39,7 +42,7 @@ export default {
     return {
       perPage: 12,
       currentPage: 1,
-      isBusy: false,
+      isBusy:false,
       fields: [
         { key: "id", label: " #" ,sortable: true},
         { key: "nombre", label: "Cliente" ,sortable: true},
@@ -52,7 +55,8 @@ export default {
       selectMode: "range",
       selectedRow: null,
       ordenes: [],
-      totalRows: 0,
+      totalRows: null,
+      selectable: true,
     };
   },
   props: {
@@ -82,11 +86,15 @@ export default {
     bus.$on("orden-agregada", () => {
       this.fetchData();
     });
+    bus.$on("order-data-loaded", () => {
+      this.selectable= true;
+    });
 
     this.fetchData();
   },
 
   methods: {
+
     updateTotalRows() {
       this.totalRows = this.ordenes.length;
     },
@@ -98,7 +106,7 @@ export default {
           this.toggleBusy() // TESTEANDO
           this.ordenes = ordenes;
           this.totalRows = this.ordenes.length
-          this.selectFirstRow();
+          // this.selectFirstRow();
         })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
@@ -123,23 +131,27 @@ export default {
     },
 
     onRowSelected(ordenes) {
+      this.ordenes.forEach((orden) => {
+    orden._rowVariant = null;
+  });
       if (ordenes.length == 0) {
-        this.selectedRow = null
-        bus.$emit("no-order-selected", this.orderData = null);
-
-      } else {
-        const orderID = ordenes[0].id;
-        bus.$emit("row-selected", orderID);
+        this.selectedRow=null
+        bus.$emit("no-order-selected",this.orderData=null);
+     } else {
+        this.selectedRow=ordenes[0];
+       this.selectedRow._rowVariant = 'active';
+        bus.$emit("row-selected", this.selectedRow.id);
+        this.selectable = false;
       }
     },
 
-    selectFirstRow() {
-      if (this.$refs.selectableTable && this.ordenes.length > 0) {
-        this.$nextTick(() => {
-          this.$refs.selectableTable.selectRow(0);
-        });
-      }
-    },
+    // selectFirstRow() {
+    //   if (this.$refs.selectableTable && this.ordenes.length > 0) {
+    //     this.$nextTick(() => {
+    //       this.$refs.selectableTable.selectRow(0);
+    //     });
+    //   }
+    // },
 
     toggleBusy() {
       this.isBusy = !this.isBusy;
@@ -153,10 +165,11 @@ export default {
           this.toggleBusy() // TESTEANDO
           this.ordenes = ordenes;
           this.totalRows = this.ordenes.length;
+         
           // this.currentPage = 1;
-          if (ordenes.length > 0) {
-            this.selectFirstRow();
-          }
+          // if (ordenes.length > 0) {
+          //   this.selectFirstRow();
+          // }
         })
         .catch((error) => {
           console.error("Error al obtener las ordenes:", error);
@@ -164,7 +177,7 @@ export default {
     },
   },
   async beforeMount() {
-    this.selectFirstRow();
+    // this.selectFirstRow();
     bus.$on("filtro-cambiado", (filtro) => {
       this.filtro = filtro.filtro;
       this.filtroPor = filtro.filtroPor;

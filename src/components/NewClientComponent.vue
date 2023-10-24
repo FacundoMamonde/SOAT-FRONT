@@ -1,15 +1,18 @@
 <template>
   <div>
-    <button v-b-modal.modal-1 class="btn btn-primary btn-sm ms-2">
-      <i class="bi bi-search"></i>
-    </button>
-
+    <b-button
+      v-b-modal.modal-prevent-closing
+      variant="primary"
+      class="btn  btn-sm ms-2"
+      ><i class="bi bi-search"></i
+    ></b-button>
     <b-modal
-      id="modal-1"
-      title="Clientes"
-      @ok="submitForm"
-      @cancel="hideForm"
-      @hide="resetForm"
+      id="modal-prevent-closing"
+      ref="modal"
+      :title='this.titleModal()'
+      @show="resetModal"
+      @hidden="resetModal"
+      @ok="handleOk"
     >
       <div :style="{ display: showForm ? 'none' : 'flex' }" id="buscador">
         <b-form-input
@@ -19,44 +22,50 @@
         ></b-form-input>
 
         <datalist id="my-list-id">
-          
           <option
             v-for="cliente in clientes"
             :key="cliente.id + cliente.nombre"
             :value="cliente.nombre"
           ></option>
         </datalist>
-      
-        <button @click="openForm" class="btn btn-success btn-sm ms-2">
+
+        <button @click="openAddClient" class="btn btn-success btn-sm ms-2">
           <i class="bi bi-plus-lg"></i>
         </button>
+       
       </div>
-
+      <p v-if="selectionError" class="text-danger">Por favor, selecciona un cliente.</p>
       <div v-if="showForm">
-        <h5 class="mt-3">Agregar cliente</h5>
-        <b-form>
+        <form ref="form" @submit.stop.prevent="handleSubmit">
           <b-form-group
-            id="nameGroup"
-            label="Nombre y apellido"
-            label-for="nameInput"
+            label="Nombre y apellido(*)"
+            label-for="name-input"
+            invalid-feedback="El nombre es requerido"
+            :state="nameState"
           >
-            <b-form-input id="nameInput" v-model="nombre" required></b-form-input>
-          </b-form-group>
-
-          <b-form-group id="phoneGroup" label="Teléfono" label-for="phoneInput">
             <b-form-input
-              id="phoneInput"
+              id="name-input"
+              v-model="nombre"
+              :state="nameState"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            label="Telefono (*)"
+            label-for="phone-input"
+            invalid-feedback="El telefono es requerido"
+            :state="phoneState"
+            ref="phoneInput"
+          >
+            <b-form-input
+              id="phone-input"
               v-model="telefono"
+              :state="phoneState"
               required
             ></b-form-input>
           </b-form-group>
-
-          <b-form-group id="dniGroup" label="dni" label-for="dniInput">
-            <b-form-input
-              id="dniInput"
-              v-model="dni"
-              required
-            ></b-form-input>
+          <b-form-group id="dniGroup" label="Dni" label-for="dniInput">
+            <b-form-input id="dniInput" v-model="dni" required></b-form-input>
           </b-form-group>
           <b-form-group
             id="descriptionGroup"
@@ -69,59 +78,78 @@
               required
             ></b-form-textarea>
           </b-form-group>
-        </b-form>
+          <b-button
+            @click="returnModal"
+            size="sm"
+            variant="primary"
+            class="my-3"
+          >
+            <b-icon icon="arrow-left" aria-label="return"></b-icon>
+          </b-button>
+        </form>
       </div>
     </b-modal>
   </div>
 </template>
 
 <script>
-import { backendData} from "../main";
+import { backendData } from "../main";
 export default {
-  name: "NewClientComponent",
   data() {
     return {
+      nameState: null,
+      phoneState: null,
       clientes: [],
       showForm: false,
       nombre: "",
       telefono: "",
       dni: null,
-      description:null,
+      description: null,
       selectedClientName: "",
       selectedClientId: null,
+      selectionError: false,
+     
     };
   },
   created() {
-    fetch(`${backendData}/cliente`)
-      .then((response) => response.json())
-      .then((clientes) => {
-        this.clientes = clientes;
-      })
-      .catch((error) => {
-        console.error("Error al obtener los clientes:", error);
-      });
+    this.getAllClients();
   },
   methods: {
-    submitForm() {
-      if (this.selectedClientName !== "") {
-        const selectedClient = this.clientes.find(
-          (cliente) => cliente.nombre == this.selectedClientName
-        );
-        this.selectedClientId = selectedClient.id;
-        this.$emit("cliente-agregado", this.selectedClientId);
-      } else {
-        if (this.nombre && this.telefono) {
-          this.showForm = false;
-          const createClientDto = {
-            nombre: this.nombre,
-            telefono: this.telefono,
-            dni: this.dni,
-            descripcion:this.description
-          };
-          this.addClient(createClientDto);
-        }
+    openAddClient(){
+      this.showForm=true;
+      this.selectionError=false;
+    },
+    returnModal(){
+      this.showForm=false;
+      this.resetModal()
+    },
+    titleModal(){
+      if(this.showForm){
+       return 'Agregar cliente'
+      }else{
+        return 'Seleccionar cliente'
       }
     },
+    getAllClients() {
+      fetch(`${backendData}/cliente`)
+        .then((response) => response.json())
+        .then((clientes) => {
+          this.clientes = clientes;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los clientes:", error);
+        });
+    },
+    // changeModal() {
+    //   this.showForm = !this.showForm
+       
+    // },
+    // openForm() {
+    //   this.nombre = "";
+    //   this.selectedClientName = "";
+    //   this.selectedClientId = null;
+    //   this.showForm = true;
+    // },
     addClient(client) {
       fetch(`${backendData}/cliente`, {
         method: "POST",
@@ -140,31 +168,67 @@ export default {
         .then((response) => {
           this.selectedClientId = response.id;
           this.$emit("cliente-agregado", this.selectedClientId);
+          this.getAllClients();
+          this.$nextTick(() => {
+            this.$bvModal.hide("modal-prevent-closing");
+          });
         })
         .catch((error) => {
           console.error("Error al agregar el cliente:", error);
         });
     },
-    resetForm() {
-      this.nombre= "";
-      this.telefono = "";
-      this.dni = "";
-      this.description=""
-      this.showForm = false;
-      this.selectedClientName = "";
-      this.selectedClientId = null;
+    checkFormValidity() {
+      this.nameState = this.nombre.length > 0;
+      // Valida el campo de teléfono
+      this.phoneState = this.telefono.length > 0;
     },
-    openForm() {
-      this.nombre = "";
-      this.selectedClientName = "";
-      this.selectedClientId = null;
-      this.showForm = true;
+    resetModal() {
+      (this.nameState = null),
+        (this.phoneState = null),
+        (this.showForm = false),
+        (this.nombre = ""),
+        (this.telefono = ""),
+        (this.dni = null),
+        (this.description = null),
+        (this.selectedClientName = ""),
+        (this.selectedClientId = null);
+        this.selectionError=false
 
     },
-    hideForm() {
-      this.showForm = false;
+    handleOk(bvModalEvent) {
+      if (!this.showForm  &&  this.selectedClientName !== "") {
+        const selectedClient = this.clientes.find(
+          (cliente) => cliente.nombre == this.selectedClientName
+        );
+        this.selectedClientId = selectedClient.id;
+        this.$emit("cliente-agregado", this.selectedClientId);
+        this.$bvModal.hide("modal-prevent-closing");
+      } else if( !this.showForm && this.selectedClientName == ""){
+        this.selectionError = true; 
+        
+    bvModalEvent.preventDefault();
+      }
+      else {
+        bvModalEvent.preventDefault();
+        this.handleSubmit(); 
+      }
+    },
+    handleSubmit() {
+      this.checkFormValidity();
+      if (!this.nameState || !this.phoneState) {
+        return;
+      }
+      if (this.dni === null || this.dni.trim() === "") {
+        this.dni = null;
+      }
+      const createClientDto = {
+        nombre: this.nombre,
+        telefono: this.telefono,
+        dni: this.dni,
+        descripcion: this.description,
+      };
+      this.addClient(createClientDto);
     },
   },
 };
 </script>
-<style></style>

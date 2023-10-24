@@ -1,5 +1,9 @@
 <template>
   <div id="divOrderDetail" class="card" style="min-width: 360px; max-width: 1000px; border-radius: 0% !important ">
+    <div v-if="isBusy" class="text-center h-100 d-flex align-items-center justify-content-center ">
+     <b-spinner variant="primary" ></b-spinner>
+   </div >
+   <div v-else class="h-100" >
       <div v-if="orderData != null">
         <div id="orderDetailContainer" style="padding-left: 15px">
           <div class="row pt-2">
@@ -114,6 +118,7 @@
         <!-- Contenido cuando orderData es nulo -->
         <p class="text-center ">No se ha seleccionado ninguna orden.</p>
       </div>
+    </div>
   </div>
 </template>
 
@@ -134,7 +139,7 @@ export default {
     return {
       orderData: null,
       typingTimer: null,
-      isBusy: null
+      isBusy: false
     };
   },
   props: {
@@ -151,6 +156,12 @@ export default {
       this.orderData = null;
     });
   },
+  mounted() {
+  bus.$emit("order-data-loaded");
+},
+updated() {
+  if (!this.isBusy)bus.$emit("order-data-loaded");
+},
   watch: {
     orderID(newOrderID) {
       this.getOrderById(newOrderID);
@@ -160,6 +171,7 @@ export default {
     }
   },
   methods: {
+  
 
     generatePDF() { },
     changeInforme() {
@@ -215,17 +227,18 @@ export default {
     },
 
     getOrderById(orderId) {
-      this.toggleBusy();
+      this.toggleBusy()
       fetch(`${backendData}/orden/${orderId}`)
         .then((response) => response.json())
         .then((order) => {
           this.orderData = order;
+       this.toggleBusy()
+      
         })
+        
         .catch((error) => {
           console.error("Error al obtener la orden:", error);
         });
-
-      this.toggleBusy();
     },
 
     changeStatus(orderId) {
