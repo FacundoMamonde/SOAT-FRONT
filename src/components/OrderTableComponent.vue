@@ -75,7 +75,6 @@ export default {
     },
     currentPage() {
       this.fetchData();
-      this.selectFirstRow();
     },
   },
 

@@ -11,7 +11,7 @@
       v-model="modalShow"
       title="Nueva Orden"
       @ok="submitForm"
-      @cancel="resetModal()"
+      @hidden="resetModal"
     >
       <div class="modal-body">
         <!-- Div Cliente -->
@@ -250,36 +250,35 @@ export default {
 
   methods: {
     async addNewOrder() {
-     
-        const orden = {
-          accesorio: this.accesorios,
-          falla: this.falla,
-          id_cliente: this.cliente.id,
-          id_equipo: this.equipo.id,
-        };
-        try {
-          const response = await fetch(`${backendData}/orden/new`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(orden),
-          });
+      const orden = {
+        accesorio: this.accesorios,
+        falla: this.falla,
+        id_cliente: this.cliente.id,
+        id_equipo: this.equipo.id,
+      };
+      try {
+        const response = await fetch(`${backendData}/orden/new`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(orden),
+        });
 
-          if (!response.ok) {
-            throw new Error("Error al agregar la orden");
-          }
-          await response.json();
-          this.$bvModal.hide("newOrderModal");
-          bus.$emit("orden-agregada");
-        } catch (error) {
-          console.error("Error al agregar la orden:", error);
-          throw error;
+        if (!response.ok) {
+          throw new Error("Error al agregar la orden");
         }
-      
+        await response.json();
+        // this.$bvModal.hide("newOrderModal");
+        bus.$emit("orden-agregada");
+      } catch (error) {
+        console.error("Error al agregar la orden:", error);
+        throw error;
+      }
     },
 
     async submitForm(bvModalEvent) {
+      bvModalEvent.preventDefault();
       if (!this.selectedModelo || !this.falla || !this.cliente) {
         this.showError = true;
         bvModalEvent.preventDefault();
@@ -288,7 +287,7 @@ export default {
         try {
           await this.addNewEquipo();
           await this.addNewOrder();
-          this.resetModal();
+          this.$bvModal.hide("newOrderModal");
         } catch (error) {
           console.error("Error al agregar equipo u orden:", error);
         }
@@ -428,6 +427,7 @@ export default {
         }
         const data = await response.json();
         this.equipo = data;
+        console.log("se agrego el equipo");
       } catch (error) {
         console.error("Error al agregar el equipo:", error);
         throw error;
