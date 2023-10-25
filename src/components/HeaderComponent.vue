@@ -20,9 +20,9 @@
       </div>
       <div class="mt-1 pr-0">
         <p class="h5 pr-1 text-light mb-0">
-          Tecnico<b-avatar variant="danger"></b-avatar>
+          {{username}}<b-avatar variant="danger"></b-avatar>
         </p>
-        <router-link to="/" class="cerrarSesion mt-0">Cerrar Sesión</router-link>
+        <a @click="logout()" class="cerrarSesion mt-0">Cerrar Sesión</a>
         |
       </div>
     </b-navbar>
@@ -42,7 +42,11 @@ export default {
       filtro: "",
       filtroPor: "cliente",
       filtroText: "Cliente",
+      username: ""
     };
+  },
+  created() {
+    this.getUserName();
   },
   props: {},
   methods: {
@@ -52,6 +56,14 @@ export default {
         filtroPor: this.filtroPor
       });
     },
+    logout(){
+      localStorage.removeItem('token')
+
+      this.$router.push('/');
+    },
+    getUserName(){
+      this.username = localStorage.getItem('username')
+    }
   },
 };
 </script>
@@ -68,7 +80,10 @@ export default {
 }
 
 .cerrarSesion {
-  color: aliceblue;
+  color: white;
   text-decoration: none;
+  background-color: inherit;
+  border: none;
+  cursor:pointer;
 }
 </style>

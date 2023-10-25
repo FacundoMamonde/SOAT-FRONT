@@ -23,7 +23,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: IngresadasView
+    component: IngresadasView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/diagnosticadas',
@@ -31,7 +32,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: DiagnosticadasView
+    component: DiagnosticadasView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/presupuestadas',
@@ -39,7 +41,8 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: PresupuestadasView
+    component: PresupuestadasView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/pendientes',
@@ -47,17 +50,20 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: PendientesView
+    component: PendientesView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/terminadas',
     name: 'terminadas',
-    component: TerminadasView
+    component: TerminadasView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/entregadas',
     name: 'entregadas',
-    component: EntregadasView
+    component: EntregadasView,
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -66,5 +72,20 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // El usuario no está autenticado, redirige al inicio de sesión
+      next('/');
+    } else {
+      // El usuario está autenticado, permite el acceso a la ruta
+      next();
+    }
+  } else {
+    next();
+  }
+});
 
 export default router
