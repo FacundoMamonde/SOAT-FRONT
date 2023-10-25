@@ -31,14 +31,13 @@ export default {
 .nav-link {
   text-decoration: none;
   color: rgba(0, 0, 0, 0.575);
+  border-top: 3px solid #c5c5c5 ;
 }
 
 .router-link-active{
   background-color: rgb(240, 240, 240);
   color: rgb(3, 3, 3) !important;
-  border-top-right-radius: 10px;
-  border-top-left-radius: 10px;
-
+  border-top: 3px solid rgb(64, 97, 158) ;
 }
 
 .router-link-exact-active {

@@ -1,28 +1,18 @@
 <template>
   <div class="header container-fluid p-0">
-    <b-navbar
-      type="dark"
-      variant="dark"
-      class="flex-column flex-md-row justify-content-md-between"
-    >
+    <b-navbar type="dark" variant="dark" class="flex-column flex-md-row justify-content-md-between">
       <b-navbar-nav>
         <b-navbar-brand href="#" class="ps-2 fs-2">SOAT</b-navbar-brand>
       </b-navbar-nav>
       <div class="d-flex align-self-md-center">
+
         <b-input-group>
-          <b-form-input
-            v-model="filtro"
-            @input="filtrarTabla"
-            size="sm"
-          ></b-form-input>
+          <span class="input-group-text " id="basic-addon1"><b-icon-search></b-icon-search></span>
+          <b-form-input v-model="filtro" @input="filtrarTabla" size="sm" placeholder="Buscar"></b-form-input>
           <template #append>
-            <b-dropdown text="Buscar por" variant="primary">
-              <b-dropdown-item @click="filtroPor = 'cliente'"
-                >Cliente</b-dropdown-item
-              >
-              <b-dropdown-item @click="filtroPor = 'equipo'"
-                >Equipo</b-dropdown-item
-              >
+            <b-dropdown id="btnSearch" :text="filtroText" variant="primary">
+              <b-dropdown-item @click="filtroPor = 'cliente', filtroText = 'Cliente'">Cliente</b-dropdown-item>
+              <b-dropdown-item @click="filtroPor = 'equipo', filtroText = 'Equipo'">Equipo</b-dropdown-item>
             </b-dropdown>
           </template>
         </b-input-group>
@@ -30,11 +20,9 @@
       </div>
       <div class="mt-1 pr-0">
         <p class="h5 pr-1 text-light mb-0">
-          Tecnico<b-avatar variant="danger"></b-avatar>
+          {{username}}<b-avatar variant="danger"></b-avatar>
         </p>
-        <router-link to="/" class="cerrarSesion mt-0"
-          >Cerrar Sesión</router-link
-        >
+        <a @click="logout()" class="cerrarSesion mt-0">Cerrar Sesión</a>
         |
       </div>
     </b-navbar>
@@ -53,16 +41,29 @@ export default {
     return {
       filtro: "",
       filtroPor: "cliente",
+      filtroText: "Cliente",
+      username: ""
     };
+  },
+  created() {
+    this.getUserName();
   },
   props: {},
   methods: {
     filtrarTabla() {
       bus.$emit("filtro-cambiado", {
         filtro: this.filtro,
-        filtroPor: this.filtroPor,
+        filtroPor: this.filtroPor
       });
     },
+    logout(){
+      localStorage.removeItem('token')
+
+      this.$router.push('/');
+    },
+    getUserName(){
+      this.username = localStorage.getItem('username')
+    }
   },
 };
 </script>
@@ -73,11 +74,16 @@ export default {
 *::after {
   box-sizing: border-box;
 }
+
 .header {
   min-width: 360px;
 }
+
 .cerrarSesion {
-  color: aliceblue;
+  color: white;
   text-decoration: none;
+  background-color: inherit;
+  border: none;
+  cursor:pointer;
 }
 </style>
