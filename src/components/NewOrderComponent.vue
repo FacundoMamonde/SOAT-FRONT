@@ -73,7 +73,7 @@
               </form>
               <button
                 v-if="selectedTipoEquipo === ''"
-                @click="abrirModal('Tipo de equipo', '', '')"
+                @click="abrirModal('Tipo de equipo', '', '',tipoEquipos)"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>
@@ -101,7 +101,7 @@
               </form>
               <button
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
-                @click="abrirModal('Marca', selectedTipoEquipo, '')"
+                @click="abrirModal('Marca', selectedTipoEquipo, '', marcasEquipo)"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>
@@ -132,7 +132,7 @@
                   selectedMarca !== '' &&
                   selectedModelo == ''
                 "
-                @click="abrirModal('Modelo', selectedTipoEquipo, selectedMarca)"
+                @click="abrirModal('Modelo', selectedTipoEquipo, selectedMarca, modelosEquipos)"
                 class="btn btn-success btn-sm ms-2"
               >
                 <i class="bi bi-plus-lg"></i>

@@ -66,7 +66,7 @@ export default {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error("Error al agregar el equipo");
+            throw new Error("Error al agregar el tipo de equipo");
           }
         })
         .then((response) => {
@@ -74,7 +74,7 @@ export default {
           this.$emit("tipo-equipo-agregado", this.tipoEquipoId);
         })
         .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
+          console.error("Error al agregar el tipo de equipo:", error);
         });
     },
 
@@ -95,7 +95,7 @@ export default {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error("Error al agregar el equipo");
+            throw new Error("Error al agregar la marca");
           }
         })
         .then((response) => {
@@ -103,7 +103,7 @@ export default {
           this.$emit("marca-agregada", this.marcaId);
         })
         .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
+          console.error("Error al agregar la marca:", error);
         });
     },
 
@@ -132,7 +132,7 @@ export default {
           this.$emit("modelo-agregado", this.modeloId);
         })
         .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
+          console.error("Error al agregar el modelo:", error);
         });
     },
 

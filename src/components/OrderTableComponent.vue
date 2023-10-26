@@ -73,9 +73,7 @@ export default {
       });
       this.itemsFiltrados();
     },
-    currentPage() {
-      this.fetchData();
-    },
+    
   },
 
   created() {

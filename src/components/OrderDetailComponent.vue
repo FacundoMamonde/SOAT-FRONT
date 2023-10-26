@@ -334,6 +334,7 @@ export default {
         .then((response) => {
           if (response.ok) {
             bus.$emit("cambiar-estado");
+            this.orderData = null;
           } else {
             console.error("Error al actualizar la orden:", response.status);
           }
@@ -354,6 +355,7 @@ export default {
           if (response.ok) {
             console.log("La orden se actualizó correctamente");
             bus.$emit("cambiar-estado");
+            this.orderData = null;
           } else {
             console.error("Error al actualizar la orden:", response.status);
           }
@@ -373,6 +375,7 @@ export default {
           if (response.ok) {
             console.log("La orden se actualizó correctamente");
             bus.$emit("cambiar-estado");
+            this.orderData = null;
           } else {
             console.error("Error al actualizar la orden:", response.status);
           }
