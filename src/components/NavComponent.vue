@@ -15,6 +15,8 @@
 
         <router-link to="/entregadas" class="p-2 nav-link col-md-mx-3">ENTREGADAS</router-link>
 
+        <router-link v-if="getUserAdmin()" to="/eliminadas" class="p-2 nav-link col-md-mx-3">ELIMINADOS</router-link>
+
       </b-navbar-nav>
     </b-navbar>
   </div>
@@ -23,7 +25,18 @@
 <script>
 export default {
   name: "NavComponent",
-  props: {},
+  props: {
+  },
+  methods:{
+    getUserAdmin(){
+      this.admin = localStorage.getItem('role')
+      if(this.admin !== "admin"){
+        return false
+      }
+      return true
+    }
+    
+  }
 };
 </script>
 

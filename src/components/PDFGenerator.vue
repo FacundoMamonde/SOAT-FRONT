@@ -120,7 +120,7 @@
   
         // Otros detalles
         addSection("Otros Detalles", [
-          { text: `Accesorios: ${ this.orderData.accesorio !== null  && this.orderData.falla !== undefined ? this.orderData.falla : "N/A"} `|| "Sin Accesorios", style: "label" },
+          { text: `Accesorios: ${ this.orderData.accesorio !== null  && this.orderData.accesorio !== undefined ? this.orderData.accesorio : "N/A"} `|| "Sin Accesorios", style: "label" },
           {
     text: `Descripción de la Falla: ${this.orderData.falla !== null && this.orderData.falla !== undefined ? this.orderData.falla : "N/A"}`,
     style: "label"
