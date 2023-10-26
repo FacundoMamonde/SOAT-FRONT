@@ -7,6 +7,7 @@ import PresupuestadasView from '../views/PresupuestadasView.vue'
 import PendientesView from '../views/PendientesView.vue'
 import TerminadasView from '../views/TerminadasView.vue'
 import EntregadasView from '../views/EntregadasView.vue'
+import EliminadasView from '../views/EliminadasView.vue'
 
 
 Vue.use(VueRouter)
@@ -64,6 +65,12 @@ const routes = [
     name: 'entregadas',
     component: EntregadasView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/eliminadas',
+    name: 'eliminadas',
+    component: EliminadasView,
+    meta: { requiresAuth: true, role:'admin' }
   }
 ]
 

@@ -68,12 +68,10 @@ export default {
           const data = await response.json();
 
           // El backend responderá con un token JWT si las credenciales son válidas
-          const token = data.access_token;
-          const username = data.userName;
-
           // Almacena el token en el almacenamiento local o en una cookie para su posterior uso
-          localStorage.setItem('token', token);
-          localStorage.setItem('username', username);
+          localStorage.setItem('token', data.access_token);
+          localStorage.setItem('username', data.userName);
+          localStorage.setItem('role', data.role);
 
           // Redirige al usuario a la página de inicio o a otra página deseada
           this.$router.push('/ingresadas');
