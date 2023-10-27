@@ -122,8 +122,10 @@ export default {
       
       else {
         this.exist = false;
-      }}else if(!this.propName || this.propName.trim() ==""){
+      }}
+      if(!this.propName || this.propName.trim() ==""){
         this.exist = true;
+        bvModalEvent.preventDefault();
       }
     },
 
