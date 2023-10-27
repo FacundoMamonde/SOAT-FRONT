@@ -59,6 +59,7 @@ export default {
     },
 
     addTipoEquipo(propName) {
+      console.log(this.allProp);
       fetch(`${backendData}/tipo-equipo`, {
         method: "POST",
         headers: {
@@ -111,22 +112,22 @@ export default {
         });
     },
     handleOk(bvModalEvent) {
-      if(this.propName || this.propName.trim() !=""){
-      const propExist = this.allProp.find(
-        (prop) => prop.nombre == this.propName.toLowerCase()
-      );
-      if (propExist) {
-        this.exist = true;
-        bvModalEvent.preventDefault();
-      } 
-      
-      else {
-        this.exist = false;
-      }}
-      if(!this.propName || this.propName.trim() ==""){
+      if (this.propName && this.propName.trim() !== "") {
+        const nombre = this.propName.toLowerCase(); // Convertir el nombre a minúsculas
+        if (this.allProp.some((prop) => prop.nombre.toLowerCase() === nombre)) {
+          this.exist = true;
+          console.log(
+            this.allProp.some((prop) => prop.nombre === nombre.toLowerCase())
+          );
+          bvModalEvent.preventDefault();
+        } else {
+          this.exist = false;
+        }
+      } else {
         this.exist = true;
         bvModalEvent.preventDefault();
       }
+      //
     },
 
     addModelo(propName) {
@@ -161,6 +162,7 @@ export default {
 
     submitForm(bvModalEvent) {
       this.handleOk(bvModalEvent);
+      console.log(this.exist);
       if (!this.exist) {
         const propiedadName = {
           nombre: this.propName,
@@ -172,6 +174,7 @@ export default {
     },
     resetModal() {
       this.propName = null;
+      this.exist = false;
     },
   },
 };
