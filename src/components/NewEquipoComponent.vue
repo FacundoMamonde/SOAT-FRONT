@@ -1,5 +1,8 @@
 <template>
   <div>
+    <button v-b-modal.equiposModal class="btn btn-success btn-sm ms-2">
+      <i class="bi bi-plus-lg"></i>
+    </button>
     <b-modal
       id="equiposModal"
       v-model="modalShow"
@@ -23,11 +26,14 @@
 </template>
 
 <script>
-import { backendData} from "../main";
+import { backendData } from "../main";
 export default {
   name: "NewEquipoComponent",
   props: {
     campo: { type: String, default: null },
+    modelos: [],
+    selectedMarca: null,
+    selectedTipoEquipo: null,
   },
   data() {
     return {
@@ -35,19 +41,15 @@ export default {
       propNombre: null,
       equipoProp: null,
       propName: null,
-      selectedMarca: null,
-      selectedTipoEquipo: null,
+      datosRecibidos: null,
+      marca: this.selectedMarca,
+      tipoEquipo: this.selectedTipoEquipo,
     };
   },
   mounted() {
     this.equipoProp = this.campo;
   },
   methods: {
-    abrirModal(campo) {
-      this.equipoProp = campo;
-      this.modalShow = true;
-    },
-
     addProp(propName) {
       if (this.equipoProp == "Tipo de equipo") this.addTipoEquipo(propName);
       if (this.equipoProp == "Marca") this.addMarca(propName);
@@ -78,10 +80,10 @@ export default {
         });
     },
 
-    actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
-      this.selectedTipoEquipo = selectedTipoEquipo;
-      this.selectedMarca = selectedMarca;
-    },
+    // actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
+    //   this.tipoEquipo= selectedTipoEquipo;
+    //   this.marca = selectedMarca;
+    // },
 
     addMarca(propName) {
       fetch(`${backendData}/marca`, {
@@ -108,6 +110,7 @@ export default {
     },
 
     addModelo(propName) {
+      console.log(this.modelos);
       const createModeloDto = {
         nombre: propName.nombre,
         marcaID: this.selectedMarca.id,
@@ -145,10 +148,8 @@ export default {
       this.resetModal();
     },
     resetModal() {
-    this.propName=null
-  }
+      this.propName = null;
+    },
   },
-
-
 };
 </script>

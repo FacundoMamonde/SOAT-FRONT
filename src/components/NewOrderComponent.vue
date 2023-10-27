@@ -71,13 +71,12 @@
                   </option>
                 </select>
               </form>
-              <button
+              <NewEquipoComponent
                 v-if="selectedTipoEquipo === ''"
-                @click="abrirModal('Tipo de equipo', '', '',tipoEquipos)"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                @tipo-equipo-agregado="updateSelectedTipoEquipo"
+                :campo="'Tipo de equipo'"
+              ></NewEquipoComponent>
             </div>
 
             <div class="d-flex">
@@ -99,13 +98,12 @@
                   </option>
                 </select>
               </form>
-              <button
+              <NewEquipoComponent
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
-                @click="abrirModal('Marca', selectedTipoEquipo, '', marcasEquipo)"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                @marca-agregada="updateSelectedMarca"
+                :campo="'Marca'"
+              ></NewEquipoComponent>
             </div>
             <div class="d-flex">
               <!-- Seleccion de Modelo -->
@@ -126,17 +124,20 @@
                   </option>
                 </select>
               </form>
-              <button
+
+              <NewEquipoComponent
                 v-if="
                   selectedTipoEquipo !== '' &&
                   selectedMarca !== '' &&
                   selectedModelo == ''
                 "
-                @click="abrirModal('Modelo', selectedTipoEquipo, selectedMarca, modelosEquipos)"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                :modelos="this.modelosEquipos"
+                @modelo-agregado="updateSelectedModelo"
+                :selectedTipoEquipo="this.selectedTipoEquipo"
+                :selectedMarca="this.selectedMarca"
+                :campo="'Modelo'"
+              ></NewEquipoComponent>
             </div>
             <div class="d-flex flex-column mt-1" style="width: 260px">
               <input
@@ -145,14 +146,6 @@
                 v-model="selectedNroSerie"
               />
             </div>
-          </div>
-          <div class="d-flex flex-column">
-            <NewEquipoComponent
-              ref="newOrderComponent"
-              @tipo-equipo-agregado="updateSelectedTipoEquipo"
-              @marca-agregada="updateSelectedMarca"
-              @modelo-agregado="updateSelectedModelo"
-            ></NewEquipoComponent>
           </div>
         </div>
 
@@ -306,9 +299,10 @@ export default {
       this.getModeloById(modeloId);
     },
 
-    abrirModal(campo) {
+    abrirModal(campo, tipoDatos) {
       this.campo = campo;
-      this.$refs.newOrderComponent.abrirModal(campo);
+      this.datosAEnviar = this.datosParaEnviar[campo];
+      this.$refs.newOrderComponent.abrirModal(campo, tipoDatos);
       if (campo === "Modelo") {
         this.$refs.newOrderComponent.actualizarSeleccion(
           this.selectedTipoEquipo,
