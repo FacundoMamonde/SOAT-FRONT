@@ -21,6 +21,7 @@
           :placeholder="this.equipoProp"
         />
       </div>
+      <p v-if="exist" class="text-danger">ya existe</p>
     </b-modal>
   </div>
 </template>
@@ -31,7 +32,7 @@ export default {
   name: "NewEquipoComponent",
   props: {
     campo: { type: String, default: null },
-    modelos: [],
+    allProp: [],
     selectedMarca: null,
     selectedTipoEquipo: null,
   },
@@ -44,6 +45,7 @@ export default {
       datosRecibidos: null,
       marca: this.selectedMarca,
       tipoEquipo: this.selectedTipoEquipo,
+      exist: false,
     };
   },
   mounted() {
@@ -108,9 +110,25 @@ export default {
           console.error("Error al agregar la marca:", error);
         });
     },
+    handleOk(bvModalEvent) {
+      if(this.propName || this.propName.trim() !=""){
+      const propExist = this.allProp.find(
+        (prop) => prop.nombre == this.propName.toLowerCase()
+      );
+      if (propExist) {
+        this.exist = true;
+        bvModalEvent.preventDefault();
+      } 
+      
+      else {
+        this.exist = false;
+      }}else if(!this.propName || this.propName.trim() ==""){
+        this.exist = true;
+      }
+    },
 
     addModelo(propName) {
-      console.log(this.modelos);
+      console.log(this.allProp);
       const createModeloDto = {
         nombre: propName.nombre,
         marcaID: this.selectedMarca.id,
@@ -139,13 +157,16 @@ export default {
         });
     },
 
-    submitForm() {
-      const propiedadName = {
-        nombre: this.propName,
-      };
-      this.addProp(propiedadName);
-      this.modalShow = false;
-      this.resetModal();
+    submitForm(bvModalEvent) {
+      this.handleOk(bvModalEvent);
+      if (!this.exist) {
+        const propiedadName = {
+          nombre: this.propName,
+        };
+        this.addProp(propiedadName);
+        this.modalShow = false;
+        this.resetModal();
+      }
     },
     resetModal() {
       this.propName = null;

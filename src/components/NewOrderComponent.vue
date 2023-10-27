@@ -76,6 +76,7 @@
                 ref="newOrderComponent"
                 @tipo-equipo-agregado="updateSelectedTipoEquipo"
                 :campo="'Tipo de equipo'"
+                :allProp="this.tipoEquipos"
               ></NewEquipoComponent>
             </div>
 
@@ -103,6 +104,7 @@
                 ref="newOrderComponent"
                 @marca-agregada="updateSelectedMarca"
                 :campo="'Marca'"
+                :allProp="this.marcasEquipo"
               ></NewEquipoComponent>
             </div>
             <div class="d-flex">
@@ -132,7 +134,7 @@
                   selectedModelo == ''
                 "
                 ref="newOrderComponent"
-                :modelos="this.modelosEquipos"
+                :allProp="this.modelosEquipos"
                 @modelo-agregado="updateSelectedModelo"
                 :selectedTipoEquipo="this.selectedTipoEquipo"
                 :selectedMarca="this.selectedMarca"
@@ -445,4 +447,7 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}</style>
