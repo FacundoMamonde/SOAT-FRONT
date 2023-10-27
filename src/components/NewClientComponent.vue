@@ -89,8 +89,11 @@
           </b-button>
         </form>
       </div>
+  
     </b-modal>
+  
   </div>
+  
 </template>
 
 <script>

@@ -8,20 +8,29 @@
       v-model="modalShow"
       :title="`Nuevo ${this.equipoProp}`"
       @ok="submitForm"
-      @cancel="resetModal()"
+      @hidden="resetModal()"
     >
       <div class="modal-body d-flex flex-column">
-        <label for="newData">
+        <!-- <label for="equipoProp" invalid-feedback="El nombre es requerido"
+        :state="propState">
           {{ this.equipoProp }}
-        </label>
-        <input
-          id="equipoProp"
-          v-model="propName"
-          type="text"
-          :placeholder="this.equipoProp"
-        />
+          
+        </label> -->
+        <b-form-group
+          label=""
+          :label-for="equipoProp"
+          :invalid-feedback="errorMessage"
+          :state="propState"
+        >
+          <b-input
+            id="equipoProp"
+            v-model="propName"
+            type="text"
+            :placeholder="this.equipoProp"
+            :state="propState"
+          />
+        </b-form-group>
       </div>
-      <p v-if="exist" class="text-danger">ya existe</p>
     </b-modal>
   </div>
 </template>
@@ -45,7 +54,8 @@ export default {
       datosRecibidos: null,
       marca: this.selectedMarca,
       tipoEquipo: this.selectedTipoEquipo,
-      exist: false,
+      propState: null,
+      errorMessage: "",
     };
   },
   mounted() {
@@ -59,7 +69,6 @@ export default {
     },
 
     addTipoEquipo(propName) {
-      console.log(this.allProp);
       fetch(`${backendData}/tipo-equipo`, {
         method: "POST",
         headers: {
@@ -111,27 +120,25 @@ export default {
           console.error("Error al agregar la marca:", error);
         });
     },
+
     handleOk(bvModalEvent) {
       if (this.propName && this.propName.trim() !== "") {
-        const nombre = this.propName.toLowerCase(); // Convertir el nombre a minúsculas
+        const nombre = this.propName.toLowerCase();
         if (this.allProp.some((prop) => prop.nombre.toLowerCase() === nombre)) {
-          this.exist = true;
-          console.log(
-            this.allProp.some((prop) => prop.nombre === nombre.toLowerCase())
-          );
+          this.propState = false;
+          this.errorMessage = "Ya existe un registro con este nombre.";
           bvModalEvent.preventDefault();
         } else {
-          this.exist = false;
+          this.propState = true;
         }
       } else {
-        this.exist = true;
+        this.propState = false;
+        this.errorMessage = "Debe completar este campo";
         bvModalEvent.preventDefault();
       }
-      //
     },
 
     addModelo(propName) {
-      console.log(this.allProp);
       const createModeloDto = {
         nombre: propName.nombre,
         marcaID: this.selectedMarca.id,
@@ -162,8 +169,7 @@ export default {
 
     submitForm(bvModalEvent) {
       this.handleOk(bvModalEvent);
-      console.log(this.exist);
-      if (!this.exist) {
+      if (this.propState) {
         const propiedadName = {
           nombre: this.propName,
         };
@@ -172,9 +178,10 @@ export default {
         this.resetModal();
       }
     },
+    
     resetModal() {
       this.propName = null;
-      this.exist = false;
+      this.propState = null;
     },
   },
 };
