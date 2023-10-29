@@ -163,12 +163,13 @@
               <div class="p-2 w-100">
                 <span class="align-middle">$ </span>
                 <input
-                  :disabled="orderData.estado > 2"
+               
+                :disabled="orderData.estado > 2"
                   :class="{
                     'border-danger': !this.orderData.importe && showError,
                   }"
                   v-model="orderData.importe"
-                  type="text"
+                  type="number"
                   style="width: 100px"
                   @input="changePrice()"
                 />
@@ -180,7 +181,10 @@
           </div>
         </div>
 
-        <div class="w-100 d-flex justify-content-end card-footer">
+        <div class="w-100 d-flex justify-content-between card-footer">
+          
+          <TrackingDates :orden="this.orderData"/>
+          <div>
           <button
           :disabled="this.isChangingData"
             v-if="orderData.estado == 4 || orderData.estado == 3"
@@ -207,6 +211,7 @@
           </button>
         </div>
       </div>
+      </div>
       <div
         v-else
         class="h-100 d-flex align-items-center justify-content-center"
@@ -223,13 +228,16 @@ import { bus, backendData } from "../main";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import PDFGenerator from "@/components/PDFGenerator.vue";
+import TrackingDates from"@/components/TrackingComponent.vue"
 import ChangeAccesories from "@/components/ChangeAccesories.vue";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
   components: {
     PDFGenerator,
     ChangeAccesories,
+    TrackingDates
   },
   name: "OrderDetailComponent",
 
@@ -252,6 +260,7 @@ export default {
     },
   },
   beforeMount() {
+    
     bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
       this.showError = false;
@@ -316,12 +325,13 @@ export default {
         return new Promise((resolve) => {
           const trimmedValue = value.trim();
           if (!trimmedValue || trimmedValue === "") {
-            this.orderData[section] = null;
+            value = null;
             this.isChangingData = false;
           }
+          console.log(value )
           const orderId = order.id;
           const newData = {
-            [section]: trimmedValue,
+            [section]: value,
             id_cliente: order.cliente.id,
             id_equipo: order.equipo.id,
           };
@@ -469,5 +479,10 @@ textarea,
 input {
   border-radius: 3px;
   border: 1px solid #ccc;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
 </style>

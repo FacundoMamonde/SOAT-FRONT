@@ -1,13 +1,10 @@
 <template>
   <div>
-    <b-button
-      v-b-modal.modal-prevent-closing
-      variant="primary"
-      class="btn btn-sm ms-2"
+    <b-button v-b-modal.modal-cliente variant="primary" class="btn btn-sm ms-2"
       ><i class="bi bi-search"></i
     ></b-button>
     <b-modal
-      id="modal-prevent-closing"
+      id="modal-cliente"
       ref="modal"
       :title="this.titleModal()"
       @show="resetModal"
@@ -34,7 +31,7 @@
         </button>
       </div>
       <p v-if="selectionError" class="text-danger">
-       {{ errorText }}
+        {{ errorText }}
       </p>
       <div v-if="showForm">
         <form ref="form" @submit.stop.prevent="handleSubmit">
@@ -89,11 +86,8 @@
           </b-button>
         </form>
       </div>
-  
     </b-modal>
-  
   </div>
-  
 </template>
 
 <script>
@@ -112,7 +106,7 @@ export default {
       selectedClientName: "",
       selectedClientId: null,
       selectionError: false,
-      errorText:""
+      errorText: "",
     };
   },
   created() {
@@ -209,12 +203,12 @@ export default {
           this.$bvModal.hide("modal-prevent-closing");
         } else {
           this.selectionError = true;
-          this.errorText="No se encuentra el cliente"
+          this.errorText = "No se encuentra el cliente";
           bvModalEvent.preventDefault();
         }
       } else if (!this.showForm && this.selectedClientName == "") {
         this.selectionError = true;
-        this.errorText="Selecciona un cliente"
+        this.errorText = "Selecciona un cliente";
         bvModalEvent.preventDefault();
       } else {
         bvModalEvent.preventDefault();

@@ -6,16 +6,11 @@
     <b-modal
       id="equiposModal"
       v-model="modalShow"
-      :title="`Nuevo ${this.equipoProp}`"
+      :title="`Nuevo ${equipoProp}`"
       @ok="submitForm"
-      @hidden="resetModal()"
+      @hidden="resetModal"
     >
       <div class="modal-body d-flex flex-column">
-        <!-- <label for="equipoProp" invalid-feedback="El nombre es requerido"
-        :state="propState">
-          {{ this.equipoProp }}
-          
-        </label> -->
         <b-form-group
           label=""
           :label-for="equipoProp"
@@ -26,7 +21,7 @@
             id="equipoProp"
             v-model="propName"
             type="text"
-            :placeholder="this.equipoProp"
+            :placeholder="equipoProp"
             :state="propState"
           />
         </b-form-group>
@@ -37,93 +32,68 @@
 
 <script>
 import { backendData } from "../main";
+
 export default {
   name: "NewEquipoComponent",
   props: {
-    campo: { type: String, default: null },
-    allProp: [],
-    selectedMarca: null,
-    selectedTipoEquipo: null,
+    campo: String,
+    allProp: Array,
+    selectedMarca: Object,
+    selectedTipoEquipo: Object,
   },
   data() {
     return {
       modalShow: false,
-      propNombre: null,
-      equipoProp: null,
+      equipoProp: this.campo,
       propName: null,
-      datosRecibidos: null,
-      marca: this.selectedMarca,
-      tipoEquipo: this.selectedTipoEquipo,
       propState: null,
       errorMessage: "",
     };
   },
-  mounted() {
-    this.equipoProp = this.campo;
-  },
   methods: {
-    addProp(propName) {
-      if (this.equipoProp == "Tipo de equipo") this.addTipoEquipo(propName);
-      if (this.equipoProp == "Marca") this.addMarca(propName);
-      if (this.equipoProp == "Modelo") this.addModelo(propName);
+    async addProp(propName) {
+      if (this.equipoProp === "Tipo de equipo") {
+        await this.addEntity("tipo-equipo", propName, "tipo-equipo-agregado", "tipoEquipoId");
+      } else if (this.equipoProp === "Marca") {
+        await this.addEntity("marca", propName, "marca-agregada", "marcaId");
+      } else if (this.equipoProp === "Modelo") {
+        const createModeloDto = {
+          nombre: propName.nombre,
+          marcaID: this.selectedMarca.id,
+          tipoEquipoID: this.selectedTipoEquipo.id,
+        };
+        await this.addEntity("modelo", createModeloDto, "modelo-agregado", "modeloId");
+      }
+      this.modalShow = false;
+      this.resetModal();
     },
 
-    addTipoEquipo(propName) {
-      fetch(`${backendData}/tipo-equipo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(propName),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar el tipo de equipo");
-          }
-        })
-        .then((response) => {
-          this.tipoEquipoId = response.id;
-          this.$emit("tipo-equipo-agregado", this.tipoEquipoId);
-        })
-        .catch((error) => {
-          console.error("Error al agregar el tipo de equipo:", error);
+    async addEntity(endpoint, data, eventName, idField) {
+      try {
+        const response = await fetch(`${backendData}/${endpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         });
-    },
 
-    // actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
-    //   this.tipoEquipo= selectedTipoEquipo;
-    //   this.marca = selectedMarca;
-    // },
-
-    addMarca(propName) {
-      fetch(`${backendData}/marca`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(propName),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar la marca");
-          }
-        })
-        .then((response) => {
-          this.marcaId = response.id;
-          this.$emit("marca-agregada", this.marcaId);
-        })
-        .catch((error) => {
-          console.error("Error al agregar la marca:", error);
-        });
+        if (response.ok) {
+          const responseData = await response.json();
+          this[idField] = responseData.id;
+          this.$emit(eventName, this[idField]);
+        } else {
+          throw new Error(`Error al agregar ${this.equipoProp}`);
+        }
+      } catch (error) {
+        console.error(`Error al agregar ${this.equipoProp}:`, error);
+        throw error;
+      }
     },
 
     handleOk(bvModalEvent) {
       if (this.propName && this.propName.trim() !== "") {
-        const nombre = this.propName.toLowerCase();
+        const nombre = this.propName.trim().toLowerCase();
         if (this.allProp.some((prop) => prop.nombre.toLowerCase() === nombre)) {
           this.propState = false;
           this.errorMessage = "Ya existe un registro con este nombre.";
@@ -138,47 +108,16 @@ export default {
       }
     },
 
-    addModelo(propName) {
-      const createModeloDto = {
-        nombre: propName.nombre,
-        marcaID: this.selectedMarca.id,
-        tipoEquipoID: this.selectedTipoEquipo.id,
-      };
-      fetch(`${backendData}/modelo`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(createModeloDto),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar el modelo");
-          }
-        })
-        .then((response) => {
-          this.modeloId = response.id;
-          this.$emit("modelo-agregado", this.modeloId);
-        })
-        .catch((error) => {
-          console.error("Error al agregar el modelo:", error);
-        });
-    },
-
     submitForm(bvModalEvent) {
       this.handleOk(bvModalEvent);
       if (this.propState) {
-        const propiedadName = {
+        const propertyName = {
           nombre: this.propName,
         };
-        this.addProp(propiedadName);
-        this.modalShow = false;
-        this.resetModal();
+        this.addProp(propertyName);
       }
     },
-    
+
     resetModal() {
       this.propName = null;
       this.propState = null;
@@ -186,3 +125,4 @@ export default {
   },
 };
 </script>
+
