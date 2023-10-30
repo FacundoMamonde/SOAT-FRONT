@@ -19,11 +19,32 @@
         <NewOrderComponent></NewOrderComponent>
       </div>
       <div class="mt-1 pr-0">
+        <div>
+          <b-dropdown size="lg" variant="link" toggle-class="text-decoration-none" toggle-text="" no-caret>
+            <template #button-content>
+              <div>
+                <p class="h5 pr-1 text-light mb-0">
+                  <b-avatar variant="danger"></b-avatar> {{ username }}
+                </p>
+              </div>
+            </template>
+            <div>
+              <b-dropdown-header id="dropdown-header-label" class="text-center">
+                {{ username }}
+              </b-dropdown-header>
+              <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()">Configuración</b-dropdown-item>
+              <b-dropdown-item @click="logout()">Cerrar Sesión</b-dropdown-item>
+            </div>
+          </b-dropdown>
+        </div>
+        <!--
         <p class="h5 pr-1 text-light mb-0">
           {{username}}<b-avatar variant="danger"></b-avatar>
         </p>
         <a @click="logout()" class="cerrarSesion mt-0">Cerrar Sesión</a>
-        |
+        |<a v-if="getUserAdmin()" class=" mt-0">Configuracion</a> 
+        -->
       </div>
     </b-navbar>
   </div>
@@ -56,13 +77,20 @@ export default {
         filtroPor: this.filtroPor
       });
     },
-    logout(){
+    logout() {
       localStorage.removeItem('token')
 
       this.$router.push('/');
     },
-    getUserName(){
+    getUserName() {
       this.username = localStorage.getItem('username')
+    },
+    getUserAdmin() {
+      this.admin = localStorage.getItem('role');
+      if (this.admin != 'admin') {
+        return false
+      }
+      return true
     }
   },
 };
@@ -84,6 +112,6 @@ export default {
   text-decoration: none;
   background-color: inherit;
   border: none;
-  cursor:pointer;
+  cursor: pointer;
 }
 </style>
