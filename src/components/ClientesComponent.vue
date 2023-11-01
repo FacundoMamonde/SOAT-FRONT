@@ -72,8 +72,8 @@
         </b-modal>
         <!-- / Modal historial-->
         <b-modal id="modal-historial" title="Historial del cliente">
-            <b-table :items="ordenesCliente"
-            :fields="['id', 'falla','equipo.modelo.nombre']">
+            <b-table :items="ordenesCliente" :fields="fieldsModalHistorial" label-sort-asc="" label-sort-desc=""
+                label-sort-clear="">
 
             </b-table>
 
@@ -98,6 +98,13 @@ export default {
                 { key: "dni", label: "DNI", sortable: true },
                 { key: "descripcion", label: "Descripción", sortable: true },
                 { key: "actions", label: "" }
+            ],
+            fieldsModalHistorial: [
+                { key: 'id', label: "#O", sortable: true },
+                { key: 'equipo.modelo.tipoEquipo.nombre', label: "Tipo" },
+                { key: 'equipo.modelo.marca.nombre', label: 'Marca' },
+                { key: 'equipo.modelo.nombre', label: 'Modelo' },
+                { key: 'falla', label: 'Falla' }
             ],
             selectedClient: Object,
             error_clienteEnUso: false,
@@ -158,16 +165,16 @@ export default {
 
         async historialCliente() {
 
-            await fetch(`${backendData}/orden`)
+            await fetch(`${backendData}/orden/cliente/${this.selectedClient.id}`)
                 .then((response) => response.json())
                 .then((response) => {
                     this.ordenesCliente = response
-                    
+                    console.log(this.ordenesCliente)
                 })
                 .catch((error) => {
                     throw error
                 });
-            
+
         },
 
         resetModalEliminar() {

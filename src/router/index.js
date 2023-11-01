@@ -9,6 +9,7 @@ import TerminadasView from '../views/TerminadasView.vue'
 import EntregadasView from '../views/EntregadasView.vue'
 import EliminadasView from '../views/EliminadasView.vue'
 import ClientesView from '../views/ClientesView.vue'
+import ConfigNegocioView from '../views/admin/ConfigNegocioView.vue'
 
 Vue.use(VueRouter)
 
@@ -76,6 +77,12 @@ const routes = [
     path: '/clientes',
     name: 'clientes',
     component: ClientesView,
+    meta: { requiresAuth: true}
+  },
+  {
+    path: '/admin/negocio',
+    name: 'negocio',
+    component: ConfigNegocioView,
     meta: { requiresAuth: true}
   }
 ]
