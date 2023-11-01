@@ -32,7 +32,7 @@
             />
             <input
               :class="{ 'border-danger': !cliente && showError }"
-              class="mt-0"
+              class="mt-2"
               :placeholder="
                 cliente && cliente.telefono
                   ? cliente.telefono
@@ -46,8 +46,8 @@
           ></NewClientComponent>
         </div>
         <!-- Div Equipo -->
-        <div class="d-flex flex-row mt-1">
-          <div class="col-md-1 mt-3" style="width: 50px">
+        <div class="d-flex flex-row mt-3">
+          <div class="col-md-1 d-flex align-items-center" style="width: 50px">
             <i class="bi bi-laptop col-md-8" style="font-size: 40px"></i>
             <!-- Icono de Equipo-->
           </div>
@@ -56,7 +56,8 @@
               <!-- Seleccion de tipo de Equipo -->
               <!-- <b-icon id="errorIconEquipment" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
               <form action="#" style="width: 260px">
-                <select
+                <select 
+                class="my-1"
                   v-model="selectedTipoEquipo"
                   :class="{ 'border-danger': !selectedTipoEquipo && showError }"
                   style="width: 100%"
@@ -71,19 +72,20 @@
                   </option>
                 </select>
               </form>
-              <button
+              <NewEquipoComponent
                 v-if="selectedTipoEquipo === ''"
-                @click="abrirModal('Tipo de equipo', '', '')"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                @tipo-equipo-agregado="updateSelectedTipoEquipo"
+                :campo="'Tipo de equipo'"
+                :allProp="this.tipoEquipos"
+              ></NewEquipoComponent>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex ">
               <!-- Seleccion de Marca -->
-              <form action="#" style="width: 260px">
+              <form action="#" style="width: 260px" >
                 <select
+                class="my-1"
                   v-model="selectedMarca"
                   :class="{ 'border-danger': !selectedMarca && showError }"
                   style="width: 100%"
@@ -99,18 +101,20 @@
                   </option>
                 </select>
               </form>
-              <button
+              <NewEquipoComponent
+              
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
-                @click="abrirModal('Marca', selectedTipoEquipo, '')"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                @marca-agregada="updateSelectedMarca"
+                :campo="'Marca'"
+                :allProp="this.marcasEquipo"
+              ></NewEquipoComponent>
             </div>
             <div class="d-flex">
               <!-- Seleccion de Modelo -->
-              <form action="#" style="width: 260px">
+              <form action="#" style="width: 260px" >
                 <select
+                class="my-1"
                   v-model="selectedModelo"
                   :class="{ 'border-danger': !selectedModelo && showError }"
                   style="width: 100%"
@@ -126,17 +130,20 @@
                   </option>
                 </select>
               </form>
-              <button
+
+              <NewEquipoComponent
                 v-if="
                   selectedTipoEquipo !== '' &&
                   selectedMarca !== '' &&
                   selectedModelo == ''
                 "
-                @click="abrirModal('Modelo', selectedTipoEquipo, selectedMarca)"
-                class="btn btn-success btn-sm ms-2"
-              >
-                <i class="bi bi-plus-lg"></i>
-              </button>
+                ref="newOrderComponent"
+                :allProp="this.modelosEquipos"
+                @modelo-agregado="updateSelectedModelo"
+                :selectedTipoEquipo="this.selectedTipoEquipo"
+                :selectedMarca="this.selectedMarca"
+                :campo="'Modelo'"
+              ></NewEquipoComponent>
             </div>
             <div class="d-flex flex-column mt-1" style="width: 260px">
               <input
@@ -146,14 +153,6 @@
               />
             </div>
           </div>
-          <div class="d-flex flex-column">
-            <NewEquipoComponent
-              ref="newOrderComponent"
-              @tipo-equipo-agregado="updateSelectedTipoEquipo"
-              @marca-agregada="updateSelectedMarca"
-              @modelo-agregado="updateSelectedModelo"
-            ></NewEquipoComponent>
-          </div>
         </div>
 
         <div>
@@ -162,7 +161,7 @@
             v-model="accesorios"
             class="col-11 p-0 m-0"
             style="
-              height: 100px;
+              height: 80px;
               min-height: 80px;
               max-height: 120px;
               width: 95%;
@@ -180,7 +179,7 @@
             v-model="falla"
             class="col-11 p-0 m-0"
             style="
-              height: 100px;
+              height: 80px;
               min-height: 80px;
               max-height: 120px;
               width: 95%;
@@ -306,9 +305,10 @@ export default {
       this.getModeloById(modeloId);
     },
 
-    abrirModal(campo) {
+    abrirModal(campo, tipoDatos) {
       this.campo = campo;
-      this.$refs.newOrderComponent.abrirModal(campo);
+      this.datosAEnviar = this.datosParaEnviar[campo];
+      this.$refs.newOrderComponent.abrirModal(campo, tipoDatos);
       if (campo === "Modelo") {
         this.$refs.newOrderComponent.actualizarSeleccion(
           this.selectedTipoEquipo,
@@ -451,4 +451,11 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+input,select,textarea{
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}</style> 

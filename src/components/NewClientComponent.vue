@@ -1,15 +1,12 @@
 <template>
   <div>
-    <b-button
-      v-b-modal.modal-prevent-closing
-      variant="primary"
-      class="btn  btn-sm ms-2"
+    <b-button v-b-modal.modal-cliente variant="primary" class="btn btn-sm ms-2"
       ><i class="bi bi-search"></i
     ></b-button>
     <b-modal
-      id="modal-prevent-closing"
+      id="modal-cliente"
       ref="modal"
-      :title='this.titleModal()'
+      :title="this.titleModal()"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
@@ -32,9 +29,10 @@
         <button @click="openAddClient" class="btn btn-success btn-sm ms-2">
           <i class="bi bi-plus-lg"></i>
         </button>
-       
       </div>
-      <p v-if="selectionError" class="text-danger">Por favor, selecciona un cliente.</p>
+      <p v-if="selectionError" class="text-danger">
+        {{ errorText }}
+      </p>
       <div v-if="showForm">
         <form ref="form" @submit.stop.prevent="handleSubmit">
           <b-form-group
@@ -108,26 +106,26 @@ export default {
       selectedClientName: "",
       selectedClientId: null,
       selectionError: false,
-     
+      errorText: "",
     };
   },
   created() {
     this.getAllClients();
   },
   methods: {
-    openAddClient(){
-      this.showForm=true;
-      this.selectionError=false;
+    openAddClient() {
+      this.showForm = true;
+      this.selectionError = false;
     },
-    returnModal(){
-      this.showForm=false;
-      this.resetModal()
+    returnModal() {
+      this.showForm = false;
+      this.resetModal();
     },
-    titleModal(){
-      if(this.showForm){
-       return 'Agregar cliente'
-      }else{
-        return 'Seleccionar cliente'
+    titleModal() {
+      if (this.showForm) {
+        return "Agregar cliente";
+      } else {
+        return "Seleccionar cliente";
       }
     },
     getAllClients() {
@@ -142,7 +140,7 @@ export default {
     },
     // changeModal() {
     //   this.showForm = !this.showForm
-       
+
     // },
     // openForm() {
     //   this.nombre = "";
@@ -192,27 +190,32 @@ export default {
         (this.description = null),
         (this.selectedClientName = ""),
         (this.selectedClientId = null);
-        this.selectionError=false
-
+      this.selectionError = false;
     },
     handleOk(bvModalEvent) {
-      if (!this.showForm  &&  this.selectedClientName !== "") {
+      if (!this.showForm && this.selectedClientName !== "") {
         const selectedClient = this.clientes.find(
           (cliente) => cliente.nombre == this.selectedClientName
         );
-        this.selectedClientId = selectedClient.id;
-        this.$emit("cliente-agregado", this.selectedClientId);
-        this.$bvModal.hide("modal-prevent-closing");
-      } else if( !this.showForm && this.selectedClientName == ""){
-        this.selectionError = true; 
-        
-    bvModalEvent.preventDefault();
-      }
-      else {
+        if (selectedClient) {
+          this.selectedClientId = selectedClient.id;
+          this.$emit("cliente-agregado", this.selectedClientId);
+          this.$bvModal.hide("modal-prevent-closing");
+        } else {
+          this.selectionError = true;
+          this.errorText = "No se encuentra el cliente";
+          bvModalEvent.preventDefault();
+        }
+      } else if (!this.showForm && this.selectedClientName == "") {
+        this.selectionError = true;
+        this.errorText = "Selecciona un cliente";
         bvModalEvent.preventDefault();
-        this.handleSubmit(); 
+      } else {
+        bvModalEvent.preventDefault();
+        this.handleSubmit();
       }
     },
+
     handleSubmit() {
       this.checkFormValidity();
       if (!this.nameState || !this.phoneState) {

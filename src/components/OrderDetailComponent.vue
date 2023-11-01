@@ -84,8 +84,10 @@
                       {{ orderData.accesorio }}
                     </p>
                     <p v-else class="m-0 pt-2">Sin Accesorios</p>
-                    <ChangeAccesories v-if="this.orderData.estado<4"
-                      :orden="this.orderData" @accesorioCambiado="actualizarAccesorio"
+                    <ChangeAccesories
+                      v-if="this.orderData.estado < 4"
+                      :orden="this.orderData"
+                      @accesorioCambiado="actualizarAccesorio"
                     ></ChangeAccesories>
                   </div>
                 </div>
@@ -95,6 +97,7 @@
           <div v-if="orderData.estado < 2">
             <h5 class="mt-3">Descripción de la falla</h5>
             <textarea
+              disabled
               v-model="orderData.falla"
               class="col-11 p-0 m-0"
               style="
@@ -125,12 +128,17 @@
               id=""
               cols="30"
               rows="10"
+              :class="{ 'border-danger': !this.orderData.informe && showError }"
               @input="changeInforme"
             ></textarea>
 
             <div v-if="orderData.estado >= 2">
               <h5 class="mt-3">Presupuesto</h5>
               <textarea
+                :disabled="orderData.estado > 2"
+                :class="{
+                  'border-danger': !this.orderData.presupuesto && showError,
+                }"
                 v-model="orderData.presupuesto"
                 class="col-11 p-0 m-0"
                 style="
@@ -155,28 +163,38 @@
               <div class="p-2 w-100">
                 <span class="align-middle">$ </span>
                 <input
+               
+                :disabled="orderData.estado > 2"
+                  :class="{
+                    'border-danger': !this.orderData.importe && showError,
+                  }"
                   v-model="orderData.importe"
-                  type="text"
+                  type="number"
                   style="width: 100px"
                   @input="changePrice()"
                 />
               </div>
               <div class="p-2 flex-shrink-1">
-                <PDFGenerator :orderData="orderData" />
+                <PDFGenerator :orderData="orderData " />
               </div>
             </div>
           </div>
         </div>
 
-        <div class="w-100 d-flex justify-content-end card-footer">
+        <div class="w-100 d-flex justify-content-between card-footer">
+          
+          <TrackingDates :orden="this.orderData"/>
+          <div>
           <button
-            v-if="orderData.estado == 4 || orderData.estado == 3 "
+          :disabled="this.isChangingData"
+            v-if="orderData.estado == 4 || orderData.estado == 3"
             class="btn btn-secondary me-3"
             @click="rebudget(orderData.id)"
           >
             Presupuestar
           </button>
           <button
+          :disabled="this.isChangingData"
             v-if="orderData.estado == 2"
             class="btn btn-danger me-3"
             @click="changeStatusNA(orderData.id)"
@@ -184,13 +202,15 @@
             No aprobado
           </button>
           <button
+            :disabled="this.isChangingData"
             v-if="orderData.estado != 5"
             class="btn btn-success"
-            @click="changeStatus(orderData.id)"
+            @click="handleOk(orderData.id)"
           >
             {{ nextButton }}
           </button>
         </div>
+      </div>
       </div>
       <div
         v-else
@@ -208,21 +228,29 @@ import { bus, backendData } from "../main";
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import PDFGenerator from "@/components/PDFGenerator.vue";
+import TrackingDates from"@/components/TrackingComponent.vue"
 import ChangeAccesories from "@/components/ChangeAccesories.vue";
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
   components: {
     PDFGenerator,
     ChangeAccesories,
+    TrackingDates
   },
   name: "OrderDetailComponent",
 
   data() {
     return {
       orderData: null,
-      typingTimer: null,
       isBusy: false,
+      showError: false,
+      isChangingData: false,
+      backendData: backendData,
+      previousOrderData: null,
+      promiseQueue: [],
+      isProcessingQueue: false,
     };
   },
   props: {
@@ -232,8 +260,10 @@ export default {
     },
   },
   beforeMount() {
+    
     bus.$on("row-selected", (orderID) => {
       this.getOrderById(orderID);
+      this.showError = false;
     });
     bus.$on("no-order-selected", () => {
       this.orderData = null;
@@ -257,60 +287,125 @@ export default {
     actualizarAccesorio(nuevoValor) {
       this.orderData.accesorio = nuevoValor;
     },
-    generatePDF() {},
-    changeInforme() {
-      clearTimeout(this.typingTimer);
-      this.typingTimer = setTimeout(() => {
-        this.changeOrderData(this.orderData.informe, "informe");
-      }, 1000);
+
+    initiateDataChange(section) {
+      this.isChangingData = true;
+      const previousOrderData = { ...this.orderData };
+      if (this[`timer${section}`]) {
+        clearTimeout(this[`timer${section}`]);
+      }
+      this[`timer${section}`] = setTimeout(() => {
+        this.changeOrderData(
+          previousOrderData[section],
+          section,
+          previousOrderData
+        );
+      }, 2000);
     },
+
+    changeInforme() {
+      this.initiateDataChange("informe");
+    },
+
     changePresupuesto() {
-      clearTimeout(this.typingTimer);
-      this.typingTimer = setTimeout(() => {
-        this.changeOrderData(this.orderData.presupuesto, "presupuesto");
-      }, 1000);
+      this.initiateDataChange("presupuesto");
+    },
+
+    changePrice() {
+      this.initiateDataChange("importe");
     },
 
     toggleBusy() {
       this.isBusy = !this.isBusy;
     },
 
-    changePrice() {
-      clearTimeout(this.typingTimer);
-      this.typingTimer = setTimeout(() => {
-        this.changeOrderData(this.orderData.importe, "importe");
-      }, 1000);
+    changeOrderData(value, section, order) {
+      console.log(order);
+      const promiseFunction = () => {
+        return new Promise((resolve) => {
+          const trimmedValue = value.trim();
+          if (!trimmedValue || trimmedValue === "") {
+            value = null;
+            this.isChangingData = false;
+          }
+          console.log(value )
+          const orderId = order.id;
+          const newData = {
+            [section]: value,
+            id_cliente: order.cliente.id,
+            id_equipo: order.equipo.id,
+          };
+          const workerCode = `
+          onmessage = function(e) {
+            const { backendData, orderId, newData } = e.data;
+
+            fetch(backendData + '/orden/' + orderId, {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(newData),
+            })
+              .then(function(response) {
+                if (response.ok) {
+                  return response.text();
+                  this.isChangingData= false;
+                } else {
+                  throw new Error('Error al actualizar el informe: ' + response.status);
+                }
+              })
+              .then(function() {
+                postMessage('changeOrderDataCompleted');
+              })
+              .catch(function(error) {
+                console.error(error);
+              });
+          }
+        `;
+          const worker = new Worker(
+            URL.createObjectURL(
+              new Blob([workerCode], { type: "application/javascript" })
+            )
+          );
+          worker.addEventListener("message", (event) => {
+            if (event.data === "changeOrderDataCompleted") {
+              this.isChangingData = false;
+              worker.terminate();
+              resolve();
+            }
+          });
+          worker.postMessage({
+            backendData: this.backendData,
+            orderId,
+            newData,
+          });
+        });
+      };
+
+      this.promiseQueue.push(promiseFunction);
+      if (!this.isProcessingQueue) {
+        this.processPromiseQueue();
+      }
     },
 
-    changeOrderData(value, section) {
-      const orderId = this.orderData.id;
-      const newData = {
-        [section]: value,
-        id_cliente: this.orderData.cliente.id,
-        id_equipo: this.orderData.equipo.id,
-      };
-      fetch(`${backendData}/orden/${orderId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newData),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.text();
-          } else {
-            throw new Error(
-              "Error al actualizar el informe: " + response.status
-            );
-          }
+    processPromiseQueue() {
+      if (this.promiseQueue.length === 0) {
+        this.isProcessingQueue = false;
+        return;
+      }
+      const nextPromise = this.promiseQueue.shift();
+      nextPromise()
+        .then(() => {
+          this.processPromiseQueue();
         })
         .catch((error) => {
-          console.error(error);
+          console.error("Error al procesar la promesa:", error);
+          this.processPromiseQueue();
         });
     },
 
     getOrderById(orderId) {
+      this.currentOrderId = orderId;
       this.toggleBusy();
       fetch(`${backendData}/orden/${orderId}`)
         .then((response) => response.json())
@@ -324,27 +419,8 @@ export default {
         });
     },
 
-    changeStatus(orderId) {
-      fetch(`${backendData}/orden/${orderId}/estado`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            bus.$emit("cambiar-estado");
-          } else {
-            console.error("Error al actualizar la orden:", response.status);
-          }
-        })
-        .catch((error) => {
-          console.error("Error en la llamada a la API:", error);
-        });
-    },
-    //':id/presupuestoNA'
-    changeStatusNA(orderId) {
-      fetch(`${backendData}/orden/${orderId}/presupuestoNA`, {
+    updateOrderStatus(orderId, endpoint) {
+      fetch(`${backendData}/orden/${orderId}/${endpoint}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -354,6 +430,7 @@ export default {
           if (response.ok) {
             console.log("La orden se actualizó correctamente");
             bus.$emit("cambiar-estado");
+            this.orderData = null;
           } else {
             console.error("Error al actualizar la orden:", response.status);
           }
@@ -361,25 +438,31 @@ export default {
         .catch((error) => {
           console.error("Error en la llamada a la API:", error);
         });
+    },
+    changeStatus(orderId) {
+      this.updateOrderStatus(orderId, "estado");
+    },
+    changeStatusNA(orderId) {
+      this.updateOrderStatus(orderId, "presupuestoNA");
     },
     rebudget(orderId) {
-      fetch(`${backendData}/orden/${orderId}/presupuestarA`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => {
-          if (response.ok) {
-            console.log("La orden se actualizó correctamente");
-            bus.$emit("cambiar-estado");
-          } else {
-            console.error("Error al actualizar la orden:", response.status);
-          }
-        })
-        .catch((error) => {
-          console.error("Error en la llamada a la API:", error);
-        });
+      this.updateOrderStatus(orderId, "presupuestarA");
+    },
+
+    handleOk(orderId) {
+      if (this.orderData.estado === 1 && !this.orderData.informe) {
+        this.showError = true;
+      } else if (this.orderData.estado === 2) {
+        if (!this.orderData.importe || !this.orderData.presupuesto) {
+          this.showError = true;
+        } else {
+          this.changeStatus(orderId);
+          this.showError = false;
+        }
+      } else {
+        this.changeStatus(orderId);
+        this.showError = false;
+      }
     },
   },
 };
@@ -387,5 +470,19 @@ export default {
 <style scoped>
 #orderDetailContainer {
   min-height: 520px !important;
+}
+textarea:focus,
+input:focus {
+  outline: none;
+}
+textarea,
+input {
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
 </style>
