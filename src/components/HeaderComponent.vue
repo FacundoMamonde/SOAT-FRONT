@@ -33,6 +33,7 @@
                 {{ username }}
               </b-dropdown-header>
               <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Config. Negocio</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()">Configuración</b-dropdown-item>
               <b-dropdown-item @click="logout()">Cerrar Sesión</b-dropdown-item>
             </div>
