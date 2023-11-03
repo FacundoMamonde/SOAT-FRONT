@@ -1,9 +1,10 @@
 <template>
-  <div>
+  <div class="h-100">
     <b-button v-b-modal.modal-cliente variant="primary" class="btn btn-sm ms-2"
       ><i class="bi bi-search"></i
     ></b-button>
     <b-modal
+    
       id="modal-cliente"
       ref="modal"
       :title="this.titleModal()"
@@ -11,20 +12,8 @@
       @hidden="resetModal"
       @ok="handleOk"
     >
-      <div :style="{ display: showForm ? 'none' : 'flex' }" id="buscador">
-        <!-- <b-form-input
-          list="my-list-id"
-          v-model="selectedClientName"
-          placeholder="Selecciona un cliente"
-        ></b-form-input>
-
-        <datalist id="my-list-id">
-          <option
-            v-for="cliente in clientes"
-            :key="cliente.id + cliente.nombre"
-            :value="cliente.nombre"
-          ></option>
-        </datalist> -->
+<div id="buscador">
+      <div :style="{ display: showForm ? 'none' : 'flex' }">
         <div class="mx-auto w-100">
           <div class="d-flex m-auto col-10">
             <b-input-group>
@@ -50,12 +39,14 @@
               :per-page="perPage"
               :current-page="currentPage"
               striped
-              hover
               :items="filteredClientes()"
               :fields="fields"
               label-sort-asc=""
               label-sort-desc=""
               label-sort-clear=""
+              select-mode="range"
+              selectable
+              @row-selected="onRowSelected"
             ></b-table>
           </div>
           <div class="d-flex justify-content-center">
@@ -72,8 +63,8 @@
       <p v-if="selectionError" class="text-danger">
         {{ errorText }}
       </p>
-      <div v-if="showForm">
-        <form ref="form" @submit.stop.prevent="handleSubmit">
+      <div v-if="showForm" id="agregar">
+        <form ref="form" @submit.stop.prevent="handleSubmit" >
           <b-form-group
             label="Nombre y apellido(*)"
             label-for="name-input"
@@ -125,8 +116,10 @@
           </b-button>
         </form>
       </div>
+    </div>
     </b-modal>
   </div>
+
 </template>
 
 <script>
@@ -146,6 +139,7 @@ export default {
       dni: null,
       description: null,
       selectedClientName: "",
+      selected: null,
       selectedClientId: null,
       selectionError: false,
       errorText: "",
@@ -157,9 +151,14 @@ export default {
     };
   },
   created() {
+    
     this.getAllClients();
   },
   methods: {
+    onRowSelected(item) {
+        this.selected = item
+        console.log(this.selected)
+      },
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
         return this.clientes;
@@ -240,7 +239,6 @@ export default {
     },
     checkFormValidity() {
       this.nameState = this.nombre.length > 0;
-      // Valida el campo de teléfono
       this.phoneState = this.telefono.length > 0;
     },
     resetModal() {
@@ -256,23 +254,17 @@ export default {
       this.selectionError = false;
     },
     handleOk(bvModalEvent) {
-      if (!this.showForm && this.selectedClientName !== "") {
-        const selectedClient = this.clientes.find(
-          (cliente) => cliente.nombre == this.selectedClientName
-        );
-        if (selectedClient) {
-          this.selectedClientId = selectedClient.id;
+      if (!this.showForm ) {
+        if (this.selected) {
+          this.selectedClientId = this.selected[0].id;
           this.$emit("cliente-agregado", this.selectedClientId);
           this.$bvModal.hide("modal-cliente");
         } else {
           this.selectionError = true;
-          this.errorText = "No se encuentra el cliente";
-          bvModalEvent.preventDefault();
-        }
-      } else if (!this.showForm && this.selectedClientName == "") {
-        this.selectionError = true;
         this.errorText = "Selecciona un cliente";
         bvModalEvent.preventDefault();
+        }
+    
       } else {
         bvModalEvent.preventDefault();
         this.handleSubmit();
@@ -298,3 +290,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+#buscador, #agregar{
+  height: 70vh !important;
+}
+</style>
