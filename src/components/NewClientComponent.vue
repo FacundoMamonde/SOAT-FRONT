@@ -12,7 +12,7 @@
       @ok="handleOk"
     >
       <div :style="{ display: showForm ? 'none' : 'flex' }" id="buscador">
-        <b-form-input
+        <!-- <b-form-input
           list="my-list-id"
           v-model="selectedClientName"
           placeholder="Selecciona un cliente"
@@ -24,11 +24,50 @@
             :key="cliente.id + cliente.nombre"
             :value="cliente.nombre"
           ></option>
-        </datalist>
-
-        <button @click="openAddClient" class="btn btn-success btn-sm ms-2">
-          <i class="bi bi-plus-lg"></i>
-        </button>
+        </datalist> -->
+        <div class="mx-auto w-100">
+          <div class="d-flex m-auto col-10">
+            <b-input-group>
+              <span class="input-group-text" id="basic-addon1"
+                ><b-icon-search></b-icon-search
+              ></span>
+              <b-form-input
+                v-model="searchQuery"
+                size="sm"
+                placeholder="Buscar por nombre o telefono"
+              />
+            </b-input-group>
+            <button @click="openAddClient" class="btn btn-success btn-sm ms-2">
+              <i class="bi bi-plus-lg"></i>
+            </button>
+          </div>
+          <div
+            class="d-flex d-column center justify-content-center mx-auto w-100"
+          >
+            <b-table
+              w-100
+              id="searchClient"
+              :per-page="perPage"
+              :current-page="currentPage"
+              striped
+              hover
+              :items="filteredClientes()"
+              :fields="fields"
+              label-sort-asc=""
+              label-sort-desc=""
+              label-sort-clear=""
+            ></b-table>
+          </div>
+          <div class="d-flex justify-content-center">
+            <b-pagination
+              size="sm"
+              v-model="currentPage"
+              :total-rows="totalRows"
+              :per-page="perPage"
+              aria-controls="searchClient"
+            ></b-pagination>
+          </div>
+        </div>
       </div>
       <p v-if="selectionError" class="text-danger">
         {{ errorText }}
@@ -95,6 +134,9 @@ import { backendData } from "../main";
 export default {
   data() {
     return {
+      totalRows: null,
+      currentPage: 1,
+      perPage: 10,
       nameState: null,
       phoneState: null,
       clientes: [],
@@ -107,12 +149,32 @@ export default {
       selectedClientId: null,
       selectionError: false,
       errorText: "",
+      searchQuery: "",
+      fields: [
+        { key: "nombre", label: "Nombre", sortable: true },
+        { key: "telefono", label: "Telefono", sortable: true },
+      ],
     };
   },
   created() {
     this.getAllClients();
   },
   methods: {
+    filteredClientes() {
+      if (this.searchQuery.trim() === "") {
+        return this.clientes;
+      }
+
+      return this.clientes.filter((cliente) => {
+        return (
+          cliente.nombre
+            .toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
+          cliente.telefono.includes(this.searchQuery)
+          // Add more fields to search if needed
+        );
+      });
+    },
     openAddClient() {
       this.showForm = true;
       this.selectionError = false;
@@ -133,6 +195,7 @@ export default {
         .then((response) => response.json())
         .then((clientes) => {
           this.clientes = clientes;
+          this.totalRows = this.clientes.length;
         })
         .catch((error) => {
           console.error("Error al obtener los clientes:", error);
@@ -168,7 +231,7 @@ export default {
           this.$emit("cliente-agregado", this.selectedClientId);
           this.getAllClients();
           this.$nextTick(() => {
-            this.$bvModal.hide("modal-prevent-closing");
+            this.$bvModal.hide("modal-cliente");
           });
         })
         .catch((error) => {
@@ -200,7 +263,7 @@ export default {
         if (selectedClient) {
           this.selectedClientId = selectedClient.id;
           this.$emit("cliente-agregado", this.selectedClientId);
-          this.$bvModal.hide("modal-prevent-closing");
+          this.$bvModal.hide("modal-cliente");
         } else {
           this.selectionError = true;
           this.errorText = "No se encuentra el cliente";
