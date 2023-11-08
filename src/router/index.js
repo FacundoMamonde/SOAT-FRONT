@@ -10,6 +10,9 @@ import EntregadasView from '../views/EntregadasView.vue'
 import EliminadasView from '../views/EliminadasView.vue'
 import ClientesView from '../views/ClientesView.vue'
 import ConfigNegocioView from '../views/admin/ConfigNegocioView.vue'
+import ConfigUsuariosView from '../views/admin/ConfigUsuariosView.vue'
+import ConfigUsuarioView from '../views/user/ConfigUsuarioView.vue'
+
 
 Vue.use(VueRouter)
 
@@ -83,6 +86,18 @@ const routes = [
     path: '/admin/negocio',
     name: 'negocio',
     component: ConfigNegocioView,
+    meta: { requiresAuth: true}
+  },
+  {
+    path: '/admin/usuarios',
+    name: 'usuarios',
+    component: ConfigUsuariosView,
+    meta: { requiresAuth: true}
+  },
+  {
+    path: '/user/config',
+    name: 'userconfig',
+    component: ConfigUsuarioView,
     meta: { requiresAuth: true}
   }
 ]

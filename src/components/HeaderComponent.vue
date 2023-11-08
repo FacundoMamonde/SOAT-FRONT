@@ -33,31 +33,36 @@
                 {{ username }}
               </b-dropdown-header>
               <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin() == false" v-b-modal.modal-config-usuario>Config. Usuario</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Config. Negocio</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()">Configuración</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios" >Config. Usuarios</b-dropdown-item>
               <b-dropdown-item @click="logout()">Cerrar Sesión</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
-        <!--
-        <p class="h5 pr-1 text-light mb-0">
-          {{username}}<b-avatar variant="danger"></b-avatar>
-        </p>
-        <a @click="logout()" class="cerrarSesion mt-0">Cerrar Sesión</a>
-        |<a v-if="getUserAdmin()" class=" mt-0">Configuracion</a> 
-        -->
       </div>
     </b-navbar>
+    <div>
+      <b-modal id="modal-config-usuario" title="Configuración Usuario">  <ConfigUsuarioComponent></ConfigUsuarioComponent>
+        <template #modal-footer="{}">
+                <div class="w-100">
+                </div>
+            </template> </b-modal>
+  
   </div>
+  </div>
+  
 </template>
 
 <script>
 import { bus } from "../main";
 import NewOrderComponent from "@/components/NewOrderComponent.vue";
+import ConfigUsuarioComponent from "@/components/user/ConfigUsuario.vue"
 export default {
   name: "HeaderComponent",
   components: {
     NewOrderComponent,
+    ConfigUsuarioComponent
   },
   data() {
     return {
@@ -84,7 +89,7 @@ export default {
       this.$router.push('/');
     },
     getUserName() {
-      this.username = localStorage.getItem('username')
+      this.username = localStorage.getItem('name')
     },
     getUserAdmin() {
       this.admin = localStorage.getItem('role');

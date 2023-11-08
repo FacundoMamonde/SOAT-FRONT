@@ -14,7 +14,7 @@
           <h2 class="mb-3">Bienvenido</h2>
           <p class="my-3">Por favor ingrese sus datos para iniciar sesión</p>
           <b-form class=" w-50 m-auto  ">
-            <b-form-input class="my-3 rounded-pill text-center" id="email" v-model="email" placeholder="Correo"
+            <b-form-input class="my-3 rounded-pill text-center" id="username" v-model="username" placeholder="Usuario"
               required></b-form-input>
             <b-form-input class="my-3 rounded-pill text-center" id="password" v-model="password" placeholder="Contraseña"
               type="password" required></b-form-input>
@@ -39,7 +39,7 @@ export default {
   props: {},
   data() {
     return {
-      email: "",
+      username: "",
       password: "",
       errorlogin: false,
     };
@@ -49,7 +49,7 @@ export default {
 
     },
     async login() {
-      console.log(`Ejecutando login - usuario: ${this.email} - contraseña: ${this.password}`)
+      console.log(`Ejecutando login - usuario: ${this.username} - contraseña: ${this.password}`)
       try {
         const response = await fetch(`${backendData}/auth/login`, {
           method: "POST",
@@ -57,7 +57,7 @@ export default {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email: this.email,
+            username: this.username,
             password: this.password,
           }),
         });
@@ -70,7 +70,8 @@ export default {
           // El backend responderá con un token JWT si las credenciales son válidas
           // Almacena el token en el almacenamiento local o en una cookie para su posterior uso
           localStorage.setItem('token', data.access_token);
-          localStorage.setItem('username', data.userName);
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('name', data.name);
           localStorage.setItem('role', data.role);
 
           // Redirige al usuario a la página de inicio o a otra página deseada
