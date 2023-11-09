@@ -1,7 +1,7 @@
 <template>
     <b-card no-body>
         <b-tabs card>
-            <!-- TAB DE EDITAR USUARIO-->
+            <!--//// TAB DE EDITAR USUARIO ////-->
             <b-tab @click="resetUpdateUserStatus(), loadUserData()" title="Editar" active>
                 <h6>Username</h6>
                 <b-input id="inputUsername" type="text" autocomplete="off" v-model=selectedUser.username> </b-input>
@@ -17,15 +17,15 @@
                 </b-alert>
 
                 <!-- Boton de guardar-->
-                <div v-if="oldData != selectedUser" class="w-100">
-                    <b-button variant="primary" size="sm" class="float-center" @click="updateUser()">
+                <div v-if="oldData != selectedUser" class="w-100 text-center">
+                    <b-button type="button" variant="primary" size="s" @click="updateUser()">
                         Guardar
                     </b-button>
                 </div>
             </b-tab>
 
 
-            <!-- TAB DE SEGURIDAD-->
+            <!--//// TAB DE SEGURIDAD ////-->
             <b-tab @click="changePasswordReset()" title="Seguridad">
                 <h6>Ingrese la contraseña actual</h6>
                 <b-form-input id="inputOldPassword" v-model=changePassword.oldPassword type="password"></b-form-input>
@@ -44,11 +44,11 @@
                     Se cambió la contraseña con exitó
                 </b-alert>
                 <!-- Modal footer -->
-                <div class="w-100">
+                <div class="w-100 text-center" >
                     <div v-if="changePassword.newPassword != '' &
                         changePassword.oldPassword != '' &
                         changePassword.newPassword == changePassword.newPassword2">
-                        <b-button variant="primary" size="sm" class="float-center"
+                        <b-button variant="primary" size="s" class="float-center"
                             @click="changePasswordErrorReset(), changePass()">
                             Guardar
                         </b-button>
@@ -189,6 +189,16 @@ export default {
 <style scoped>
 #divConfigUsuarios {
     background-color: white;
+}
+
+input{
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+input:focus {
+    border-color: none;
+    box-shadow: none;
 }
 </style>
   

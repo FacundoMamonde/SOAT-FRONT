@@ -33,7 +33,7 @@
                 {{ username }}
               </b-dropdown-header>
               <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin() == false" v-b-modal.modal-config-usuario>Config. Usuario</b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-config-usuario>Config. Usuario</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Config. Negocio</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios" >Config. Usuarios</b-dropdown-item>
               <b-dropdown-item @click="logout()">Cerrar Sesión</b-dropdown-item>
