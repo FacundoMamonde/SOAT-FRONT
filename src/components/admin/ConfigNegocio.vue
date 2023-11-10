@@ -6,19 +6,24 @@
         <div v-else>
 
             <div id="divDatosNegocio">
-                <h2>Datos del negocio</h2>
-
+                <h3>Modificar datos del negocio</h3>
+                <b-alert v-if="isNewNegocio" show variant="primary">A continuación ingrese los datos de su negocio</b-alert>
                 <div class="d-flex flex-row">
                     <div class="col-md-6">
-                        <h6>Nombre</h6>
+                        <h6 v-if="isNewNegocio">Nombre (*)</h6>
+                        <h6 v-else>Nombre</h6>
                         <b-form-input id="inputNombre" label="Nombre" v-model=negocio.nombre></b-form-input>
-                        <h6>Pais</h6>
+                        <h6 v-if="isNewNegocio">Pais (*)</h6>
+                        <h6 v-else>Pais</h6>
                         <b-form-input id="inputPais" v-model=negocio.pais> </b-form-input>
-                        <h6>Provincia / Estado</h6>
+                        <h6 v-if="isNewNegocio">Provincia / Estado (*)</h6>
+                        <h6 v-else>Provincia / Estado</h6>
                         <b-form-input id="inputProvincia" v-model=negocio.provincia></b-form-input>
-                        <h6>Ciudad</h6>
+                        <h6 v-if="isNewNegocio">Ciudad (*)</h6>
+                        <h6 v-else>Ciudad</h6>
                         <b-form-input id="inputCiudad" v-model=negocio.ciudad></b-form-input>
-                        <h6>Direccion</h6>
+                        <h6 v-if="isNewNegocio">Dirección (*)</h6>
+                        <h6 v-else>Dirección</h6>
                         <b-form-input id="inputDireccion" v-model=negocio.direccion></b-form-input>
                     </div>
                     <div class="col-md-6 ms-4">
@@ -32,8 +37,12 @@
                         <b-form-input id="inputCuit" v-model=negocio.cuit></b-form-input>
                     </div>
                 </div>
-
                 <b-button class="mt-3" variant="outline-primary" @click="saveData()">Guardar</b-button>
+                <div class="mt-3">
+                    <b-alert v-if="saveSuccess" variant="success" show>Cambios guardados con éxito</b-alert>
+                    <b-alert v-if="saveError.message != null" variant="danger" show>{{ saveError.message }}</b-alert>
+                </div>
+
 
             </div>
         </div>
@@ -61,7 +70,9 @@ export default {
                 cuit: null,
             },
             isBusy: false,
-            isNewNegocio: false
+            isNewNegocio: false,
+            saveError: { message: null },
+            saveSuccess: false
         }
     },
     computed: {
@@ -78,9 +89,8 @@ export default {
             try {
                 const response = await fetch(`${backendData}/negocio`)
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data');
+                    throw new Error('No se pudo hacer fetch a data');
                 }
-                console.log(response.text)
                 const text = await response.text();
                 if (text.trim() == '') {
                     this.isNewNegocio = true;
@@ -90,43 +100,76 @@ export default {
                 }
             } catch (error) {
                 console.error("Error al obtener negocio:", error);
-            } finally {
-                this.toggleBusy();
             }
+            this.toggleBusy();
+
         },
         async saveData() {
             this.toggleBusy();
-            if (!this.isNewNegocio == true) {
-                await fetch(`${backendData}/negocio`, {
-                    method: 'PATCH', // *GET, POST, PUT, DELETE, etc.
-                    mode: 'cors', // no-cors, *cors, same-origin
-                    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-                    credentials: 'same-origin', // include, *same-origin, omit
-                    headers: {
-                        'Content-Type': 'application/json'
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: JSON.stringify(this.negocio)
-                })
-                    .then((response) => response.json())
-                    .then((json) => console.log(json));
-                this.toggleBusy();
-            } else {
-                console.log("ejecutando POST")
-                const response = await fetch(`${backendData}/negocio`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.negocio),
-                });
 
-                if (!response.ok) {
-                    throw new Error('Failed to create new negocio');
+            /// Si ya esta creado el negocio en la DB
+            if (!this.isNewNegocio == true) {
+                try {
+                    const response = await fetch(`${backendData}/negocio`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.token}`
+                        },
+                        body: JSON.stringify(this.negocio)
+                    });
+
+                    if (response.ok) {
+                        this.toggleBusy();
+                        this.saveSuccess = true;
+                        this.saveError.message = null;
+                    } else {
+                        this.toggleBusy();
+                        const errorResponse = await response.json();
+                        this.saveError.message = errorResponse;
+                    }
+                } catch (error) {
+                    this.saveSuccess = false;
+                    this.saveError.message = "No se pudo conectar al servidor"
+                    this.toggleBusy();
                 }
-                this.toggleBusy()
-                const json = await response.json();
-                console.log(json);
+            } else {
+                // Si el negocio no esta creado en la DB
+                // Comprobacion de campos necesarios
+                if (this.negocio.nombre == null ||
+                    this.negocio.pais == null ||
+                    this.negocio.provincia == null ||
+                    this.negocio.ciudad == null ||
+                    this.negocio.direccion == null) {
+                    this.toggleBusy();
+                    this.saveError.message = "Faltan datos nesesarios";
+                } else {
+                    try {
+                        const response = await fetch(`${backendData}/negocio`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${localStorage.token}`
+                            },
+                            body: JSON.stringify(this.negocio)
+                        });
+
+                        if (response.ok) {
+                            this.toggleBusy();
+                            this.isNewNegocio = false;
+                            this.saveError.message = null;
+                            this.saveSuccess = true;
+                        } else {
+                            this.toggleBusy();
+                            const errorResponse = await response.json();
+                            this.saveError.message = errorResponse;
+                        }
+                    } catch (error) {
+                        this.saveSuccess = false;
+                        this.saveError.message = "No se pudo conectar al servidor"
+                        this.toggleBusy();
+                    }
+                }
             }
         }
     }
