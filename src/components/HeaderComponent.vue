@@ -23,27 +23,33 @@
           <b-dropdown size="lg" variant="link" toggle-class="text-decoration-none" toggle-text="" no-caret>
             <template #button-content>
               <div>
-                <p class="h5 pr-1 text-light mb-0">
-                  <b-avatar variant="danger"></b-avatar> {{ username }}
+                <p class="h5 pr-1 text-light mb-0" v-b-tooltip.hover :title=username>
+                  <b-avatar variant="danger"></b-avatar> 
                 </p>
               </div>
             </template>
-            <div>
-              <b-dropdown-header id="dropdown-header-label" class="text-center">
-                {{ username }}
+            <div id="dropdown-usuario">
+              <b-dropdown-header id="dropdown-header-label">
+                <b-avatar class="m-auto" variant="danger"></b-avatar>
+                <div>{{ username }}</div>
+            
               </b-dropdown-header>
+              <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
-              <b-dropdown-item v-b-modal.modal-config-usuario>Config. Usuario</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Config. Negocio</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios" >Config. Usuarios</b-dropdown-item>
-              <b-dropdown-item @click="logout()">Cerrar Sesión</b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-config-usuario>Mis datos</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item disabled>Administración</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Negocio</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios">Usuarios</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
+              <b-dropdown-item @click="logout()"> <b-power ></b-power>Cerrar Sesión</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
       </div>
     </b-navbar>
     <div>
-      <b-modal id="modal-config-usuario" title="Configuración Usuario">  <ConfigUsuarioComponent></ConfigUsuarioComponent>
+      <b-modal id="modal-config-usuario" title="Mis datos">  <ConfigUsuarioComponent></ConfigUsuarioComponent>
         <template #modal-footer="{}">
                 <div class="w-100">
                 </div>
@@ -113,11 +119,4 @@ export default {
   min-width: 360px;
 }
 
-.cerrarSesion {
-  color: white;
-  text-decoration: none;
-  background-color: inherit;
-  border: none;
-  cursor: pointer;
-}
 </style>

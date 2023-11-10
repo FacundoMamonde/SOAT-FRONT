@@ -2,7 +2,9 @@
     <b-card no-body>
         <b-tabs card>
             <!--//// TAB DE EDITAR USUARIO ////-->
-            <b-tab @click="resetUpdateUserStatus(), loadUserData()" title="Editar" active>
+            <b-tab @click="resetUpdateUserStatus(), loadUserData()" title="Perfil" active>
+                <h5 class="mb-4">Editar mis datos</h5>
+
                 <h6>Username</h6>
                 <b-input id="inputUsername" type="text" autocomplete="off" v-model=selectedUser.username> </b-input>
                 <h6>Nombre</h6>
@@ -27,9 +29,12 @@
 
             <!--//// TAB DE SEGURIDAD ////-->
             <b-tab @click="changePasswordReset()" title="Seguridad">
+                <h5 class="mb-4">Cambio de contraseña</h5>
+
                 <h6>Ingrese la contraseña actual</h6>
                 <b-form-input id="inputOldPassword" v-model=changePassword.oldPassword type="password"></b-form-input>
-                <h6>Ingrese la nueva contraseña</h6>
+
+                <h6 class="mt-5">Ingrese la nueva contraseña</h6>
                 <b-form-input id="inputNewPassword1" v-model=changePassword.newPassword type="password">
                 </b-form-input>
                 <h6>Ingrese nuevamente la nueva contraseña</h6>
@@ -50,7 +55,7 @@
                         changePassword.newPassword == changePassword.newPassword2">
                         <b-button variant="primary" size="s" class="float-center"
                             @click="changePasswordErrorReset(), changePass()">
-                            Guardar
+                            Cambiar
                         </b-button>
                     </div>
                 </div>
