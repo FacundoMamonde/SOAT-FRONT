@@ -15,7 +15,7 @@
                     {{ this.updateUserStatus.error }}
                 </b-alert>
                 <b-alert show variant="success" v-if="updateUserStatus.success == true">
-                    Datos guardados con exito
+                   Datos guardados con exito
                 </b-alert>
 
                 <!-- Boton de guardar-->
@@ -50,8 +50,7 @@
                 </b-alert>
                 <!-- Modal footer -->
                 <div class="w-100 text-center" >
-                    <div v-if="changePassword.newPassword != '' &
-                        changePassword.oldPassword != '' &
+                    <div v-if="(changePassword.newPassword).length > 5 &
                         changePassword.newPassword == changePassword.newPassword2">
                         <b-button variant="primary" size="s" class="float-center"
                             @click="changePasswordErrorReset(), changePass()">

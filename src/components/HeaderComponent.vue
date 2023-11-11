@@ -42,7 +42,7 @@
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Negocio</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios">Usuarios</b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item @click="logout()"> <b-power ></b-power>Cerrar Sesión</b-dropdown-item>
+              <b-dropdown-item @click="logout()"> <b-icon-power ></b-icon-power>Cerrar Sesión</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
