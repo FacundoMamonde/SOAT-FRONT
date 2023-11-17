@@ -10,21 +10,67 @@
                 <h6>Nombre</h6>
                 <b-input id="inputNombre" label="Nombre" v-model=selectedUser.name></b-input>
 
-                <!-- Mensajes de Errores-->
-                <b-alert show variant="warning" v-if="updateUserStatus.error != ''">
-                    {{ this.updateUserStatus.error }}
-                </b-alert>
-                <b-alert show variant="success" v-if="updateUserStatus.success == true">
-                    Datos guardados con exito
+                <!-- ALERTS -->
+                <b-alert class="mt-3" show variant="primary" v-if="isBusyEditUser == true">
+                    <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
                 </b-alert>
 
-                <!-- Boton de guardar-->
-                <div v-if="oldData != selectedUser" class="w-100 text-center">
-                    <b-button type="button" variant="primary" size="s" @click="updateUser()">
-                        Guardar
-                    </b-button>
+                <b-alert class="mt-3" show variant="success" v-if="updateUserStatus.success == true">
+                    <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                    Se modificó {{ selectedUser.username }} correctamente
+                </b-alert>
+
+                <b-alert class="mt-3" show variant="danger" v-if="updateUserStatus.error != ''">
+                    <b-icon class="ms-1 me-1" icon="x-circle-fill" scale="1"></b-icon>
+                    {{ updateUserStatus.error }}
+                </b-alert>
+
+                <!-- Modal footer -->
+                <div>
+                    <div v-if="!updateUserStatus.success">
+                        <b-button v-if="oldData.name != selectedUser.name
+                            || oldData.username != selectedUser.username" v-b-modal.modal-confirmChange
+                            variant="primary">Guardar</b-button>
+                        <b-button v-else v-b-modal.modal-confirmChange variant="primary" disabled>Guardar</b-button>
+                    </div>
                 </div>
             </b-tab>
+
+            <!-- MODAL CONFIRMACION DE CAMBIOS -->
+            <template>
+                <b-modal id="modal-confirmChange" title="Confirmar cambios">
+                    <h5 class="mb-3">Desea afectuar los siguientes cambios?</h5>
+                    <div v-if="this.selectedUser.username != this.oldData.username">
+                        <b-alert class="mt-3" show variant="warning">
+                            <h6>Username: </h6>
+                            <h6>{{ this.oldData.username }} <b-icon icon="arrow-right"></b-icon> {{
+                                this.selectedUser.username }}</h6>
+                        </b-alert>
+                    </div>
+                    <div v-if="this.selectedUser.name != this.oldData.name">
+                        <b-alert class="mt-3" show variant="warning">
+                            <h6>Nombre: </h6>
+                            <h6>{{ this.oldData.name }} <b-icon icon="arrow-right"></b-icon> {{
+                                this.selectedUser.name }}
+                            </h6>
+                        </b-alert>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <template #modal-footer="{ ok }">
+                        <div class="w-100">
+                            <b-button class="me-2 " @click="ok">
+                                Cancelar
+                            </b-button>
+                            <b-button variant="primary" class="float-center" @click="updateUser(), ok()">
+                                Confirmar
+                            </b-button>
+
+                        </div>
+                    </template>
+                </b-modal>
+            </template>
+
 
 
             <!--//// TAB DE SEGURIDAD ////-->
@@ -41,17 +87,23 @@
                 <b-form-input id="inputNewPassword2" v-model=changePassword.newPassword2 type="password">
                 </b-form-input>
 
-                <b-alert show variant="warning" v-if="changePassword.error != ''">
+
+                <!-- ALERTS -->
+                <b-alert class="mt-3" show variant="primary" v-if="isBusyChangePassword">
+                    <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
+                </b-alert>
+                <b-alert class="mt-3" show variant="success" v-if="changePassword.success">
+                    <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                    Se modificó contraseña correctamente
+                </b-alert>
+                <b-alert class="mt-3" show variant="danger" v-if="changePassword.error != ''">
+                    <b-icon class="ms-1 me-1" icon="x-circle-fill" scale="1"></b-icon>
                     {{ changePassword.error }}
                 </b-alert>
 
-                <b-alert show variant="success" v-if="changePassword.success == true">
-                    Se cambió la contraseña con exitó
-                </b-alert>
                 <!-- Modal footer -->
-                <div class="w-100 text-center" >
-                    <div v-if="changePassword.newPassword != '' &
-                        changePassword.oldPassword != '' &
+                <div class="w-100 text-center">
+                    <div v-if="(changePassword.newPassword).length > 5 &
                         changePassword.newPassword == changePassword.newPassword2">
                         <b-button variant="primary" size="s" class="float-center"
                             @click="changePasswordErrorReset(), changePass()">
@@ -73,7 +125,9 @@ export default {
     },
     data() {
         return {
-            isBusy: false,
+            isBust:false,
+            isBusyEditUser: false,
+            isBusyChangePassword:false,
             editUser: {},
             selectedUser: Object,
             oldData: Object,
@@ -113,6 +167,12 @@ export default {
         toggleBusy() {
             this.isBusy = !this.isBusy
         },
+        toggleBusyEditUser() {
+            this.isBusyEditUser = !this.isBusyEditUser
+        },
+        toggleBusyChangePassword() {
+            this.isBusyChangePassword = !this.isBusyChangePassword
+        },
         resetUpdateUserStatus() {
             this.updateUserStatus = { success: false, error: '' }
         },
@@ -123,8 +183,12 @@ export default {
             this.changePassword.error = '',
                 this.changePassword.success = false
         },
+        async sleepFunction(ms) {
+            await new Promise(r => setTimeout(r, ms));
+        },
         async updateUser() {
-            this.toggleBusy();
+            this.toggleBusyEditUser();
+            await this.sleepFunction(1500)
             this.resetUpdateUserStatus();
 
             try {
@@ -140,7 +204,7 @@ export default {
                 if (response.ok) {
                     // Si la respuesta es exitosa, procesa los datos si es necesario
                     this.updateUserStatus.success = true;
-                    this.toggleBusy();
+                    this.toggleBusyEditUser();
                     this.loadUserData();
                     // Hacer algo con json si es necesario
                 } else {
@@ -151,11 +215,12 @@ export default {
                 }
             } catch (error) {
                 // Manejo de errores generales
+                this.toggleBusyEditUser()
                 this.updateUserStatus.error = error.message;
             }
         },
         async changePass() {
-            this.toggleBusy();
+            this.toggleBusyChangePassword();
             try {
                 const response = await fetch(`${backendData}/auth/password`, {
                     method: "PATCH",
@@ -172,19 +237,20 @@ export default {
 
                 if (!response.ok) {
                     // Manejo de errores en caso de que la respuesta no sea exitosa (por ejemplo, un error HTTP)
+                    this.toggleBusyChangePassword();
                     const errorResponse = await response.json();
                     this.changePassword.error = errorResponse.message;
                 } else {
+                    this.toggleBusyChangePassword();
                     // Manejo de éxito
                     this.changePassword.success = true
                     // Realizar acciones adicionales si es necesario
                 }
-
-                this.toggleBusy();
             } catch (error) {
                 // Manejo de errores generales que no sean errores de respuesta HTTP
+                this.toggleBusyChangePassword();
                 this.changePassword.error = error.message;
-                this.toggleBusy();
+            
             }
         }
     }
@@ -196,7 +262,7 @@ export default {
     background-color: white;
 }
 
-input{
+input {
     margin-top: 2px;
     margin-bottom: 8px;
 }

@@ -1,6 +1,6 @@
 <template>
     <div>
-      <HeaderComponent></HeaderComponent>
+      <HeaderComponent :buscadorOrdenes="true"></HeaderComponent>
       <NavComponent></NavComponent>
       <div id="divOrderContainer">
         <OrderTableComponent :estado="1" ></OrderTableComponent>

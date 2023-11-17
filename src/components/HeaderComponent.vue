@@ -4,7 +4,7 @@
       <b-navbar-nav>
         <b-navbar-brand href="#" class="ps-2 fs-2">SOAT</b-navbar-brand>
       </b-navbar-nav>
-      <div class="d-flex align-self-md-center">
+      <div v-if="buscadorOrdenes" class="d-flex align-self-md-center" >
 
         <b-input-group>
           <span class="input-group-text " id="basic-addon1"><b-icon-search></b-icon-search></span>
@@ -42,7 +42,7 @@
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Negocio</b-dropdown-item>
               <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios">Usuarios</b-dropdown-item>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item @click="logout()"> <b-power ></b-power>Cerrar Sesión</b-dropdown-item>
+              <b-dropdown-item @click="logout()"> <b-icon-power ></b-icon-power>Cerrar Sesión</b-dropdown-item>
             </div>
           </b-dropdown>
         </div>
@@ -81,7 +81,9 @@ export default {
   created() {
     this.getUserName();
   },
-  props: {},
+  props: {
+    buscadorOrdenes:Boolean
+  },
   methods: {
     filtrarTabla() {
       bus.$emit("filtro-cambiado", {
