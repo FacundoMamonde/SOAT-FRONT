@@ -1,12 +1,9 @@
 <template>
   <div>
-    <button v-b-modal.equiposModal class="btn btn-success btn-sm ms-2">
-      <i class="bi bi-plus-lg"></i>
-    </button>
     <b-modal
       id="equiposModal"
       v-model="modalShow"
-      :title="`Nuevo ${equipoProp}`"
+      :title="`Nuevo ${this.equipoProp}`"
       @ok="submitForm"
       @hidden="resetModal"
     >
@@ -37,9 +34,8 @@ export default {
   name: "NewEquipoComponent",
   props: {
     campo: String,
-    allProp: Array,
-    selectedMarca: Object,
-    selectedTipoEquipo: Object,
+    // allProp: Array,
+    
   },
   data() {
     return {
@@ -48,9 +44,17 @@ export default {
       propName: null,
       propState: null,
       errorMessage: "",
+      allProp:[]
     };
   },
   methods: {
+    abrirModal(campo,allProp) {
+      this.equipoProp = campo;
+      this.allProp=allProp
+      console.log(this.equipoProp)
+      console.log(this.allProp)
+     
+    },
     async addProp(propName) {
       if (this.equipoProp === "Tipo de equipo") {
         await this.addEntity("tipo-equipo", propName, "tipo-equipo-agregado", "tipoEquipoId");
@@ -90,7 +94,10 @@ export default {
         throw error;
       }
     },
-
+    actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
+      this.selectedTipoEquipo = selectedTipoEquipo;
+      this.selectedMarca = selectedMarca;
+    },
     handleOk(bvModalEvent) {
       if (this.propName && this.propName.trim() !== "") {
         const nombre = this.propName.trim().toLowerCase();
@@ -117,12 +124,17 @@ export default {
         this.addProp(propertyName);
       }
     },
-
+     
     resetModal() {
       this.propName = null;
       this.propState = null;
+      this.$emit("cerrar-modal-equipo");
+
     },
   },
 };
 </script>
+<style>
 
+
+</style>

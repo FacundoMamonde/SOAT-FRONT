@@ -117,6 +117,9 @@ export default {
     bus.$on("cambiar-estado", () => {
       this.fetchData();
     });
+    bus.$on("orden-eliminada", () => {
+      this.fetchData();
+    });
     bus.$on("orden-agregada", () => {
       this.fetchData();
     });

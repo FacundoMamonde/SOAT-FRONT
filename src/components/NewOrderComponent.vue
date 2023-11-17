@@ -1,17 +1,21 @@
 <template>
   <div>
     <b-button
-      @click="modalShow = !modalShow"
+      v-b-modal.newOrderModal
       variant="success rounded-pill"
       class="ms-2 fw-bold"
       >+</b-button
     >
     <b-modal
+      ref="newOrderModal"
       id="newOrderModal"
-      v-model="modalShow"
       title="Nueva Orden"
       @ok="submitForm"
-      @hidden="resetModal"
+      @cancel="resetModal"
+      hide-header-close
+      no-close-on-backdrop
+      no-close-on-esc
+      no-stacking
     >
       <div class="modal-body">
         <!-- Div Cliente -->
@@ -20,7 +24,6 @@
             <i class="bi bi-person-circle col-md-8" style="font-size: 40px"></i>
             <!-- Icono de Cliente-->
           </div>
-          <!-- <b-icon id="errorIconClient" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
           <div class="d-flex flex-column" style="width: 260px">
             <input
               :class="{ 'border-danger': !cliente && showError }"
@@ -41,9 +44,14 @@
               readonly
             />
           </div>
-          <NewClientComponent
-            @cliente-agregado="getClient"
-          ></NewClientComponent>
+          <div class="col-md-1 d-flex align-items-center">
+            <b-button
+              v-b-modal.modal-cliente
+              variant="primary"
+              class="btn btn-sm ms-2"
+              ><i class="bi bi-search"></i
+            ></b-button>
+          </div>
         </div>
         <!-- Div Equipo -->
         <div class="d-flex flex-row mt-3">
@@ -54,10 +62,9 @@
           <div class="d-flex flex-column">
             <div class="d-flex">
               <!-- Seleccion de tipo de Equipo -->
-              <!-- <b-icon id="errorIconEquipment" icon="exclamation-circle" variant="danger" class="m-1 "></b-icon> -->
               <form action="#" style="width: 260px">
-                <select 
-                class="my-1"
+                <select
+                  class="my-1"
                   v-model="selectedTipoEquipo"
                   :class="{ 'border-danger': !selectedTipoEquipo && showError }"
                   style="width: 100%"
@@ -72,20 +79,21 @@
                   </option>
                 </select>
               </form>
-              <NewEquipoComponent
+              <button
+                v-b-modal.equiposModal
                 v-if="selectedTipoEquipo === ''"
-                ref="newOrderComponent"
-                @tipo-equipo-agregado="updateSelectedTipoEquipo"
-                :campo="'Tipo de equipo'"
-                :allProp="this.tipoEquipos"
-              ></NewEquipoComponent>
+                @click="abrirModal('Tipo de equipo', tipoEquipos)"
+                class="btn btn-success btn-sm ms-2"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
             </div>
 
-            <div class="d-flex ">
+            <div class="d-flex">
               <!-- Seleccion de Marca -->
-              <form action="#" style="width: 260px" >
+              <form action="#" style="width: 260px">
                 <select
-                class="my-1"
+                  class="my-1"
                   v-model="selectedMarca"
                   :class="{ 'border-danger': !selectedMarca && showError }"
                   style="width: 100%"
@@ -101,20 +109,20 @@
                   </option>
                 </select>
               </form>
-              <NewEquipoComponent
-              
+              <button
+                v-b-modal.equiposModal
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
-                ref="newOrderComponent"
-                @marca-agregada="updateSelectedMarca"
-                :campo="'Marca'"
-                :allProp="this.marcasEquipo"
-              ></NewEquipoComponent>
+                @click="abrirModal('Marca', marcasEquipo)"
+                class="btn btn-success btn-sm ms-2"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
             </div>
             <div class="d-flex">
               <!-- Seleccion de Modelo -->
-              <form action="#" style="width: 260px" >
+              <form action="#" style="width: 260px">
                 <select
-                class="my-1"
+                  class="my-1"
                   v-model="selectedModelo"
                   :class="{ 'border-danger': !selectedModelo && showError }"
                   style="width: 100%"
@@ -130,20 +138,25 @@
                   </option>
                 </select>
               </form>
-
-              <NewEquipoComponent
+              <button
+                v-b-modal.equiposModal
                 v-if="
                   selectedTipoEquipo !== '' &&
                   selectedMarca !== '' &&
                   selectedModelo == ''
                 "
-                ref="newOrderComponent"
-                :allProp="this.modelosEquipos"
-                @modelo-agregado="updateSelectedModelo"
-                :selectedTipoEquipo="this.selectedTipoEquipo"
-                :selectedMarca="this.selectedMarca"
-                :campo="'Modelo'"
-              ></NewEquipoComponent>
+                @click="
+                  abrirModal(
+                    'Modelo',
+                    modelosEquipos,
+                    selectedTipoEquipo,
+                    selectedMarca
+                  )
+                "
+                class="btn btn-success btn-sm ms-2"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
             </div>
             <div class="d-flex flex-column mt-1" style="width: 260px">
               <input
@@ -192,6 +205,18 @@
         </div>
       </div>
     </b-modal>
+    <NewClientComponent
+      ref="clientComponent"
+      @cliente-agregado="getClient"
+      @cerrar-modal-actual="abrirNuevoModal"
+    ></NewClientComponent>
+    <NewEquipoComponent
+      ref="newOrderComponent"
+      @cerrar-modal-equipo="abrirNuevoModal"
+      @tipo-equipo-agregado="getTipoEquipoById"
+      @marca-agregada="getMarcaById"
+      @modelo-agregado="getModeloById"
+    ></NewEquipoComponent>
   </div>
 </template>
 
@@ -199,18 +224,18 @@
 import { bus, backendData } from "../main";
 import NewClientComponent from "./NewClientComponent.vue";
 import NewEquipoComponent from "./NewEquipoComponent.vue";
+
 export default {
   name: "NewOrderComponent",
   data() {
     return {
-      modalShow: false,
       clientID: null,
       cliente: null,
       tipoEquipos: [],
-      selectedTipoEquipo: "",
       marcasEquipo: [],
-      selectedMarca: "",
       modelosEquipos: [],
+      selectedTipoEquipo: "",
+      selectedMarca: "",
       selectedModelo: "",
       accesorios: null,
       falla: null,
@@ -219,11 +244,14 @@ export default {
       selectedNroSerie: null,
       equipo: {},
       showError: false,
+      allProp: [],
+      selected:""
     };
   },
   components: { NewClientComponent, NewEquipoComponent },
 
   created() {
+    bus.$on("cliente-agregado", this.handleClienteAgregado)
     this.getTiposEquipo();
     this.getMarcasEquipo();
   },
@@ -248,6 +276,13 @@ export default {
   },
 
   methods: {
+    handleClienteAgregado(selectedClientId) {
+      this.getClient(selectedClientId)
+    },
+    abrirNuevoModal() {
+      this.$bvModal.show("newOrderModal");
+    },
+
     async addNewOrder() {
       const orden = {
         accesorio: this.accesorios,
@@ -268,7 +303,6 @@ export default {
           throw new Error("Error al agregar la orden");
         }
         await response.json();
-        // this.$bvModal.hide("newOrderModal");
         bus.$emit("orden-agregada");
       } catch (error) {
         console.error("Error al agregar la orden:", error);
@@ -287,28 +321,17 @@ export default {
           await this.addNewEquipo();
           await this.addNewOrder();
           this.$bvModal.hide("newOrderModal");
+          this.resetModal();
         } catch (error) {
           console.error("Error al agregar equipo u orden:", error);
         }
       }
     },
 
-    updateSelectedTipoEquipo(tipoEquipoId) {
-      this.getTipoEquipoById(tipoEquipoId);
-    },
-
-    updateSelectedMarca(marcaId) {
-      this.getMarcaById(marcaId);
-    },
-
-    updateSelectedModelo(modeloId) {
-      this.getModeloById(modeloId);
-    },
-
-    abrirModal(campo, tipoDatos) {
+    abrirModal(campo, allProp) {
+      this.modalS = false;
       this.campo = campo;
-      this.datosAEnviar = this.datosParaEnviar[campo];
-      this.$refs.newOrderComponent.abrirModal(campo, tipoDatos);
+      this.$refs.newOrderComponent.abrirModal(campo, allProp);
       if (campo === "Modelo") {
         this.$refs.newOrderComponent.actualizarSeleccion(
           this.selectedTipoEquipo,
@@ -316,23 +339,11 @@ export default {
         );
       }
     },
-
     getClient(clientID) {
       this.clientID = clientID;
       this.getClientById(clientID);
     },
-
-    getClientById(clientId) {
-      fetch(`${backendData}/cliente/${clientId}`)
-        .then((response) => response.json())
-        .then((cliente) => {
-          this.cliente = cliente;
-        })
-        .catch((error) => {
-          console.error("Error al obtener el cliente:", error);
-        });
-    },
-
+   
     getTiposEquipo() {
       fetch(`${backendData}/tipo-equipo`)
         .then((response) => response.json())
@@ -344,43 +355,33 @@ export default {
         });
     },
 
-    getTipoEquipoById(id) {
-      fetch(`${backendData}/tipo-equipo/${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          this.selectedTipoEquipo = data;
-        })
-        .catch((error) => {
-          console.error("Error al obtener el tipo de equipo", error);
-        });
+
+    getDataById(id, data, targetProperty) {
+  fetch(`${backendData}/${data}/${id}`)
+    .then((response) => response.json())
+    .then((responseData) => {
+      this[targetProperty] = responseData;
+    })
+    .catch((error) => {
+      console.error(`Error al obtener la ${data} de equipo`, error);
+    });
+},
+getClientById(id) {
+  this.getDataById(id, "cliente", "cliente");
     },
 
-    getMarcaById(id) {
-      fetch(`${backendData}/marca/${id}`)
-        .then((response) => response.json())
-        .then((data) => {
-          this.selectedMarca = data;
-        })
-        .catch((error) => {
-          console.error("Error al obtener la marca de equipo", error);
-        });
-    },
+getMarcaById(id) {
+  this.getDataById(id, "marca", "selectedMarca");
+},
 
-    getModeloById(id) {
-      return fetch(`${backendData}/modelo/${id}`)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Error al obtener el modelo de equipo");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.selectedModelo = data;
-        })
-        .catch((error) => {
-          console.error("Error al obtener el de equipo", error);
-        });
-    },
+getModeloById(id) {
+  this.getDataById(id, "modelo", "selectedModelo");
+},
+
+getTipoEquipoById(id) {
+  this.getDataById(id, "tipo-equipo", "selectedTipoEquipo");
+},
+
 
     getMarcasEquipo() {
       fetch(`${backendData}/marca`)
@@ -435,7 +436,6 @@ export default {
     },
 
     resetModal() {
-      this.modalShow = false;
       this.clientID = null;
       this.cliente = null;
       this.selectedTipoEquipo = "";
@@ -452,10 +452,15 @@ export default {
 </script>
 
 <style scoped>
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
   outline: none;
 }
-input,select,textarea{
+input,
+select,
+textarea {
   border-radius: 3px;
   border: 1px solid #ccc;
-}</style> 
+}
+</style>

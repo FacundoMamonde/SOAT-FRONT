@@ -182,8 +182,11 @@
         </div>
 
         <div class="w-100 d-flex justify-content-between card-footer">
-          
-          <TrackingDates :orden="this.orderData"/>
+          <div class="d-flex">
+          <TrackingDates :orden="this.orderData" class="me-3"/>
+
+         <DeleteOrder :orden="this.orderData" @orden-eliminada="handleOrdenEliminada"/>
+        </div>
           <div>
           <button
           :disabled="this.isChangingData"
@@ -230,14 +233,15 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import PDFGenerator from "@/components/PDFGenerator.vue";
 import TrackingDates from"@/components/TrackingComponent.vue"
 import ChangeAccesories from "@/components/ChangeAccesories.vue";
-
+import DeleteOrder from "@/components/DeleteOrder.vue";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
   components: {
     PDFGenerator,
     ChangeAccesories,
-    TrackingDates
+    TrackingDates,
+    DeleteOrder
   },
   name: "OrderDetailComponent",
 
@@ -284,6 +288,9 @@ export default {
     },
   },
   methods: {
+    handleOrdenEliminada(){
+      this.orderData = null;
+    },
     actualizarAccesorio(nuevoValor) {
       this.orderData.accesorio = nuevoValor;
     },
