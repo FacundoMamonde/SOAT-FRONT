@@ -2,7 +2,7 @@
   <div id="generalDivClientes" class="p-3">
     <!-- <b-button href="/ingresadas">Volver a ordenes</b-button>
             <b-button @click="getAllClients()">Recargar</b-button> -->
-    <div class="m-3 col-4">
+    <div  class="m-3 col-4">
       <b-input-group>
         <span class="input-group-text" id="basic-addon1"
           ><b-icon-search></b-icon-search
@@ -33,7 +33,7 @@
           <!-- Botones de acciones -->
           <template v-slot:cell(actions)="data">
             <!-- Boton Historial Ordenes -->
-            <span class="p-0 m-0">
+            <span class="p-0 m-0 ">
               <a @click="(selectedClient = data.item), historialCliente()">
                 <b-button
                   v-b-modal.modal-historial
@@ -46,10 +46,11 @@
             </span>
             <!-- Boton editar -->
             <span class="p-0 m-0">
-              <a @click="editarCliente(data.item)">
-                <b-button size="sm" variant="outline-primary"
+              <a >
+                <b-button size="sm" variant="outline-primary"  @click="(selectedClient = data.item)" v-b-modal.modal-editar
                   ><b-icon icon="pencil" scale="1"
                 /></b-button>
+                
               </a>
             </span>
             <!-- Boton eliminar -->
@@ -66,6 +67,11 @@
           </template>
         </b-table>
       </div>
+      <!-- Modal editar-->
+      <b-modal id="modal-editar" title="Editar cliente" @ok="editClient">
+         <ClientForm :cliente="selectedClient" :modo="'editar'" @cliente-actualizado="getAllClients" ref="editar"></ClientForm>
+                </b-modal>
+
       <!-- Modal eliminar-->
       <b-modal id="modal-eliminar" title="Eliminar cliente">
         <div v-if="!eliminarSuccess">
@@ -137,11 +143,12 @@
 </template>
 
 <script>
-import { backendData } from "../main";
-
+import {bus, backendData } from "../main";
+import ClientForm from "./ClientFormComponent.vue";
 export default {
   name: "ClientesComponent",
-  props: {},
+  props: { mensaje:Boolean},
+  components:{ClientForm},
   data() {
     return {
       clientes: [],
@@ -187,7 +194,13 @@ export default {
       });
     },
   },
+
+
   created() {
+  
+  bus.$on("cliente-agregado", this.getAllClients);
+  
+
     this.getAllClients();
   },
   methods: {
@@ -204,6 +217,7 @@ export default {
     },
 
     async eliminarCliente(cliente) {
+      console.log(cliente)
       await fetch(`${backendData}/cliente/${cliente.id}`, { method: "DELETE" })
         .then((response) => response.json())
         .then((response) => {
@@ -235,14 +249,15 @@ export default {
     },
 
     resetModalEliminar() {
+      (console.log(this.selectedClient)),
       (this.selectedClient = {}),
         (this.error_clienteEnUso = false),
         (this.responseMessege = ""),
         (this.eliminarSuccess = false);
     },
-    editarCliente() {
-      console.log("Editando cliente");
-    },
+     editClient() {
+      this.$refs.editar.handleSubmit();
+     },
   },
 };
 </script>

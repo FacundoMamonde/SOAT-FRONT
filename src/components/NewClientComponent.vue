@@ -1,132 +1,90 @@
 <template>
   <div class="h-100">
-    <b-button v-b-modal.modal-cliente variant="primary" class="btn btn-sm ms-2"
-      ><i class="bi bi-search"></i
-    ></b-button>
     <b-modal
-    
       id="modal-cliente"
-      ref="modal"
+      v-model="modalShow"
       :title="this.titleModal()"
       @show="resetModal"
       @hidden="resetModal"
       @ok="handleOk"
     >
-<div id="buscador">
-      <div :style="{ display: showForm ? 'none' : 'flex' }">
-        <div class="mx-auto w-100">
-          <div class="d-flex m-auto col-10">
-            <b-input-group>
-              <span class="input-group-text" id="basic-addon1"
-                ><b-icon-search></b-icon-search
-              ></span>
-              <b-form-input
-                v-model="searchQuery"
+      <div id="buscador">
+        <div :style="{ display: showForm ? 'none' : 'flex' }">
+          <div class="mx-auto w-100">
+            <div class="d-flex m-auto col-10">
+              <b-input-group>
+                <span class="input-group-text" id="basic-addon1"
+                  ><b-icon-search></b-icon-search
+                ></span>
+                <b-form-input
+                  v-model="searchQuery"
+                  size="sm"
+                  placeholder="Buscar por nombre o telefono"
+                />
+              </b-input-group>
+              <button
+                @click="openAddClient"
+                class="btn btn-success btn-sm ms-2"
+              >
+                <i class="bi bi-plus-lg"></i>
+              </button>
+            </div>
+            <div
+              class="d-flex d-column center justify-content-center mx-auto w-100"
+            >
+              <b-table
+                w-100
+                id="searchClient"
+                :per-page="perPage"
+                :current-page="currentPage"
+                striped
+                :items="filteredClientes()"
+                :fields="fields"
+                label-sort-asc=""
+                label-sort-desc=""
+                label-sort-clear=""
+                select-mode="range"
+                selectable
+                @row-selected="onRowSelected"
+              ></b-table>
+            </div>
+            <div class="d-flex justify-content-center">
+              <b-pagination
                 size="sm"
-                placeholder="Buscar por nombre o telefono"
-              />
-            </b-input-group>
-            <button @click="openAddClient" class="btn btn-success btn-sm ms-2">
-              <i class="bi bi-plus-lg"></i>
-            </button>
-          </div>
-          <div
-            class="d-flex d-column center justify-content-center mx-auto w-100"
-          >
-            <b-table
-              w-100
-              id="searchClient"
-              :per-page="perPage"
-              :current-page="currentPage"
-              striped
-              :items="filteredClientes()"
-              :fields="fields"
-              label-sort-asc=""
-              label-sort-desc=""
-              label-sort-clear=""
-              select-mode="range"
-              selectable
-              @row-selected="onRowSelected"
-            ></b-table>
-          </div>
-          <div class="d-flex justify-content-center">
-            <b-pagination
-              size="sm"
-              v-model="currentPage"
-              :total-rows="totalRows"
-              :per-page="perPage"
-              aria-controls="searchClient"
-            ></b-pagination>
+                v-model="currentPage"
+                :total-rows="totalRows"
+                :per-page="perPage"
+                aria-controls="searchClient"
+              ></b-pagination>
+            </div>
           </div>
         </div>
-      </div>
-      <p v-if="selectionError" class="text-danger">
-        {{ errorText }}
-      </p>
-      <div v-if="showForm" id="agregar">
-        <form ref="form" @submit.stop.prevent="handleSubmit" >
-          <b-form-group
-            label="Nombre y apellido(*)"
-            label-for="name-input"
-            invalid-feedback="El nombre es requerido"
-            :state="nameState"
-          >
-            <b-form-input
-              id="name-input"
-              v-model="nombre"
-              :state="nameState"
-              required
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group
-            label="Telefono (*)"
-            label-for="phone-input"
-            invalid-feedback="El telefono es requerido"
-            :state="phoneState"
-            ref="phoneInput"
-          >
-            <b-form-input
-              id="phone-input"
-              v-model="telefono"
-              :state="phoneState"
-              required
-            ></b-form-input>
-          </b-form-group>
-          <b-form-group id="dniGroup" label="Dni" label-for="dniInput">
-            <b-form-input id="dniInput" v-model="dni" required></b-form-input>
-          </b-form-group>
-          <b-form-group
-            id="descriptionGroup"
-            label="Descripción"
-            label-for="descriptionInput"
-          >
-            <b-form-textarea
-              id="descriptionInput"
-              v-model="description"
-              required
-            ></b-form-textarea>
-          </b-form-group>
+        <p v-if="selectionError" class="text-danger">
+          {{ errorText }}
+        </p>
+        <div v-if="showForm" id="agregar">
+          <ClientForm :modo="'agregar'" ref="UpdateClient"/>
           <b-button
-            @click="returnModal"
-            size="sm"
-            variant="primary"
-            class="my-3"
-          >
-            <b-icon icon="arrow-left" aria-label="return"></b-icon>
-          </b-button>
-        </form>
+              @click="returnModal"
+              size="sm"
+              variant="primary"
+              class="my-3"
+            >
+              <b-icon icon="arrow-left" aria-label="return"></b-icon>
+            </b-button>
+        </div>
       </div>
-    </div>
     </b-modal>
   </div>
-
 </template>
 
 <script>
-import { backendData } from "../main";
+import {bus, backendData } from "../main";
+import ClientForm from "./ClientFormComponent.vue";
 export default {
   data() {
     return {
+      modalShow:false,
       totalRows: null,
       currentPage: 1,
       perPage: 10,
@@ -150,38 +108,45 @@ export default {
       ],
     };
   },
+  components:{ClientForm},
   created() {
-    
     this.getAllClients();
+    bus.$on('abrir-modal-en-cliente', () => {
+    this.abrirModal();
+  });
+  
   },
+
   methods: {
+ 
     onRowSelected(item) {
-        this.selected = item
-        console.log(this.selected)
-      },
+      this.selected = item;
+      console.log(this.selected);
+    },
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
         return this.clientes;
       }
-
-      return this.clientes.filter((cliente) => {
+  return this.clientes.filter((cliente) => {
         return (
           cliente.nombre
             .toLowerCase()
             .includes(this.searchQuery.toLowerCase()) ||
           cliente.telefono.includes(this.searchQuery)
-          // Add more fields to search if needed
         );
       });
     },
+
     openAddClient() {
       this.showForm = true;
       this.selectionError = false;
     },
+
     returnModal() {
       this.showForm = false;
       this.resetModal();
     },
+
     titleModal() {
       if (this.showForm) {
         return "Agregar cliente";
@@ -189,6 +154,7 @@ export default {
         return "Seleccionar cliente";
       }
     },
+
     getAllClients() {
       fetch(`${backendData}/cliente`)
         .then((response) => response.json())
@@ -200,16 +166,7 @@ export default {
           console.error("Error al obtener los clientes:", error);
         });
     },
-    // changeModal() {
-    //   this.showForm = !this.showForm
-
-    // },
-    // openForm() {
-    //   this.nombre = "";
-    //   this.selectedClientName = "";
-    //   this.selectedClientId = null;
-    //   this.showForm = true;
-    // },
+   
     addClient(client) {
       fetch(`${backendData}/cliente`, {
         method: "POST",
@@ -237,11 +194,9 @@ export default {
           console.error("Error al agregar el cliente:", error);
         });
     },
-    checkFormValidity() {
-      this.nameState = this.nombre.length > 0;
-      this.phoneState = this.telefono.length > 0;
-    },
+  
     resetModal() {
+      this.selected=null,
       (this.nameState = null),
         (this.phoneState = null),
         (this.showForm = false),
@@ -252,46 +207,32 @@ export default {
         (this.selectedClientName = ""),
         (this.selectedClientId = null);
       this.selectionError = false;
+      this.$emit("cerrar-modal-actual");
     },
+
     handleOk(bvModalEvent) {
-      if (!this.showForm ) {
+      if (!this.showForm) {
         if (this.selected) {
           this.selectedClientId = this.selected[0].id;
           this.$emit("cliente-agregado", this.selectedClientId);
+          this.$emit("cerrar-modal-actual");
           this.$bvModal.hide("modal-cliente");
         } else {
           this.selectionError = true;
-        this.errorText = "Selecciona un cliente";
-        bvModalEvent.preventDefault();
+          this.errorText = "Selecciona un cliente";
+          bvModalEvent.preventDefault();
         }
-    
       } else {
         bvModalEvent.preventDefault();
-        this.handleSubmit();
+        
+        this.$refs.UpdateClient.handleSubmit();
       }
     },
 
-    handleSubmit() {
-      this.checkFormValidity();
-      if (!this.nameState || !this.phoneState) {
-        return;
-      }
-      if (this.dni === null || this.dni.trim() === "") {
-        this.dni = null;
-      }
-      const createClientDto = {
-        nombre: this.nombre,
-        telefono: this.telefono,
-        dni: this.dni,
-        descripcion: this.description,
-      };
-      this.addClient(createClientDto);
-    },
+    
   },
 };
 </script>
 <style scoped>
-#buscador, #agregar{
-  height: 70vh !important;
-}
+
 </style>
