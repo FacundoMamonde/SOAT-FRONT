@@ -1,9 +1,6 @@
 <template>
     <div id="divConfigNegocio">
-        <div v-if="isBusy">
-            <h1>LOADING</h1>
-        </div>
-        <div v-else>
+        <div>
 
             <div id="divDatosNegocio">
                 <h3>Modificar datos del negocio</h3>
@@ -38,10 +35,20 @@
                     </div>
                 </div>
                 <b-button class="mt-3" variant="outline-primary" @click="saveData()">Guardar</b-button>
-                <div class="mt-3">
-                    <b-alert v-if="saveSuccess" variant="success" show>Cambios guardados con éxito</b-alert>
-                    <b-alert v-if="saveError.message != null" variant="danger" show>{{ saveError.message }}</b-alert>
-                </div>
+                <!-- Mensajes -->
+                <b-alert class="mt-3" show variant="primary" v-if="isBusy == true">
+                    <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
+                </b-alert>
+
+                <b-alert class="mt-3" show variant="success" v-if="saveSuccess && isBusy == false">
+                    <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                    Se guardaron los cambios con éxito
+                </b-alert>
+
+                <b-alert class="mt-3" show variant="danger" v-if="saveError.message && isBusy == false">
+                    <b-icon class="ms-1 me-1" icon="x-circle-fill" scale="1"></b-icon>
+                    {{ saveError.message }}
+                </b-alert>
 
 
             </div>
@@ -104,9 +111,13 @@ export default {
             this.toggleBusy();
 
         },
+        async sleepFunction(ms) {
+            await new Promise(r => setTimeout(r, ms));
+        },
         async saveData() {
             this.toggleBusy();
-
+            await this.sleepFunction(1500);
+            this.saveSuccess = false;
             /// Si ya esta creado el negocio en la DB
             if (!this.isNewNegocio == true) {
                 try {
@@ -125,8 +136,9 @@ export default {
                         this.saveError.message = null;
                     } else {
                         this.toggleBusy();
+                        this.saveSuccess = false;
                         const errorResponse = await response.json();
-                        this.saveError.message = errorResponse;
+                        this.saveError.message = errorResponse.message[0];
                     }
                 } catch (error) {
                     this.saveSuccess = false;

@@ -13,32 +13,42 @@
                             </b-button>
                         </a>
                     </span>
-
+                    <!-- Boton reset password-->
                     <span class="p-0 m-0">
                         <a @click="selectUser(data.item), newPasswordReset()">
-                            <b-button v-b-modal.modal-resetPassword size="sm" variant="outline-primary">
+                            <b-button v-b-modal.modal-resetPassword size="sm" variant="outline-warning">
                                 <b-icon icon="lock-fill" scale="1" />
+                            </b-button>
+                        </a>
+                    </span>
+                    <!-- Boton delete user-->
+                    <span class="p-0 m-0">
+                        <a @click="selectUser(data.item), deleteUserReset()">
+                            <b-button v-b-modal.modal-deleteUser size="sm" variant="outline-danger">
+                                <b-icon icon="trash" scale="1" />
                             </b-button>
                         </a>
                     </span>
                 </template>
             </b-table>
 
-            <b-button variant="success" @click="newUserReset()" v-b-modal.modal-newUser>Nuevo Usuario</b-button>
+            <b-button variant="success" @click="newUserReset(), newUserDataReset()" v-b-modal.modal-newUser>Nuevo
+                Usuario</b-button>
         </div>
 
         <!-- MODAL NUEVO USUARIO-->
         <b-modal id="modal-newUser" title="Nuevo usuario">
-            <h6>Username</h6>
-            <b-form-input v-model=newUserData.username> </b-form-input>
-            <h6>Nombre</h6>
-            <b-form-input v-model=newUserData.name></b-form-input>
-            <h6 class="mt-5">Contraseña <i>(al menos 6 caracteres)</i></h6>
-            
-            <b-form-input type="password" v-model=newUserData.password> </b-form-input>
-            <h6 class="mt-2">Ingrese nuevamente la nueva contraseña</h6>
-            <b-form-input type="password" v-model=newUserData.password2> </b-form-input>
+            <div v-if="!newUser.success">
+                <h6>Username</h6> <i>(al menos 5 caracteres)</i>
+                <b-form-input v-model=newUserData.username> </b-form-input>
+                <h6>Nombre</h6> <i>(al menos 5 caracteres)</i>
+                <b-form-input v-model=newUserData.name></b-form-input>
 
+                <h6 class="mt-5">Contraseña </h6> <i>(al menos 6 caracteres)</i>
+                <b-form-input type="password" v-model=newUserData.password> </b-form-input>
+                <h6 class="mt-2">Ingrese nuevamente la nueva contraseña</h6>
+                <b-form-input type="password" v-model=newUserData.password2> </b-form-input>
+            </div>
 
             <!-- Mensajes -->
             <b-alert class="mt-3" show variant="primary" v-if="isBusyNewUser == true">
@@ -46,7 +56,8 @@
             </b-alert>
 
             <b-alert class="mt-3" show variant="success" v-if="newUser.success == true">
-                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon> Se agrego el usuario con éxito
+                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                Se agrego el usuario {{ newUserData.username }} con éxito
             </b-alert>
 
             <b-alert class="mt-3" show variant="danger" v-if="newUser.error != ''">
@@ -56,32 +67,37 @@
 
             <!-- Modal footer -->
             <template #modal-footer="{ }">
-                <b-button v-if="newUserData.username != null
-                    && newUserData.name != null 
-                    && (newUserData.password).length > 5 
-                    && newUserData.password == newUserData.password2" variant="primary" @click="newUserPost()">Crear Usuario</b-button>
-                <b-button v-else variant="primary" disabled>Crear Usuario</b-button>
+                <div>
+                    <div v-if="!newUser.success">
+                        <b-button v-if="(newUserData.password).length > 5
+                            && newUserData.password == newUserData.password2
+                            && (newUserData.username).length > 4
+                            && (newUserData.name).length > 4" variant="primary" @click="newUserPost()">Crear Usuario</b-button>
+                        <b-button v-else variant="primary" disabled>Crear Usuario</b-button>
+                    </div>
+                </div>
             </template>
         </b-modal>
 
 
         <!-- MODAL EDITAR-->
         <b-modal id="modal-editUser" title="Modificar usuario">
-            <h6>Username</h6>
-            <b-form-input id="inputEmail" v-model=selectedUser.username> </b-form-input>
-            <h6>Nombre</h6>
-            <b-form-input id="inputNombre" label="Nombre" v-model=selectedUser.name></b-form-input>
-            <h6>Rol</h6>
-            <b-form-select id="table-style-variant" v-model="selectedUser.role" :options="usersRoles">
-            </b-form-select>
-
+            <div v-if="!newData.success">
+                <h6>Username</h6>
+                <b-form-input class="mb-3" v-model=selectedUser.username> </b-form-input>
+                <h6>Nombre</h6>
+                <b-form-input class="mb-3" label="Nombre" v-model=selectedUser.name></b-form-input>
+                <h6>Rol</h6>
+                <b-form-select class="mb-3" v-model="selectedUser.role" :options="usersRoles">
+                </b-form-select>
+            </div>
             <b-alert class="mt-3" show variant="primary" v-if="isBusyUpdateUser == true">
                 <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
             </b-alert>
 
             <b-alert class="mt-3" show variant="success" v-if="newData.success == true">
-                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon> Se actualizó la información
-                correctamente
+                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                Se modificó {{ selectedUser.username }} correctamente
             </b-alert>
 
             <b-alert class="mt-3" show variant="danger" v-if="newData.error != ''">
@@ -91,11 +107,15 @@
 
             <!-- Modal footer -->
             <template #modal-footer="{ }">
-                <b-button v-if="selectedUser.name != actualUserData.name
-                    || selectedUser.username != actualUserData.username
-                    || selectedUser.role != actualUserData.role" v-b-modal.modal-confirmChanges
-                    variant="primary">Guardar</b-button>
-                <b-button v-else v-b-modal.modal-confirmChanges variant="primary" disabled>Guardar</b-button>
+                <div>
+                    <div v-if="!newData.success">
+                        <b-button v-if="selectedUser.name != actualUserData.name
+                            || selectedUser.username != actualUserData.username
+                            || selectedUser.role != actualUserData.role" v-b-modal.modal-confirmChanges
+                            variant="primary">Guardar</b-button>
+                        <b-button v-else v-b-modal.modal-confirmChanges variant="primary" disabled>Guardar</b-button>
+                    </div>
+                </div>
             </template>
         </b-modal>
 
@@ -143,20 +163,20 @@
 
         <!-- MODAL RESET PASSWORD -->
         <b-modal id="modal-resetPassword" title="Resetear contraseña" newPassword.success="false">
-
-            <h6>Ingrese la nueva contraseña</h6>
-            <b-form-input id="inputNewPassword1" type="password" v-model=newPassword.newPassword> </b-form-input>
-            <h6>Ingrese nuevamente la nueva contraseña</h6>
-            <b-form-input id="inputNewPassword2" type="password" v-model=newPassword.newPassword2> </b-form-input>
-
+            <div v-if="!newPassword.success">
+                <h6>Ingrese la nueva contraseña</h6>
+                <b-form-input id="inputNewPassword1" type="password" v-model=newPassword.newPassword> </b-form-input>
+                <h6>Ingrese nuevamente la nueva contraseña</h6>
+                <b-form-input id="inputNewPassword2" type="password" v-model=newPassword.newPassword2> </b-form-input>
+            </div>
             <!-- ALERTAS -->
             <b-alert class="mt-3" show variant="primary" v-if="isBusyNewPassword == true">
                 <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
             </b-alert>
 
             <b-alert class="mt-3" show variant="success" v-if="newPassword.success == true">
-                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon> Se actualizó la contraseña
-                correctamente
+                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                Se actualizó la contraseña de {{ selectedUser.username }} correctamente
             </b-alert>
 
             <b-alert class="mt-3" show variant="danger" v-if="newPassword.error != ''">
@@ -167,10 +187,50 @@
             <!-- Modal footer -->
             <template #modal-footer="{ }">
                 <div class="w-100">
-                    <div v-if="(newPassword.newPassword).length > 5 &
-                        newPassword.newPassword == newPassword.newPassword2">
-                        <b-button variant="primary" size="sm" class="float-center" @click="alertsErrorReset(), newPass()">
-                            Cambiar
+                    <div v-if="!newPassword.success">
+                        <div v-if="(newPassword.newPassword).length > 5 &
+                            newPassword.newPassword == newPassword.newPassword2">
+                            <b-button variant="primary" size="sm" class="float-center"
+                                @click="alertsErrorReset(), newPass()">
+                                Cambiar
+                            </b-button>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+        </b-modal>
+
+        <!-- MODAL ELIMINAR USUARIO -->
+
+        <b-modal id="modal-deleteUser" title="Eliminar Usuario" deleteUser.success="false">
+
+            <h6 v-if="!deleteUser.success">Esta seguro que desea eliminar el usuario {{ selectedUser.username }} ?</h6>
+
+            <!-- ALERTAS -->
+            <b-alert class="mt-3" show variant="primary" v-if="isBusyDeleteUser == true">
+                <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner> Procesando solicitud...
+            </b-alert>
+
+            <b-alert class="mt-3" show variant="success" v-if="deleteUser.success == true">
+                <b-icon class="ms-1 me-1" icon="check-circle-fill" scale="1"></b-icon>
+                Se eliminó el usuario {{ selectedUser.username }} correctamente
+            </b-alert>
+
+            <b-alert class="mt-3" show variant="danger" v-if="deleteUser.error != ''">
+                <b-icon class="ms-1 me-1" icon="x-circle-fill" scale="1"></b-icon>
+                {{ deleteUser.error }}
+            </b-alert>
+
+            <!-- Modal footer -->
+            <template #modal-footer="{ }">
+                <div class="w-100">
+                    <div v-if="!deleteUser.success">
+                        <b-button class="me-2 " @click="ok">
+                            Cancelar
+                        </b-button>
+                        <b-button variant="primary" class="float-center" @click="delUser(), ok()">
+                            Eliminar
                         </b-button>
                     </div>
                 </div>
@@ -193,6 +253,7 @@ export default {
             isBusyUpdateUser: false,
             isBusyNewPassword: false,
             isBusyNewUser: false,
+            isBusyDeleteUser: false,
             usuarios: Array,
             fields: [
                 { key: "username", label: "Username", sortable: true },
@@ -206,8 +267,9 @@ export default {
             actualUserData: {},
             newPassword: { newPassword: '', newPassword2: '', error: '', success: false },
             newData: { error: '', success: false },
-            newUserData: {username: null, name: null,password:null},
-            newUser: {error: '', success: false }
+            newUserData: { username: null, name: null, password: '', password2: '' },
+            newUser: { error: '', success: false },
+            deleteUser: { error: '', success: false }
         }
     },
     computed: {
@@ -258,7 +320,7 @@ export default {
                 if (!response.ok) {
                     // En caso de error
                     const errorResponse = await response.json();
-                    this.newUser.error = errorResponse.error;
+                    this.newUser.error = errorResponse.message;
                 } else {
                     // En caso de Exito
                     this.newUser.success = true
@@ -304,6 +366,39 @@ export default {
                 // En caso de no conectarse al servidor
                 this.toggleBusy('updateUser')
                 this.newData.error = "Error al conectarse con el servidor";
+            }
+            this.loadData()
+        },
+        ///---- METODO DELETE USER ----///
+        async delUser() {
+            this.deleteUserReset()
+            this.toggleBusy('deleteUser')
+            // DEMORA ////////////////////
+            await this.sleepFunction(1500)
+            //////////////////////////////
+            try {
+                const response = await fetch(`${backendData}/auth/user/${this.selectedUser.username}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.token}`
+                    }
+                })
+                //// ACTUAL
+                if (!response.ok) {
+                    // En caso de error
+                    const errorResponse = await response.json();
+                    this.deleteUser.error = errorResponse.message;
+                } else {
+                    // En caso de Exito
+                    this.deleteUser.success = true
+                }
+                this.toggleBusy('deleteUser')
+
+            } catch (error) {
+                // En caso de no conectarse al servidor
+                this.toggleBusy('deleteUser')
+                this.deleteUser.error = "Error al conectarse con el servidor";
             }
             this.loadData()
         },
@@ -356,8 +451,11 @@ export default {
             if (option == 'newPassword') {
                 this.isBusyNewPassword = !this.isBusyNewPassword
             }
-            if (option == 'newUser'){
+            if (option == 'newUser') {
                 this.isBusyNewUser = !this.isBusyNewUser
+            }
+            if (option == 'deleteUser') {
+                this.isBusyDeleteUser = !this.isBusyDeleteUser
             }
         },
         selectUser(user) {
@@ -371,12 +469,19 @@ export default {
             this.newData.success = false;
             this.newData.error = '';
         },
+        deleteUserReset() {
+            this.deleteUser.success = false;
+            this.deleteUser.error = '';
+        },
         alertsErrorReset() {
             this.newPassword.error = '',
-            this.newPassword.success = false
+                this.newPassword.success = false
         },
-        newUserReset(){
-            this.newUser = {error: '', success: false }
+        newUserReset() {
+            this.newUser = { error: '', success: false }
+        },
+        newUserDataReset() {
+            this.newUserData = { username: null, name: null, password: '', password2: '' }
         }
     }
 };

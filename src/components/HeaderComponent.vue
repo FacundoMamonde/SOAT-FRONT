@@ -4,7 +4,7 @@
       <b-navbar-nav>
         <b-navbar-brand href="#" class="ps-2 fs-2">SOAT</b-navbar-brand>
       </b-navbar-nav>
-      <div class="d-flex align-self-md-center">
+      <div v-if="buscadorOrdenes" class="d-flex align-self-md-center" >
 
         <b-input-group>
           <span class="input-group-text " id="basic-addon1"><b-icon-search></b-icon-search></span>
@@ -81,7 +81,9 @@ export default {
   created() {
     this.getUserName();
   },
-  props: {},
+  props: {
+    buscadorOrdenes:Boolean
+  },
   methods: {
     filtrarTabla() {
       bus.$emit("filtro-cambiado", {
