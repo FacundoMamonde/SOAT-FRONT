@@ -7,7 +7,7 @@
     >
       <b-navbar-nav>
         <b-navbar-brand
-          href="/ingresadas"
+          router-link to="/ingresadas"
           class="ps-2 fs-2"
           v-b-tooltip.hover.right
           title="Volver a ordenes ingresadas"
