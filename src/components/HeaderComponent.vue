@@ -77,16 +77,16 @@
                 <div>{{ username }}</div>
               </b-dropdown-header>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
+              <b-dropdown-item router-link to="/clientes">Clientes</b-dropdown-item>
               <b-dropdown-item v-b-modal.modal-config-usuario
                 >Mis datos</b-dropdown-item
               >
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item disabled>Administración</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio"
+              <b-dropdown-item v-if="getUserAdmin()" router-link to="/admin/negocio"
                 >Negocio</b-dropdown-item
               >
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios"
+              <b-dropdown-item v-if="getUserAdmin()" router-link to="/admin/usuarios"
                 >Usuarios</b-dropdown-item
               >
               <b-dropdown-divider></b-dropdown-divider>
