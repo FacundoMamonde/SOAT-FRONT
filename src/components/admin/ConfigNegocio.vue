@@ -1,12 +1,11 @@
 <template>
-    <div id="divConfigNegocio">
-        <div>
-
-            <div id="divDatosNegocio">
+    <div id="divConfigNegocio" class="h-100">
+        <div class="flex-grow-1 ">
+  <div id="divDatosNegocio" class="flex-grow-1   d-flex flex-column align-items-center  mt-5">
                 <h3>Modificar datos del negocio</h3>
                 <b-alert v-if="isNewNegocio" show variant="primary">A continuación ingrese los datos de su negocio</b-alert>
-                <div class="d-flex flex-row">
-                    <div class="col-md-6">
+                <div class="d-flex flex-row  flex-grow-1 w-75 justify-content-center ">
+                    <div class=" col-md-4 me-4">
                         <h6 v-if="isNewNegocio">Nombre (*)</h6>
                         <h6 v-else>Nombre</h6>
                         <b-form-input id="inputNombre" label="Nombre" v-model=negocio.nombre></b-form-input>
@@ -23,7 +22,7 @@
                         <h6 v-else>Dirección</h6>
                         <b-form-input id="inputDireccion" v-model=negocio.direccion></b-form-input>
                     </div>
-                    <div class="col-md-6 ms-4">
+                    <div class="  col-md-4  ">
                         <h6>Email</h6>
                         <b-form-input id="inputEmail" v-model=negocio.email></b-form-input>
                         <h6>Celular</h6>
@@ -190,12 +189,12 @@ export default {
   
 <style scoped>
 #divConfigNegocio {
-    background-color: white
+    background-color: #ededed;
 }
 
 #divDatosNegocio {
     padding: 15px;
-    width: 600px;
+    
     margin: auto;
 }
 

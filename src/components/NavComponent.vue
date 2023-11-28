@@ -1,7 +1,9 @@
 <template>
-  <div class="nav d-flex justify-content-center w-100">
-    <b-navbar class="p-0">
-       <b-navbar-nav>
+  <div class="w-100 d-flex justify-content-center navc">
+    <b-navbar toggleable="lg" class="p-0">
+      <b-navbar-toggle target="nav-links" class="m-auto" ></b-navbar-toggle>
+       <b-collapse id="nav-links" is-nav>
+      <b-navbar-nav class="d-flex nav justify-content-around w-100">
         
         <router-link to="/ingresadas" class-active="active" class="p-2 nav-link"> INGRESADAS </router-link>
           
@@ -18,9 +20,11 @@
         <router-link v-if="getUserAdmin()" to="/eliminadas" class="p-2 nav-link col-md-mx-3">ELIMINADOS</router-link>
 
       </b-navbar-nav>
+      </b-collapse>
     </b-navbar>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -41,6 +45,9 @@ export default {
 </script>
 
 <style scoped>
+.navc{
+  background-color: #c5c5c5;
+}
 .nav-link {
   text-decoration: none;
   color: rgba(0, 0, 0, 0.575);
@@ -67,4 +74,5 @@ export default {
 *::after {
   box-sizing: border-box;
 }
+
 </style>

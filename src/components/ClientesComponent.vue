@@ -1,8 +1,7 @@
 <template>
-  <div id="generalDivClientes" class="p-3">
-    <!-- <b-button href="/ingresadas">Volver a ordenes</b-button>
-            <b-button @click="getAllClients()">Recargar</b-button> -->
-    <div  class="m-3 col-4">
+  <div id="generalDivClientes" class="p-3 ">
+    <div class="d-flex flex-column  h-100">
+    <div  class="m-3 buscador ">
       <b-input-group>
         <span class="input-group-text" id="basic-addon1"
           ><b-icon-search></b-icon-search
@@ -14,22 +13,31 @@
         />
       </b-input-group>
     </div>
-    <div class="m-3">
+    <div class="m-3 d-flex flex-column flex-grow-1">
       <h5>Listado de clientes</h5>
-      <div class="tabla border-top border-1">
+      <div class="tabla border-top border-1  ">
         <b-table
           id="clientTable"
-          class="h-100"
+         
+          class=" text-muted "
           :per-page="perPage"
           :current-page="currentPage"
           striped
-          hover
           :items="filteredClientes"
           :fields="fields"
           label-sort-asc=""
           label-sort-desc=""
           label-sort-clear=""
         >
+        <!-- borderless="true" -->
+        <template #head()="data">
+            <span class="text">{{ data.label }}</span>
+          </template>
+        <template #cell()="data">
+            <td >
+              <span class="text-secondary">{{ data.value }}</span>
+            </td>
+          </template>
           <!-- Botones de acciones -->
           <template v-slot:cell(actions)="data">
             <!-- Boton Historial Ordenes -->
@@ -38,23 +46,23 @@
                 <b-button
                   v-b-modal.modal-historial
                   size="sm"
-                  variant="outline-danger"
+                  variant="outline-primary"
                 >
                   <b-icon icon="layout-text-sidebar" scale="1" />
                 </b-button>
               </a>
             </span>
             <!-- Boton editar -->
-            <span class="p-0 m-0">
+            <span class="p-0 m-0 ms-3">
               <a >
-                <b-button size="sm" variant="outline-primary"  @click="(selectedClient = data.item)" v-b-modal.modal-editar
+                <b-button size="sm" variant="outline-secondary"  @click="(selectedClient = data.item)" v-b-modal.modal-editar
                   ><b-icon icon="pencil" scale="1"
                 /></b-button>
                 
               </a>
             </span>
             <!-- Boton eliminar -->
-            <span class="p-0 m-0">
+            <span class="p-0 m-0 ms-3">
               <a @click="resetModalEliminar(), (selectedClient = data.item)">
                 <b-button
                   v-b-modal.modal-eliminar
@@ -65,7 +73,16 @@
               </a>
             </span>
           </template>
-        </b-table>
+        </b-table></div>
+        <div class="d-flex justify-content-center mt-auto ">
+      <b-pagination
+        size="sm"
+        v-model="currentPage"
+        :total-rows="totalRows"
+        :per-page="perPage"
+        aria-controls="clientTable"
+      ></b-pagination>
+    </div>
       </div>
       <!-- Modal editar-->
       <b-modal id="modal-editar" title="Editar cliente" @ok="editClient">
@@ -130,15 +147,7 @@
         </b-table>
       </b-modal>
     </div>
-    <div class="d-flex justify-content-center">
-      <b-pagination
-        size="sm"
-        v-model="currentPage"
-        :total-rows="totalRows"
-        :per-page="perPage"
-        aria-controls="clientTable"
-      ></b-pagination>
-    </div>
+   
   </div>
 </template>
 
@@ -205,11 +214,13 @@ export default {
   },
   methods: {
     async getAllClients() {
+      console.log("haciendo el get")
       await fetch(`${backendData}/cliente`)
         .then((response) => response.json())
         .then((clientes) => {
           this.clientes = clientes;
           this.totalRows = this.clientes.length;
+          console.log("haciendo el get")
         })
         .catch((error) => {
           console.error("Error al obtener los clientes:", error);
@@ -255,7 +266,8 @@ export default {
         (this.responseMessege = ""),
         (this.eliminarSuccess = false);
     },
-     editClient() {
+     editClient(bvModalEvent) {
+      bvModalEvent.preventDefault();
       this.$refs.editar.handleSubmit();
      },
   },
@@ -271,8 +283,7 @@ export default {
   color: red;
 }
 .tabla {
-  min-height: 600px;
-  max-height: 600px;
+ 
   white-space: nowrap;
 }
 
@@ -291,7 +302,6 @@ export default {
 }
 
 .tabla {
-  max-height: 600px;
   overflow-x: scroll !important;
 
   white-space: nowrap;
@@ -321,5 +331,13 @@ export default {
   white-space: nowrap;
   scrollbar-width: thin;
   scrollbar-color: #6c757d transparent;
+}
+.buscador{
+  width: 300px;
+}
+input:focus
+ {
+  outline: none;
+  box-shadow: none;
 }
 </style>

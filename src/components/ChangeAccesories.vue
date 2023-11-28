@@ -12,6 +12,7 @@
       title="Accesorios"
       @ok="changeAccesories"
     >
+    <h5>Actualizar accesorios</h5>
       <textarea v-model="newAccesorio" class="w-100"></textarea>
     </b-modal>
   </div>

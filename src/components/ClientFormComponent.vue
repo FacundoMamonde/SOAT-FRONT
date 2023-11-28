@@ -56,6 +56,10 @@
         ></b-form-textarea>
       </b-form-group>
     </form>
+    <b-alert class="mt-3" show variant="primary" v-if="isBusy == true">
+      <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner>
+      Procesando solicitud...
+    </b-alert>
   </div>
 </template>
 
@@ -74,6 +78,7 @@ export default {
 
   data() {
     return {
+      isBusy: false,
       nameState: null,
       phoneState: null,
       dniState: null,
@@ -97,6 +102,7 @@ export default {
   },
   methods: {
     addClient(client) {
+      this.isBusy = true;
       fetch(`${backendData}/cliente`, {
         method: "POST",
         headers: {
@@ -115,6 +121,7 @@ export default {
           this.selectedClientId = response.id;
           bus.$emit("cliente-agregado", this.selectedClientId);
           this.$emit("cliente-actualizado");
+          this.isBusy = false;
           this.$nextTick(() => {
             this.$bvModal.hide("modal-cliente");
           });
@@ -125,6 +132,7 @@ export default {
     },
 
     updateClient(client) {
+      this.isBusy = true;
       fetch(`${backendData}/cliente/${this.cliente.id}`, {
         method: "PATCH",
         headers: {
@@ -142,6 +150,10 @@ export default {
         .then((response) => {
           console.log(`Cliente con ID ${response.id} actualizado`);
           this.$emit("cliente-actualizado");
+          this.isBusy = false;
+          this.$nextTick(() => {
+            this.$bvModal.hide("modal-editar");
+          });
         })
         .catch((error) => {
           console.error("Error al actualizar el cliente:", error);
@@ -151,13 +163,18 @@ export default {
     checkFormValidity() {
       this.nameState = this.nombre.length > 0;
       this.phoneState = this.telefono.length > 0;
-      if (this.dni) {
-        this.dniState = this.dni.toString().length < 10;
+      if (this.dni !==null) {
+        if (this.dni.toString().length < 10) this.dniState = true;
+        else this.dniState = false;
+      } else {
+        this.dniState = null;
+        this.dni = null;
+
       }
     },
     handleSubmit() {
       this.checkFormValidity();
-      if (!this.nameState || !this.phoneState || !this.dniState) {
+      if (!this.nameState || !this.phoneState || this.dniState==false) {
         return;
       }
       if (
@@ -173,10 +190,8 @@ export default {
         descripcion: this.description,
       };
       if (this.modo === "agregar") {
-        console.log("carla");
         this.addClient(createClientDto);
       } else {
-        console.log("carla");
         this.updateClient(createClientDto);
       }
     },

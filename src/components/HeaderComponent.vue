@@ -1,111 +1,160 @@
 <template>
   <div class="header container-fluid p-0">
-    <b-navbar type="dark" variant="dark" class="flex-column flex-md-row justify-content-md-between">
+    <b-navbar
+      type="dark"
+      variant="dark"
+      class="flex-column flex-md-row justify-content-md-between"
+    >
       <b-navbar-nav>
-        <b-navbar-brand href="#" class="ps-2 fs-2">SOAT</b-navbar-brand>
+        <b-navbar-brand
+          href="/ingresadas"
+          class="ps-2 fs-2"
+          v-b-tooltip.hover.right
+          title="Volver a ordenes ingresadas"
+          >SOAT</b-navbar-brand
+        >
       </b-navbar-nav>
-      <div v-if="buscadorOrdenes" class="d-flex align-self-md-center" >
-
+      <div v-if="buscadorOrdenes" class="d-flex align-self-md-center">
         <b-input-group>
-          <span class="input-group-text " id="basic-addon1"><b-icon-search></b-icon-search></span>
-          <b-form-input v-model="filtro" @input="filtrarTabla" size="sm" placeholder="Buscar"></b-form-input>
+          <span class="input-group-text" id="basic-addon1"
+            ><b-icon-search></b-icon-search
+          ></span>
+          <b-form-input
+            v-model="filtro"
+            @input="filtrarTabla"
+            size="sm"
+            placeholder="Buscar"
+          ></b-form-input>
           <template #append>
-            <b-dropdown id="btnSearch" :text="filtroText" variant="primary">
-              <b-dropdown-item @click="filtroPor = 'cliente', filtroText = 'Cliente'">Cliente</b-dropdown-item>
-              <b-dropdown-item @click="filtroPor = 'equipo', filtroText = 'Equipo'">Equipo</b-dropdown-item>
+            <b-dropdown
+              id="btnSearch"
+              :text="filtroText"
+              block
+              variant="primary"
+            >
+              <b-dropdown-item
+                @click="(filtroPor = 'cliente'), (filtroText = 'Cliente')"
+                >Cliente</b-dropdown-item
+              >
+              <b-dropdown-item
+                @click="(filtroPor = 'equipo'), (filtroText = 'Equipo')"
+                >Equipo</b-dropdown-item
+              >
             </b-dropdown>
           </template>
         </b-input-group>
+       
         <NewOrderComponent></NewOrderComponent>
+    
       </div>
-      <div class="mt-1 pr-0">
-        <div>
-          <b-dropdown size="lg" variant="link" toggle-class="text-decoration-none" toggle-text="" no-caret>
+
+      <div class="mt-1 pr-0 drop d-flex justify-content-end">
+        <div class="w-100">
+          <b-dropdown
+            class="w-100 text-sm-center text-md-end"
+            menu-class="w-100"
+            size="lg"
+            variant="link"
+            block
+            toggle-class="text-decoration-none"
+            toggle-text=""
+            no-caret
+          >
             <template #button-content>
-              <div>
-                <p class="h5 pr-1 text-light mb-0" v-b-tooltip.hover :title=username>
-                  <b-avatar variant="danger"></b-avatar> 
+              <div class="w-100">
+                <p
+                  class="h5 pr-1 text-light mb-0"
+                  v-b-tooltip.hover.left
+                  :title="username"
+                >
+                  <b-avatar variant="danger"></b-avatar>
                 </p>
               </div>
             </template>
-            <div id="dropdown-usuario">
+            <div id="dropdown-usuario" class="w-100">
               <b-dropdown-header id="dropdown-header-label">
                 <b-avatar class="m-auto" variant="danger"></b-avatar>
                 <div>{{ username }}</div>
-            
               </b-dropdown-header>
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item href="/clientes">Clientes</b-dropdown-item>
-              <b-dropdown-item v-b-modal.modal-config-usuario>Mis datos</b-dropdown-item>
+              <b-dropdown-item v-b-modal.modal-config-usuario
+                >Mis datos</b-dropdown-item
+              >
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item disabled>Administración</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio">Negocio</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios">Usuarios</b-dropdown-item>
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/negocio"
+                >Negocio</b-dropdown-item
+              >
+              <b-dropdown-item v-if="getUserAdmin()" href="/admin/usuarios"
+                >Usuarios</b-dropdown-item
+              >
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item @click="logout()"> <b-icon-power ></b-icon-power>Cerrar Sesión</b-dropdown-item>
+              <b-dropdown-item @click="logout()">
+                <b-icon-power></b-icon-power>Cerrar Sesión</b-dropdown-item
+              >
             </div>
           </b-dropdown>
         </div>
       </div>
     </b-navbar>
     <div>
-      <b-modal id="modal-config-usuario" title="Mis datos">  <ConfigUsuarioComponent></ConfigUsuarioComponent>
+      <b-modal id="modal-config-usuario" title="Mis datos">
+        <ConfigUsuarioComponent></ConfigUsuarioComponent>
         <template #modal-footer="{}">
-                <div class="w-100">
-                </div>
-            </template> </b-modal>
-  
+          <div class="w-100"></div>
+        </template>
+      </b-modal>
+    </div>
   </div>
-  </div>
-  
 </template>
 
 <script>
 import { bus } from "../main";
 import NewOrderComponent from "@/components/NewOrderComponent.vue";
-import ConfigUsuarioComponent from "@/components/user/ConfigUsuario.vue"
+import ConfigUsuarioComponent from "@/components/user/ConfigUsuario.vue";
 export default {
   name: "HeaderComponent",
   components: {
     NewOrderComponent,
-    ConfigUsuarioComponent
+    ConfigUsuarioComponent,
   },
   data() {
     return {
       filtro: "",
       filtroPor: "cliente",
       filtroText: "Cliente",
-      username: ""
+      username: "",
     };
   },
   created() {
     this.getUserName();
   },
   props: {
-    buscadorOrdenes:Boolean
+    buscadorOrdenes: Boolean,
   },
   methods: {
     filtrarTabla() {
       bus.$emit("filtro-cambiado", {
         filtro: this.filtro,
-        filtroPor: this.filtroPor
+        filtroPor: this.filtroPor,
       });
     },
     logout() {
-      localStorage.removeItem('token')
+      localStorage.removeItem("token");
 
-      this.$router.push('/');
+      this.$router.push("/");
     },
     getUserName() {
-      this.username = localStorage.getItem('name')
+      this.username = localStorage.getItem("name");
     },
     getUserAdmin() {
-      this.admin = localStorage.getItem('role');
-      if (this.admin != 'admin') {
-        return false
+      this.admin = localStorage.getItem("role");
+      if (this.admin != "admin") {
+        return false;
       }
-      return true
-    }
+      return true;
+    },
   },
 };
 </script>
@@ -120,5 +169,11 @@ export default {
 .header {
   min-width: 360px;
 }
-
+.drop {
+  width: 200px !important;
+}
+input:focus {
+  outline: none;
+  box-shadow: none;
+}
 </style>

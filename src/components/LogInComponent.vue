@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid d-flex  p-0 min-vh-100 ancho">
     <div class="row flex-grow-1">
-      <div class="col-md-6 d-none d-md-flex bg-light text-white justify-content-center align-items-center">
+      <div class="col-md-6 d-none d-md-flex backgroundSoat text-white justify-content-center align-items-center">
         <div class="text-center text-dark w-100">
           <h1 class="display-1">SOAT</h1>
 
@@ -14,16 +14,16 @@
           <h2 class="mb-3">Bienvenido</h2>
           <p class="my-3">Por favor ingrese sus datos para iniciar sesión</p>
           <b-form class=" w-50 m-auto  ">
-            <b-form-input class="my-3 rounded-pill text-center" id="username" v-model="username" placeholder="Usuario"
+            <b-form-input class="my-3  text-center" id="username" v-model="username" placeholder="Usuario"
               required></b-form-input>
-            <b-form-input class="my-3 rounded-pill text-center" id="password" v-model="password" placeholder="Contraseña"
+            <b-form-input class="my-3  text-center" id="password" v-model="password" placeholder="Contraseña"
               type="password" required></b-form-input>
 
           </b-form>
           <div v-if="errorlogin">
             <span class="errorL">Error al inciar sesion, revise los datos ingresados y vuelva a intentarlo</span>
           </div>
-          <button @click="login()">INGRESAR</button>
+          <b-button variant="outline-light" @click="login()">INGRESAR</b-button>
 
 
         </div>
@@ -112,6 +112,9 @@ export default {
   left: 0;
   z-index: 100;
   width: 100vw;
+}
+.backgroundSoat{
+  background-color: #ededed;
 }
 
 .errorL {

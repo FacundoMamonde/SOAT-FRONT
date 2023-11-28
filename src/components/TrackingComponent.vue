@@ -30,7 +30,6 @@ export default {
         { label: "Terminada", value: this.orden.fechaTerminada },
         { label: "Entregada", value: this.orden.fechaEntregada },
       ];
-
       return fechas.filter((fecha) => fecha.value);
     },
   },

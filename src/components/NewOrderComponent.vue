@@ -1,12 +1,14 @@
 <template>
   <div>
+    
     <b-button
       v-b-modal.newOrderModal
-      variant="success rounded-pill"
-      class="ms-2 fw-bold"
-      >+</b-button
-    >
+      variant="success"
+      class="ms-2 botonNewOrder"
+      
+      >Nueva orden</b-button>
     <b-modal
+      centered
       ref="newOrderModal"
       id="newOrderModal"
       title="Nueva Orden"
@@ -20,65 +22,72 @@
       <div class="modal-body">
         <!-- Div Cliente -->
         <div class="d-flex flex-row">
-          <div class="col-md-1" style="width: 50px">
-            <i class="bi bi-person-circle col-md-8" style="font-size: 40px"></i>
+          <div class="col-md-1 icon-div">
+            <i class="bi bi-person-circle col-md-8 icon"></i>
             <!-- Icono de Cliente-->
           </div>
-          <div class="d-flex flex-column" style="width: 260px">
-            <input
-              :class="{ 'border-danger': !cliente && showError }"
-              class="m-0"
-              :placeholder="
-                cliente && cliente.nombre ? cliente.nombre : 'Nombre de cliente'
-              "
-              readonly
-            />
-            <input
-              :class="{ 'border-danger': !cliente && showError }"
-              class="mt-2"
-              :placeholder="
-                cliente && cliente.telefono
-                  ? cliente.telefono
-                  : 'Celular del cliente'
-              "
-              readonly
-            />
-          </div>
-          <div class="col-md-1 d-flex align-items-center">
-            <b-button
-              v-b-modal.modal-cliente
-              variant="primary"
-              class="btn btn-sm ms-2"
-              ><i class="bi bi-search"></i
-            ></b-button>
+          <div class="d-flex flex-row w-100">
+            <div class="d-flex flex-column input-div">
+              <input
+                :class="{ 'border-danger': !cliente && showError }"
+                class="m-0"
+                :placeholder="
+                  cliente && cliente.nombre
+                    ? cliente.nombre
+                    : 'Nombre de cliente'
+                "
+                readonly
+              />
+              <input
+                :class="{ 'border-danger': !cliente && showError }"
+                class="mt-2"
+                :placeholder="
+                  cliente && cliente.telefono
+                    ? cliente.telefono
+                    : 'Celular del cliente'
+                "
+                readonly
+              />
+            </div>
+            <div class="col-md-1 d-flex align-items-center">
+              <b-button
+                v-b-modal.modal-cliente
+                variant="primary"
+                class="btn btn-sm ms-2"
+                ><i class="bi bi-search"></i
+              ></b-button>
+            </div>
           </div>
         </div>
         <!-- Div Equipo -->
-        <div class="d-flex flex-row mt-3">
-          <div class="col-md-1 d-flex align-items-center" style="width: 50px">
-            <i class="bi bi-laptop col-md-8" style="font-size: 40px"></i>
+        <div class="d-flex flex-row mt-3 w-100">
+          <div class="col-md-1 d-flex align-items-center icon-div">
+            <i class="bi bi-laptop col-md-8 icon"></i>
             <!-- Icono de Equipo-->
           </div>
-          <div class="d-flex flex-column">
-            <div class="d-flex">
-              <!-- Seleccion de tipo de Equipo -->
-              <form action="#" style="width: 260px">
-                <select
-                  class="my-1"
-                  v-model="selectedTipoEquipo"
-                  :class="{ 'border-danger': !selectedTipoEquipo && showError }"
-                  style="width: 100%"
-                >
-                  <option value="">---Tipo de Equipo---</option>
-                  <option
-                    v-for="tipo in tipoEquipos"
-                    :key="tipo.id"
-                    :value="tipo"
+          <div class="d-flex flex-column w-100">
+            <div class="d-flex w-100">
+              <div class="input-div">
+                <!-- Seleccion de tipo de Equipo -->
+                <form action="#">
+                  <select
+                    class="my-1 w-100"
+                    v-model="selectedTipoEquipo"
+                    :class="{
+                      'border-danger': !selectedTipoEquipo && showError,
+                    }"
                   >
-                    {{ tipo.nombre }}
-                  </option>
-                </select>
-              </form>
+                    <option value="">---Tipo de Equipo---</option>
+                    <option
+                      v-for="tipo in tipoEquipos"
+                      :key="tipo.id"
+                      :value="tipo"
+                    >
+                      {{ tipo.nombre }}
+                    </option>
+                  </select>
+                </form>
+              </div>
               <button
                 v-b-modal.equiposModal
                 v-if="selectedTipoEquipo === ''"
@@ -89,26 +98,27 @@
               </button>
             </div>
 
-            <div class="d-flex">
+            <div class="d-flex w-100">
               <!-- Seleccion de Marca -->
-              <form action="#" style="width: 260px">
-                <select
-                  class="my-1"
-                  v-model="selectedMarca"
-                  :class="{ 'border-danger': !selectedMarca && showError }"
-                  style="width: 100%"
-                  required
-                >
-                  <option value="">---Marca del equipo---</option>
-                  <option
-                    v-for="marca in marcasEquipo"
-                    :key="marca.id"
-                    :value="marca"
+              <div class="input-div">
+                <form action="#">
+                  <select
+                    class="my-1 w-100"
+                    v-model="selectedMarca"
+                    :class="{ 'border-danger': !selectedMarca && showError }"
+                    required
                   >
-                    {{ marca.nombre }}
-                  </option>
-                </select>
-              </form>
+                    <option value="">---Marca del equipo---</option>
+                    <option
+                      v-for="marca in marcasEquipo"
+                      :key="marca.id"
+                      :value="marca"
+                    >
+                      {{ marca.nombre }}
+                    </option>
+                  </select>
+                </form>
+              </div>
               <button
                 v-b-modal.equiposModal
                 v-if="selectedTipoEquipo !== '' && selectedMarca == ''"
@@ -118,26 +128,27 @@
                 <i class="bi bi-plus-lg"></i>
               </button>
             </div>
-            <div class="d-flex">
+            <div class="d-flex w-100">
               <!-- Seleccion de Modelo -->
-              <form action="#" style="width: 260px">
-                <select
-                  class="my-1"
-                  v-model="selectedModelo"
-                  :class="{ 'border-danger': !selectedModelo && showError }"
-                  style="width: 100%"
-                  required
-                >
-                  <option value="">---Modelo del equipo---</option>
-                  <option
-                    v-for="modelo in modelosEquipos"
-                    :key="modelo.id"
-                    :value="modelo"
+              <div class="input-div">
+                <form action="#">
+                  <select
+                    class="my-1 w-100"
+                    v-model="selectedModelo"
+                    :class="{ 'border-danger': !selectedModelo && showError }"
+                    required
                   >
-                    {{ modelo.nombre }}
-                  </option>
-                </select>
-              </form>
+                    <option value="">---Modelo del equipo---</option>
+                    <option
+                      v-for="modelo in modelosEquipos"
+                      :key="modelo.id"
+                      :value="modelo"
+                    >
+                      {{ modelo.nombre }}
+                    </option>
+                  </select>
+                </form>
+              </div>
               <button
                 v-b-modal.equiposModal
                 v-if="
@@ -158,7 +169,7 @@
                 <i class="bi bi-plus-lg"></i>
               </button>
             </div>
-            <div class="d-flex flex-column mt-1" style="width: 260px">
+            <div class="d-flex flex-column mt-1 input-div">
               <input
                 class="m-0"
                 placeholder="Numero de serie "
@@ -172,17 +183,8 @@
           <h5 class="mt-3">Accesorios</h5>
           <textarea
             v-model="accesorios"
-            class="col-11 p-0 m-0"
-            style="
-              height: 80px;
-              min-height: 80px;
-              max-height: 120px;
-              width: 95%;
-            "
-            name=""
-            id=""
-            cols="30"
-            rows="10"
+            class="col-12 p-0 m-0"
+            rows="3"
           ></textarea>
         </div>
         <div>
@@ -190,20 +192,28 @@
           <textarea
             :class="{ 'border-danger': !this.falla && showError }"
             v-model="falla"
-            class="col-11 p-0 m-0"
-            style="
-              height: 80px;
-              min-height: 80px;
-              max-height: 120px;
-              width: 95%;
-            "
-            name=""
-            id=""
-            cols="30"
-            rows="10"
+            class="col-12 p-0 m-0"
+            rows="3"
           ></textarea>
         </div>
       </div>
+      <b-alert class="mt-3" show variant="primary" v-if="isBusy == true">
+        <b-spinner class="ms-1 me-1" small variant="primary"></b-spinner>
+        Procesando solicitud...
+      </b-alert>
+      <template #modal-footer="{ cancel, ok }">
+        <b-button
+          size="sm"
+          variant="danger"
+          @click="cancel()"
+          :disabled="isBusy"
+        >
+          Cancel
+        </b-button>
+        <b-button size="sm" variant="success" @click="ok()" :disabled="isBusy">
+          OK
+        </b-button>
+      </template>
     </b-modal>
     <NewClientComponent
       ref="clientComponent"
@@ -245,13 +255,14 @@ export default {
       equipo: {},
       showError: false,
       allProp: [],
-      selected:""
+      selected: "",
+      isBusy: false,
     };
   },
   components: { NewClientComponent, NewEquipoComponent },
 
   created() {
-    bus.$on("cliente-agregado", this.handleClienteAgregado)
+    bus.$on("cliente-agregado", this.handleClienteAgregado);
     this.getTiposEquipo();
     this.getMarcasEquipo();
   },
@@ -277,7 +288,7 @@ export default {
 
   methods: {
     handleClienteAgregado(selectedClientId) {
-      this.getClient(selectedClientId)
+      this.getClient(selectedClientId);
     },
     abrirNuevoModal() {
       this.$bvModal.show("newOrderModal");
@@ -304,6 +315,7 @@ export default {
         }
         await response.json();
         bus.$emit("orden-agregada");
+        this.isBusy = false;
       } catch (error) {
         console.error("Error al agregar la orden:", error);
         throw error;
@@ -316,6 +328,7 @@ export default {
         this.showError = true;
         bvModalEvent.preventDefault();
       } else {
+        this.isBusy = true;
         this.showError = false;
         try {
           await this.addNewEquipo();
@@ -343,7 +356,7 @@ export default {
       this.clientID = clientID;
       this.getClientById(clientID);
     },
-   
+
     getTiposEquipo() {
       fetch(`${backendData}/tipo-equipo`)
         .then((response) => response.json())
@@ -355,33 +368,31 @@ export default {
         });
     },
 
-
     getDataById(id, data, targetProperty) {
-  fetch(`${backendData}/${data}/${id}`)
-    .then((response) => response.json())
-    .then((responseData) => {
-      this[targetProperty] = responseData;
-    })
-    .catch((error) => {
-      console.error(`Error al obtener la ${data} de equipo`, error);
-    });
-},
-getClientById(id) {
-  this.getDataById(id, "cliente", "cliente");
+      fetch(`${backendData}/${data}/${id}`)
+        .then((response) => response.json())
+        .then((responseData) => {
+          this[targetProperty] = responseData;
+        })
+        .catch((error) => {
+          console.error(`Error al obtener la ${data} de equipo`, error);
+        });
+    },
+    getClientById(id) {
+      this.getDataById(id, "cliente", "cliente");
     },
 
-getMarcaById(id) {
-  this.getDataById(id, "marca", "selectedMarca");
-},
+    getMarcaById(id) {
+      this.getDataById(id, "marca", "selectedMarca");
+    },
 
-getModeloById(id) {
-  this.getDataById(id, "modelo", "selectedModelo");
-},
+    getModeloById(id) {
+      this.getDataById(id, "modelo", "selectedModelo");
+    },
 
-getTipoEquipoById(id) {
-  this.getDataById(id, "tipo-equipo", "selectedTipoEquipo");
-},
-
+    getTipoEquipoById(id) {
+      this.getDataById(id, "tipo-equipo", "selectedTipoEquipo");
+    },
 
     getMarcasEquipo() {
       fetch(`${backendData}/marca`)
@@ -396,16 +407,20 @@ getTipoEquipoById(id) {
     },
 
     getModelosEquipo() {
-      fetch(
-        `${backendData}/modelo/search?id_tipo_equipo=${this.selectedTipoEquipo.id}&id_marca=${this.selectedMarca.id}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          this.modelosEquipos = data;
-        })
-        .catch((error) => {
-          console.error("Error al obtener los modelos de equipo", error);
-        });
+      if (this.selectedTipoEquipo != "" && this.selectedMarca != "") {
+        fetch(
+          `${backendData}/modelo/search?id_tipo_equipo=${this.selectedTipoEquipo.id}&id_marca=${this.selectedMarca.id}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.modelosEquipos = data;
+          })
+          .catch((error) => {
+            console.error("Error al obtener los modelos de equipo", error);
+          });
+      } else {
+        this.modelosEquipos = [];
+      }
     },
 
     async addNewEquipo() {
@@ -428,7 +443,6 @@ getTipoEquipoById(id) {
         }
         const data = await response.json();
         this.equipo = data;
-        console.log("se agrego el equipo");
       } catch (error) {
         console.error("Error al agregar el equipo:", error);
         throw error;
@@ -436,6 +450,7 @@ getTipoEquipoById(id) {
     },
 
     resetModal() {
+      this.isBusy = false;
       this.clientID = null;
       this.cliente = null;
       this.selectedTipoEquipo = "";
@@ -462,5 +477,17 @@ select,
 textarea {
   border-radius: 3px;
   border: 1px solid #ccc;
+}
+.icon-div {
+  width: 50px;
+}
+.icon {
+  font-size: 40px;
+}
+.input-div {
+  width: 70%;
+}
+.botonNewOrder{
+  white-space: nowrap;
 }
 </style>

@@ -74,6 +74,7 @@
             </b-button>
         </div>
       </div>
+   
     </b-modal>
   </div>
 </template>
@@ -87,7 +88,7 @@ export default {
       modalShow:false,
       totalRows: null,
       currentPage: 1,
-      perPage: 10,
+      perPage: 6,
       nameState: null,
       phoneState: null,
       clientes: [],
@@ -114,7 +115,9 @@ export default {
     bus.$on('abrir-modal-en-cliente', () => {
     this.abrirModal();
   });
-  
+  bus.$on('cliente-agregado', () => {
+    this.getAllClients();
+  });
   },
 
   methods: {
@@ -167,33 +170,6 @@ export default {
         });
     },
    
-    addClient(client) {
-      fetch(`${backendData}/cliente`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(client),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar el cliente");
-          }
-        })
-        .then((response) => {
-          this.selectedClientId = response.id;
-          this.$emit("cliente-agregado", this.selectedClientId);
-          this.getAllClients();
-          this.$nextTick(() => {
-            this.$bvModal.hide("modal-cliente");
-          });
-        })
-        .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
-        });
-    },
   
     resetModal() {
       this.selected=null,
