@@ -66,12 +66,13 @@ export default {
   name: "OrderTableComponent",
   data() {
     return {
-      perPage: 12,
+      perPage: 16, // Modificado 28-11
       currentPage: 1,
       isBusy: false,
       fields: [
         { key: "id", label: " #", sortable: true },
         { key: "nombre", label: "Cliente", sortable: true },
+        { key: "tipoEquipo", label: "Tipo", sortable: true }, // Modificado 28-11
         { key: "marca", label: "Marca", sortable: true },
         { key: "modelo", label: "Modelo", sortable: true },
         { key: "falla", label: "Falla", sortable: true },
