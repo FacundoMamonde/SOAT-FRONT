@@ -12,7 +12,7 @@
           class="ps-2 fs-2"
           v-b-tooltip.hover.right
           title="Volver a ordenes ingresadas"
-          >SOAT</b-navbar-brand
+          > <img src="./../logo.png" class="logo " /> SOAT </b-navbar-brand
         >
       </b-navbar-nav>
       <div v-if="buscadorOrdenes" class="d-flex align-self-md-center">
@@ -179,5 +179,10 @@ export default {
 input:focus {
   outline: none;
   box-shadow: none;
+}
+
+.logo{
+  height: 35px;
+  margin: auto;
 }
 </style>

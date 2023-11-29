@@ -147,11 +147,20 @@
               </div>
               <b-alert
                 show
-                variant="danger"
+                variant="warning"
                 class="text-center col-11"
-                v-if="orderData.estado == 4 && !orderData.presupuestoAprobado"
+                v-if="orderData.estado == 4 && !orderData.presupuestoAprobado && !orderData.sinReparacion"
               >
                 No aprobado
+              </b-alert>
+
+              <b-alert
+                show
+                variant="danger"
+                class="text-center col-11"
+                v-if="orderData.sinReparacion"
+              >
+                Sin Reparacion
               </b-alert>
             </div>
           </div>
@@ -166,9 +175,20 @@
               :orden="this.orderData"
               @orden-eliminada="handleOrdenEliminada"
             />
+
+            <button 
+              :disabled="this.isChangingData"
+              v-if="orderData.estado == 1"
+              class="btn btn-warning ms-3"
+              @click="sinReparacion(orderData.id)"
+            >
+              Sin reparación
+            </button>
           </div>
 
           <div>
+        
+
             <button
               :disabled="this.isChangingData"
               v-if="orderData.estado == 4 || orderData.estado == 3"
@@ -442,6 +462,9 @@ export default {
     },
     rebudget(orderId) {
       this.updateOrderStatus(orderId, "presupuestarA");
+    },
+    sinReparacion(orderId) {
+      this.updateOrderStatus(orderId, "sinReparacion");
     },
     restore(orderId) {
       this.updateOrderStatus(orderId, "restore");

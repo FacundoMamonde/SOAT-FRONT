@@ -39,6 +39,7 @@
             </template>
             <!-- Botones de acciones -->
             <template v-slot:cell(actions)="data">
+              <div class="d-flex justify-content-end">
               <!-- Boton Historial Ordenes -->
               <span class="p-0 m-0">
                 <a @click="(selectedClient = data.item), historialCliente()">
@@ -74,6 +75,7 @@
                   /></b-button>
                 </a>
               </span>
+            </div>
             </template>
           </b-table>
         </div>
@@ -117,6 +119,7 @@
         <template #modal-footer="{ ok }">
           <div v-if="!error_clienteEnUso && !eliminarSuccess">
             <b-button
+            class="me-2"
               size="sm"
               variant="primary"
               @click="ok(), getAllClients()"
