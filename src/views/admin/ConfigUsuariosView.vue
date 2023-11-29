@@ -1,20 +1,18 @@
 <template>
-    <div>
-      <HeaderComponent></HeaderComponent>
-      <ConfigUsuariosComponent></ConfigUsuariosComponent>
-    </div>
-  </template>
-  
-  <script>
+  <div class="d-flex flex-column h-100">
+    <HeaderComponent></HeaderComponent>
+    <ConfigUsuariosComponent class="flex-grow-1"></ConfigUsuariosComponent>
+    <FooterComponent></FooterComponent>
+  </div>
+</template>
 
-  import HeaderComponent from "@/components/HeaderComponent.vue";
-  import ConfigUsuariosComponent from "@/components/admin/ConfigUsuarios.vue";
-  
-  export default {
-    name: "ConfigUsuariosView",
-  
-    components:{HeaderComponent, ConfigUsuariosComponent}
-  };
-  </script>
-  
-  
+<script>
+import HeaderComponent from "@/components/HeaderComponent.vue";
+import ConfigUsuariosComponent from "@/components/admin/ConfigUsuarios.vue";
+import FooterComponent from "@/components/FooterComponent.vue";
+
+export default {
+  name: "ConfigUsuariosView",
+  components: { HeaderComponent, ConfigUsuariosComponent, FooterComponent },
+};
+</script>

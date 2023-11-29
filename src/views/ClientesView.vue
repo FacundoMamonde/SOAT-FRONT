@@ -1,18 +1,17 @@
 <template>
-    <div>
-      <HeaderComponent></HeaderComponent>
-      <ClientesComponent></ClientesComponent>
-    </div>
-  </template>
-  
-  <script>
+  <div class="d-flex flex-column h-100">
+    <HeaderComponent></HeaderComponent>
+    <ClientesComponent class="flex-grow-1"></ClientesComponent>
+    <FooterComponent></FooterComponent>
+  </div>
+</template>
 
-  import HeaderComponent from "@/components/HeaderComponent.vue";
-  import ClientesComponent from "@/components/ClientesComponent.vue";
-  export default {
-    name: "ClientesView",
-  
-    components:{HeaderComponent, ClientesComponent}
-  };
-  </script>
-  
+<script>
+import HeaderComponent from "@/components/HeaderComponent.vue";
+import ClientesComponent from "@/components/ClientesComponent.vue";
+import FooterComponent from "@/components/FooterComponent.vue";
+export default {
+  name: "ClientesView",
+  components: { HeaderComponent, ClientesComponent, FooterComponent },
+};
+</script>

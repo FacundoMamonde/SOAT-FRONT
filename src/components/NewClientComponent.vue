@@ -63,15 +63,15 @@
           {{ errorText }}
         </p>
         <div v-if="showForm" id="agregar">
-          <ClientForm :modo="'agregar'" ref="UpdateClient"/>
+          <ClientForm :modo="'agregar'" ref="UpdateClient" />
           <b-button
-              @click="returnModal"
-              size="sm"
-              variant="primary"
-              class="my-3"
-            >
-              <b-icon icon="arrow-left" aria-label="return"></b-icon>
-            </b-button>
+            @click="returnModal"
+            size="sm"
+            variant="primary"
+            class="my-3"
+          >
+            <b-icon icon="arrow-left" aria-label="return"></b-icon>
+          </b-button>
         </div>
       </div>
     </b-modal>
@@ -79,15 +79,15 @@
 </template>
 
 <script>
-import {bus, backendData } from "../main";
+import { bus, backendData } from "../main";
 import ClientForm from "./ClientFormComponent.vue";
 export default {
   data() {
     return {
-      modalShow:false,
+      modalShow: false,
       totalRows: null,
       currentPage: 1,
-      perPage: 10,
+      perPage: 6,
       nameState: null,
       phoneState: null,
       clientes: [],
@@ -108,26 +108,27 @@ export default {
       ],
     };
   },
-  components:{ClientForm},
+  components: { ClientForm },
   created() {
     this.getAllClients();
-    bus.$on('abrir-modal-en-cliente', () => {
-    this.abrirModal();
-  });
-  
+    bus.$on("abrir-modal-en-cliente", () => {
+      this.abrirModal();
+    });
+    bus.$on("cliente-agregado", () => {
+      this.getAllClients();
+    });
   },
 
   methods: {
- 
     onRowSelected(item) {
       this.selected = item;
-      console.log(this.selected);
     },
+
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
         return this.clientes;
       }
-  return this.clientes.filter((cliente) => {
+      return this.clientes.filter((cliente) => {
         return (
           cliente.nombre
             .toLowerCase()
@@ -166,38 +167,10 @@ export default {
           console.error("Error al obtener los clientes:", error);
         });
     },
-   
-    addClient(client) {
-      fetch(`${backendData}/cliente`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(client),
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Error al agregar el cliente");
-          }
-        })
-        .then((response) => {
-          this.selectedClientId = response.id;
-          this.$emit("cliente-agregado", this.selectedClientId);
-          this.getAllClients();
-          this.$nextTick(() => {
-            this.$bvModal.hide("modal-cliente");
-          });
-        })
-        .catch((error) => {
-          console.error("Error al agregar el cliente:", error);
-        });
-    },
-  
+
     resetModal() {
-      this.selected=null,
-      (this.nameState = null),
+      (this.selected = null),
+        (this.nameState = null),
         (this.phoneState = null),
         (this.showForm = false),
         (this.nombre = ""),
@@ -224,15 +197,10 @@ export default {
         }
       } else {
         bvModalEvent.preventDefault();
-        
         this.$refs.UpdateClient.handleSubmit();
       }
     },
-
-    
   },
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="container-fluid-lg">
     <router-view />
   </div>
 </template>
@@ -7,6 +7,8 @@
 <style>
 body {
   background-color: rgb(32, 32, 32) !important;
+  max-width: 100vw;
+  height: 100vh;
 }
 
 #app {
@@ -14,29 +16,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #252628;
-  max-width: 1200px;
+
   margin: auto;
+  max-width: 100vw;
   height: 100vh;
+
   background-color: #252628;
 }
 
-nav {
-  padding: 30px;
-  text-align: center;
-}
-
-nav a {
-  font-weight: bold;
-  color: #101011;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-
 #divOrderContainer {
-  min-width: 360px;
-  max-width: 1200px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -45,17 +33,14 @@ nav a.router-link-exact-active {
 
 #divOrderDetail,
 #divOrderTable {
-  min-width: 360px;
   background-color: #ededed;
-  flex: 1;
+
   border: none;
   color: #494949;
-  min-height: 600px;
-
 }
 #divOrderTable {
   background-color: #f3f3f3;
- }
+}
 p {
   font-size: 14px;
 }

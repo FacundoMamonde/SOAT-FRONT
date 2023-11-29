@@ -1,5 +1,5 @@
 <template>
-  <div id="divOrderTable" class="px-md-0">
+  <div id="divOrderTable" class="px-md-0 h-100">
     <div
       v-if="isBusy"
       class="text-center h-100 d-flex align-items-center justify-content-center"
@@ -7,7 +7,11 @@
       <b-spinner variant="primary"></b-spinner>
     </div>
     <div v-else class="d-flex flex-column h-100">
-      <div class="flex-grow-1 container pe-0 ps-0" v-show="ordenes.length > 0">
+      <div
+        v-if="ordenes.length > 0"
+        class="h-100 container d-flex flex-column justify-content-between pe-0 ps-0"
+        v-show="ordenes.length > 0"
+      >
         <b-table
           id="table"
           class="text-muted tabla"
@@ -26,7 +30,6 @@
           label-sort-desc=""
           label-sort-clear=""
         >
-          <!-- borderless="true" -->
           <template #head()="data">
             <span class="text">{{ data.label }}</span>
           </template>
@@ -36,7 +39,7 @@
             </td>
           </template>
         </b-table>
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center mt-auto">
           <b-pagination
             size="sm"
             v-model="currentPage"
@@ -47,7 +50,7 @@
         </div>
       </div>
       <div
-        v-if="ordenes.length <= 0"
+        v-else
         class="h-100 d-flex align-items-center justify-content-center"
       >
         <p>No se ha encontrado ninguna orden.</p>
@@ -63,12 +66,13 @@ export default {
   name: "OrderTableComponent",
   data() {
     return {
-      perPage: 12,
+      perPage: 16, // Modificado 28-11
       currentPage: 1,
       isBusy: false,
       fields: [
         { key: "id", label: " #", sortable: true },
         { key: "nombre", label: "Cliente", sortable: true },
+        { key: "tipoEquipo", label: "Tipo", sortable: true }, // Modificado 28-11
         { key: "marca", label: "Marca", sortable: true },
         { key: "modelo", label: "Modelo", sortable: true },
         { key: "falla", label: "Falla", sortable: true },
@@ -200,7 +204,6 @@ export default {
 }
 
 .tabla {
-  max-height: 600px;
   white-space: nowrap;
 }
 
@@ -219,7 +222,6 @@ export default {
 }
 
 .tabla {
-  max-height: 600px;
   overflow-x: scroll !important;
 
   white-space: nowrap;
@@ -245,7 +247,6 @@ export default {
 }
 
 .tabla {
-  max-height: 600px;
   overflow-x: scroll !important;
   white-space: nowrap;
   scrollbar-width: thin;
@@ -254,6 +255,5 @@ export default {
 
 #divOrderTable {
   border-right: 2px solid #cecece;
-  color: blacks;
 }
 </style>

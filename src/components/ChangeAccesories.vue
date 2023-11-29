@@ -9,9 +9,10 @@
     <b-modal
       id="changeAccesories"
       size="sm"
-      title="Accesorios"
+      title="Actualizar accesorios"
       @ok="changeAccesories"
     >
+      <h5>Accesorios</h5>
       <textarea v-model="newAccesorio" class="w-100"></textarea>
     </b-modal>
   </div>
@@ -27,7 +28,7 @@ export default {
       default: null,
     },
   },
-  
+
   data() {
     return {
       newAccesorio: this.orden.accesorio,
@@ -36,8 +37,9 @@ export default {
 
   methods: {
     changeAccesories() {
+      const accesorioToSave = this.newAccesorio.trim() !== "" ? this.newAccesorio : null;
       const newData = {
-        accesorio: this.newAccesorio,
+        accesorio: accesorioToSave,
         id_cliente: this.orden.cliente.id,
         id_equipo: this.orden.equipo.id,
       };
