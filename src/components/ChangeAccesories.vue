@@ -9,10 +9,10 @@
     <b-modal
       id="changeAccesories"
       size="sm"
-      title="Accesorios"
+      title="Actualizar accesorios"
       @ok="changeAccesories"
     >
-      <h5>Actualizar accesorios</h5>
+      <h5>Accesorios</h5>
       <textarea v-model="newAccesorio" class="w-100"></textarea>
     </b-modal>
   </div>
