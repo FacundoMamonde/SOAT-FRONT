@@ -32,6 +32,7 @@
               type="password"
               required
             ></b-form-input>
+            <p class="my-3">Usuario: tecnico1 - Pass: tecnico123</p>
           </b-form>
           <div v-if="errorlogin">
             <span class="errorL"
