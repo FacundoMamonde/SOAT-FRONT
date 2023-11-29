@@ -83,8 +83,8 @@
               <b-dropdown-item v-b-modal.modal-config-usuario
                 >Mis datos</b-dropdown-item
               >
-              <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item disabled>Administración</b-dropdown-item>
+              <b-dropdown-divider v-if="getUserAdmin()"></b-dropdown-divider>
+              <b-dropdown-item v-if="getUserAdmin()" disabled>Administración</b-dropdown-item>
               <b-dropdown-item
                 v-if="getUserAdmin()"
                 router-link
