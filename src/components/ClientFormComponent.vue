@@ -52,7 +52,6 @@
         <b-form-textarea
           id="descriptionInput"
           v-model="description"
-          required
         ></b-form-textarea>
       </b-form-group>
     </form>
@@ -97,11 +96,12 @@ export default {
       this.nombre = this.cliente.nombre;
       this.telefono = this.cliente.telefono;
       this.dni = this.cliente.dni;
-      this.descripcion = this.cliente.descripcion;
+      this.description = this.cliente.descripcion;
     }
   },
   methods: {
     addClient(client) {
+      console.log(client);
       this.isBusy = true;
       fetch(`${backendData}/cliente`, {
         method: "POST",
@@ -172,7 +172,7 @@ export default {
 
       }
     },
-    
+
     handleSubmit() {
       this.checkFormValidity();
       if (!this.nameState || !this.phoneState || this.dniState==false) {
