@@ -8,7 +8,6 @@
       
       >Nueva orden</b-button>
     <b-modal
-      centered
       ref="newOrderModal"
       id="newOrderModal"
       title="Nueva Orden"

@@ -172,6 +172,7 @@ export default {
 
       }
     },
+    
     handleSubmit() {
       this.checkFormValidity();
       if (!this.nameState || !this.phoneState || this.dniState==false) {

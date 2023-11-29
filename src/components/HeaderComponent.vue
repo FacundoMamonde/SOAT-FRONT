@@ -7,7 +7,8 @@
     >
       <b-navbar-nav>
         <b-navbar-brand
-          router-link to="/ingresadas"
+          router-link
+          to="/ingresadas"
           class="ps-2 fs-2"
           v-b-tooltip.hover.right
           title="Volver a ordenes ingresadas"
@@ -43,9 +44,8 @@
             </b-dropdown>
           </template>
         </b-input-group>
-       
+
         <NewOrderComponent></NewOrderComponent>
-    
       </div>
 
       <div class="mt-1 pr-0 drop d-flex justify-content-end">
@@ -77,16 +77,24 @@
                 <div>{{ username }}</div>
               </b-dropdown-header>
               <b-dropdown-divider></b-dropdown-divider>
-              <b-dropdown-item router-link to="/clientes">Clientes</b-dropdown-item>
+              <b-dropdown-item router-link to="/clientes"
+                >Clientes</b-dropdown-item
+              >
               <b-dropdown-item v-b-modal.modal-config-usuario
                 >Mis datos</b-dropdown-item
               >
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item disabled>Administración</b-dropdown-item>
-              <b-dropdown-item v-if="getUserAdmin()" router-link to="/admin/negocio"
+              <b-dropdown-item
+                v-if="getUserAdmin()"
+                router-link
+                to="/admin/negocio"
                 >Negocio</b-dropdown-item
               >
-              <b-dropdown-item v-if="getUserAdmin()" router-link to="/admin/usuarios"
+              <b-dropdown-item
+                v-if="getUserAdmin()"
+                router-link
+                to="/admin/usuarios"
                 >Usuarios</b-dropdown-item
               >
               <b-dropdown-divider></b-dropdown-divider>
@@ -142,7 +150,6 @@ export default {
     },
     logout() {
       localStorage.removeItem("token");
-
       this.$router.push("/");
     },
     getUserName() {
@@ -166,9 +173,6 @@ export default {
   box-sizing: border-box;
 }
 
-.header {
-  min-width: 360px;
-}
 .drop {
   width: 200px !important;
 }

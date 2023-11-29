@@ -63,29 +63,28 @@
           {{ errorText }}
         </p>
         <div v-if="showForm" id="agregar">
-          <ClientForm :modo="'agregar'" ref="UpdateClient"/>
+          <ClientForm :modo="'agregar'" ref="UpdateClient" />
           <b-button
-              @click="returnModal"
-              size="sm"
-              variant="primary"
-              class="my-3"
-            >
-              <b-icon icon="arrow-left" aria-label="return"></b-icon>
-            </b-button>
+            @click="returnModal"
+            size="sm"
+            variant="primary"
+            class="my-3"
+          >
+            <b-icon icon="arrow-left" aria-label="return"></b-icon>
+          </b-button>
         </div>
       </div>
-   
     </b-modal>
   </div>
 </template>
 
 <script>
-import {bus, backendData } from "../main";
+import { bus, backendData } from "../main";
 import ClientForm from "./ClientFormComponent.vue";
 export default {
   data() {
     return {
-      modalShow:false,
+      modalShow: false,
       totalRows: null,
       currentPage: 1,
       perPage: 6,
@@ -109,28 +108,27 @@ export default {
       ],
     };
   },
-  components:{ClientForm},
+  components: { ClientForm },
   created() {
     this.getAllClients();
-    bus.$on('abrir-modal-en-cliente', () => {
-    this.abrirModal();
-  });
-  bus.$on('cliente-agregado', () => {
-    this.getAllClients();
-  });
+    bus.$on("abrir-modal-en-cliente", () => {
+      this.abrirModal();
+    });
+    bus.$on("cliente-agregado", () => {
+      this.getAllClients();
+    });
   },
 
   methods: {
- 
     onRowSelected(item) {
       this.selected = item;
-      console.log(this.selected);
     },
+
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
         return this.clientes;
       }
-  return this.clientes.filter((cliente) => {
+      return this.clientes.filter((cliente) => {
         return (
           cliente.nombre
             .toLowerCase()
@@ -169,11 +167,10 @@ export default {
           console.error("Error al obtener los clientes:", error);
         });
     },
-   
-  
+
     resetModal() {
-      this.selected=null,
-      (this.nameState = null),
+      (this.selected = null),
+        (this.nameState = null),
         (this.phoneState = null),
         (this.showForm = false),
         (this.nombre = ""),
@@ -200,15 +197,10 @@ export default {
         }
       } else {
         bvModalEvent.preventDefault();
-        
         this.$refs.UpdateClient.handleSubmit();
       }
     },
-
-    
   },
 };
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>

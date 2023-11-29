@@ -35,7 +35,6 @@ export default {
   props: {
     campo: String,
     // allProp: Array,
-    
   },
   data() {
     return {
@@ -44,20 +43,25 @@ export default {
       propName: null,
       propState: null,
       errorMessage: "",
-      allProp:[]
+      allProp: [],
     };
   },
   methods: {
-    abrirModal(campo,allProp) {
+    abrirModal(campo, allProp) {
       this.equipoProp = campo;
-      this.allProp=allProp
-      console.log(this.equipoProp)
-      console.log(this.allProp)
-     
+      this.allProp = allProp;
+      console.log(this.equipoProp);
+      console.log(this.allProp);
     },
+
     async addProp(propName) {
       if (this.equipoProp === "Tipo de equipo") {
-        await this.addEntity("tipo-equipo", propName, "tipo-equipo-agregado", "tipoEquipoId");
+        await this.addEntity(
+          "tipo-equipo",
+          propName,
+          "tipo-equipo-agregado",
+          "tipoEquipoId"
+        );
       } else if (this.equipoProp === "Marca") {
         await this.addEntity("marca", propName, "marca-agregada", "marcaId");
       } else if (this.equipoProp === "Modelo") {
@@ -66,7 +70,12 @@ export default {
           marcaID: this.selectedMarca.id,
           tipoEquipoID: this.selectedTipoEquipo.id,
         };
-        await this.addEntity("modelo", createModeloDto, "modelo-agregado", "modeloId");
+        await this.addEntity(
+          "modelo",
+          createModeloDto,
+          "modelo-agregado",
+          "modeloId"
+        );
       }
       this.modalShow = false;
       this.resetModal();
@@ -94,10 +103,12 @@ export default {
         throw error;
       }
     },
+
     actualizarSeleccion(selectedTipoEquipo, selectedMarca) {
       this.selectedTipoEquipo = selectedTipoEquipo;
       this.selectedMarca = selectedMarca;
     },
+
     handleOk(bvModalEvent) {
       if (this.propName && this.propName.trim() !== "") {
         const nombre = this.propName.trim().toLowerCase();
@@ -124,17 +135,13 @@ export default {
         this.addProp(propertyName);
       }
     },
-     
+
     resetModal() {
       this.propName = null;
       this.propState = null;
       this.$emit("cerrar-modal-equipo");
-
     },
   },
 };
 </script>
-<style>
-
-
-</style>
+<style></style>

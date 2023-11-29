@@ -9,150 +9,156 @@
     <div v-else class="h-100">
       <div
         v-if="orderData != null"
-        class=" d-flex flex-column justify-content-between h-100"
+        class="d-flex flex-column justify-content-between h-100"
       >
-        <div id="orderDetailContainer" class="ps-5  flex-grow-1" >
+        <div id="orderDetailContainer" class="ps-5 flex-grow-1">
           <div>
-          <div class="row pt-2">
-            <!-- DIV NUMERO Y FECHA DE ORDEN -->
-            <div class="col-6 p-0">
-              <p class="h2 ml-1 mb-0 pt-1">Orden # {{ orderData.id }}</p>
-              <p class="badge bg-secondary">
-                <i class="bi bi-calendar3"></i> {{ orderData.fechaIngreso }}
-              </p>
-            </div>
-            <div class="col-6">
-              <!-- DIV DATOS CLIENTE -->
-              <div class="d-flex flex-row align-items-center">
-            
+            <div class="row pt-2">
+              <!-- DIV NUMERO Y FECHA DE ORDEN -->
+              <div class="col-6 p-0">
+                <p class="h2 ml-1 mb-0 pt-1">Orden # {{ orderData.id }}</p>
+                <p class="badge bg-secondary">
+                  <i class="bi bi-calendar3"></i> {{ orderData.fechaIngreso }}
+                </p>
+              </div>
+              <div class="col-6">
+                <!-- DIV DATOS CLIENTE -->
+                <div class="d-flex flex-row align-items-center">
                   <!-- Icono de Cliente-->
                   <b-icon icon="person-circle" font-scale="3"></b-icon>
-                 
-               <!-- </div> -->
-                <div class="d-flex flex-column ms-3" > 
-                  <p v-if="orderData.cliente.nombre" class="m-0 pt-2 ">
-                    {{ orderData.cliente.nombre }}
-                  </p>
-                  <p v-else class="m-0 pt-2 " >Nombre de Cliente</p>
-                  <p v-if="orderData.cliente.telefono" class="mt-0 ">
-                    {{ orderData.cliente.telefono }}
-                  </p>
-                  <p v-else class="mt-0 ">Celular del cliente</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6 p-0 ">
-              <!-- DIV EQUIPO -->
-              <div class="d-flex flex-row align-items-center">
-                <b-icon icon="laptop" font-scale="3"></b-icon>
-                <div class="d-flex flex-column ms-3">
-                  <p v-if="orderData.equipo.modelo.marca" class="m-0 pt-2  ">
-                    {{ orderData.equipo.modelo.marca.nombre }}
-                  </p>
-                  <p v-else class="m-0 pt-2 ">Tipo de Equipo - Marca</p>
-                  <p v-if="orderData.equipo.modelo" class="m-0  ">
-                    {{ orderData.equipo.modelo.nombre }}
-                  </p>
-                  <p v-else class="m-0 pt-2 ">Modelo</p>
-                  <p v-if="orderData.equipo.n_serie" class="m-0 ">
-                    {{ orderData.equipo.n_serie }}
-                  </p>
-                  <p v-else class="m-0  ">n de serie</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-6 d-flex flex-row align-items-center">
-              <!-- DIV ACCESORIOS -->
-              <div class="d-flex flex-row align-items-center">
-                <!-- Icono de Accesorios-->
-                <b-icon icon="clipboard-check" font-scale="3"></b-icon>
-              
-                <div >
-                  <div class="d-flex ms-3">
-                    <p v-if="orderData.accesorio" class="m-0  ">
-                      {{ orderData.accesorio }}
+
+                  <!-- </div> -->
+                  <div class="d-flex flex-column ms-3">
+                    <p v-if="orderData.cliente.nombre" class="m-0 pt-2">
+                      {{ orderData.cliente.nombre }}
                     </p>
-                    <p v-else class="m-0 ">Sin Accesorios</p>
-                    <ChangeAccesories
-                      v-if="this.orderData.estado < 4"
-                      :orden="this.orderData"
-                      @accesorioCambiado="actualizarAccesorio"
-                    ></ChangeAccesories>
+                    <p v-else class="m-0 pt-2">Nombre de Cliente</p>
+                    <p v-if="orderData.cliente.telefono" class="mt-0">
+                      {{ orderData.cliente.telefono }}
+                    </p>
+                    <p v-else class="mt-0">Celular del cliente</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 p-0">
+                <!-- DIV EQUIPO -->
+                <div class="d-flex flex-row align-items-center">
+                  <b-icon icon="laptop" font-scale="3"></b-icon>
+                  <div class="d-flex flex-column ms-3">
+                    <p v-if="orderData.equipo.modelo.marca" class="m-0 pt-2">
+                      {{ orderData.equipo.modelo.marca.nombre }}
+                    </p>
+                    <p v-else class="m-0 pt-2">Tipo de Equipo - Marca</p>
+                    <p v-if="orderData.equipo.modelo" class="m-0">
+                      {{ orderData.equipo.modelo.nombre }}
+                    </p>
+                    <p v-else class="m-0 pt-2">Modelo</p>
+                    <p v-if="orderData.equipo.n_serie" class="m-0">
+                      {{ orderData.equipo.n_serie }}
+                    </p>
+                    <p v-else class="m-0">n de serie</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 d-flex flex-row align-items-center">
+                <!-- DIV ACCESORIOS -->
+                <div class="d-flex flex-row align-items-center">
+                  <!-- Icono de Accesorios-->
+                  <b-icon icon="clipboard-check" font-scale="3"></b-icon>
+
+                  <div>
+                    <div class="d-flex ms-3">
+                      <p v-if="orderData.accesorio" class="m-0">
+                        {{ orderData.accesorio }}
+                      </p>
+                      <p v-else class="m-0">Sin Accesorios</p>
+                      <ChangeAccesories
+                        v-if="this.orderData.estado < 4"
+                        :orden="this.orderData"
+                        @accesorioCambiado="actualizarAccesorio"
+                      ></ChangeAccesories>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          </div>
-          <div >
-          <div v-if="orderData.estado < 2">
-            <h5 class="mt-3 ">Descripción de la falla</h5>
-            <textarea
-              disabled
-              v-model="orderData.falla"
-              class="col-11 p-0 m-0 "
-              rows="5"
-            >
-            </textarea>
-          </div>
-          <div v-if="orderData.estado != 0">
-            <h5 class="mt-3">Diagnóstico</h5>
-            <textarea
-              v-model="orderData.informe"
-              class="col-11 p-0 m-0"
-              rows="5"
-              :class="{ 'border-danger': !this.orderData.informe && showError }"
-              @input="changeInforme"
-             
-            ></textarea>
-
-            <div v-if="orderData.estado >= 2">
-              <h5 class="mt-3">Presupuesto</h5>
+          <div>
+            <div v-if="orderData.estado < 2">
+              <h5 class="mt-3">Descripción de la falla</h5>
               <textarea
-                :disabled="orderData.estado > 2"
-                :class="{
-                  'border-danger': !this.orderData.presupuesto && showError,
-                }"
-                v-model="orderData.presupuesto"
+                disabled
+                v-model="orderData.falla"
                 class="col-11 p-0 m-0"
-                rows="5"
-                 @input="changePresupuesto"
-                
-              ></textarea>
+                rows="6"
+              >
+              </textarea>
             </div>
+            <div v-if="orderData.estado != 0">
+              <h5 class="mt-3">Diagnóstico</h5>
+              <textarea
+                v-model="orderData.informe"
+                class="col-11 p-0 m-0"
+                rows="6"
+                :class="{
+                  'border-danger': !this.orderData.informe && showError,
+                }"
+                @input="changeInforme"
+              ></textarea>
 
-            <div
-              v-if="orderData.estado >= 2"
-              class="d-flex flex-row justify-content-between col-11"
-             
-            >
-              <div class="p-2 ">
-                <span class="align-middle">$ </span>
-                <input id="price"
+              <div v-if="orderData.estado >= 2">
+                <h5 class="mt-3">Presupuesto</h5>
+                <textarea
                   :disabled="orderData.estado > 2"
                   :class="{
-                    'border-danger': !this.orderData.importe && showError,
+                    'border-danger': !this.orderData.presupuesto && showError,
                   }"
-                  v-model="orderData.importe"
-                  type="number"
-                  @input="changePrice()"
-                />
+                  v-model="orderData.presupuesto"
+                  class="col-11 p-0 m-0"
+                  rows="6"
+                  @input="changePresupuesto"
+                ></textarea>
               </div>
-           
-              <!-- <h5 v-if="orderData.estado == 4 && !orderData.presupuestoAprobado" class="m-auto text-danger">NO APROBADO</h5> -->
-              <div class="p-2 flex-shrink-1">
-                <PDFGenerator :orderData="orderData" />
+
+              <div
+                v-if="orderData.estado >= 2"
+                class="d-flex flex-row justify-content-between col-11"
+              >
+                <div class="p-2">
+                  <span class="align-middle">$ </span>
+                  <input
+                    id="price"
+                    :disabled="orderData.estado > 2"
+                    :class="{
+                      'border-danger': !this.orderData.importe && showError,
+                    }"
+                    v-model="orderData.importe"
+                    type="number"
+                    @input="changePrice()"
+                  />
+                </div>
+
+                <!-- <h5 v-if="orderData.estado == 4 && !orderData.presupuestoAprobado" class="m-auto text-danger">NO APROBADO</h5> -->
+                <div class="p-2 flex-shrink-1">
+                  <PDFGenerator :orderData="orderData" />
+                </div>
               </div>
+              <b-alert
+                show
+                variant="danger"
+                class="text-center col-11"
+                v-if="orderData.estado == 4 && !orderData.presupuestoAprobado"
+              >
+                No aprobado
+              </b-alert>
             </div>
-            <b-alert  show variant="danger" class="text-center col-11" v-if="orderData.estado == 4 && !orderData.presupuestoAprobado">
-   No aprobado
-    </b-alert>
           </div>
         </div>
-      </div>
-        <div class="w-100 d-flex justify-content-between card-footer mb-3 ps-5 col-3">
+        <div
+          class="w-100 d-flex justify-content-between card-footer mb-3 ps-5 col-3"
+        >
           <div class="d-flex">
             <TrackingDates :orden="this.orderData" class="me-3" />
 
@@ -161,7 +167,7 @@
               @orden-eliminada="handleOrdenEliminada"
             />
           </div>
-          
+
           <div>
             <button
               :disabled="this.isChangingData"
@@ -175,7 +181,7 @@
               :disabled="this.isChangingData"
               v-if="orderData.estado == 2"
               class="btn btn-danger me-3"
-              @click="handleOk(orderData.id,false)"
+              @click="handleOk(orderData.id, false)"
             >
               No aprobado
             </button>
@@ -309,8 +315,6 @@ export default {
     },
 
     changeOrderData(value, section, order) {
-      console.log(section);
-      console.log(order);
       const promiseFunction = () => {
         return new Promise((resolve) => {
           const trimmedValue = value.trim();
@@ -318,7 +322,7 @@ export default {
             value = null;
             this.isChangingData = false;
           }
-         if(section=="importe") value =Number(value)
+          if (section == "importe") value = Number(value);
           const orderId = order.id;
           const newData = {
             [section]: value,
@@ -413,7 +417,7 @@ export default {
       fetch(`${backendData}/orden/${orderId}/${endpoint}`, {
         method: "PATCH",
         headers: {
-          "Authorization": `Bearer ${localStorage.token}`,
+          Authorization: `Bearer ${localStorage.token}`,
           "Content-Type": "application/json",
         },
       })
@@ -439,24 +443,25 @@ export default {
     rebudget(orderId) {
       this.updateOrderStatus(orderId, "presupuestarA");
     },
-    restore(orderId){
+    restore(orderId) {
       this.updateOrderStatus(orderId, "restore");
     },
 
-    handleOk(orderId,presupuesto) {
+    handleOk(orderId, presupuesto) {
       if (this.orderData.estado === 1 && !this.orderData.informe) {
         this.showError = true;
-      } else if (this.orderData.estado === 2 ) {
+      } else if (this.orderData.estado === 2) {
         if (!this.orderData.importe || !this.orderData.presupuesto) {
           this.showError = true;
         } else {
-          if(presupuesto==false){
-            this.changeStatusNA(orderId)
-            this.showError=false;
-          }else{
-          this.changeStatus(orderId);
-          this.showError = false;
-        }}
+          if (presupuesto == false) {
+            this.changeStatusNA(orderId);
+            this.showError = false;
+          } else {
+            this.changeStatus(orderId);
+            this.showError = false;
+          }
+        }
       } else {
         this.changeStatus(orderId);
         this.showError = false;
@@ -485,9 +490,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-#price{
+#price {
   width: 100px;
 }
-
-
 </style>

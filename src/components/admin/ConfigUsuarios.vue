@@ -460,8 +460,7 @@ export default {
         })
           .then((response) => response.json())
           .then((json) => (this.usuarios = json));
-
-        this.toggleBusy();
+    this.toggleBusy();
       } catch (error) {
         this.toggleBusy();
         console.error("Error al obtener Usuario:", error);

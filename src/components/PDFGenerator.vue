@@ -13,27 +13,56 @@
 <script>
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { backendData } from "../main";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export default {
+  data() {
+    return {
+      negocio: {},
+    };
+  },
   props: {
     orderData: {
       type: Object,
       required: true,
     },
   },
+  created() {
+    this.getDatosNegocio();
+  },
   methods: {
-    generatePDF() {
+    getDatosNegocio() {
+      fetch(`${backendData}/negocio`)
+        .then((response) => response.json())
+        .then((negocio) => {
+          this.negocio = negocio;
+        })
+        .catch((error) => {
+          console.error("Error al obtener los datos del negocio:", error);
+        });
+    },
+    async generatePDF() {
       const docDefinition = {
         content: [
           {
-            text: "SOAT",
+            text: this.negocio.nombre,
             style: "header",
+          },
+          {
+            text: [
+              { text: ` ${this.negocio.direccion}, ${this.negocio.ciudad}, ${this.negocio.provincia}, ${this.negocio.pais}\n`, style: "smallLabel" },
+              ...(this.negocio.telefono !== null
+                ? [{ text: ` ${this.negocio.telefono}`, style: "smallLabel", alignment: "center", }]
+                : []),
+            ],
+            style: "smallLabel",
+            alignment: "center",
           },
         ],
         styles: {
           header: {
-            fontSize: 30,
+            fontSize: 20,
             bold: true,
             alignment: "center",
             margin: [0, 0, 0, 10],
@@ -62,7 +91,7 @@ export default {
             alignment: "right",
           },
           footer: {
-            fontSize: 12,
+            fontSize: 14,
             bold: true,
             alignment: "center",
             margin: [0, 10, 0, 0],
@@ -92,7 +121,7 @@ export default {
       }
 
       // Detalles del Servicio
-      addSection("Detalles del Servicio", [
+      addSection("Datos de la orden", [
         { text: `Orden #: ${this.orderData.id.toString()}`, style: "label" },
         {
           text: `Fecha de Ingreso: ${this.orderData.fechaIngreso}`,
@@ -107,7 +136,6 @@ export default {
             `Nombre: ${this.orderData.cliente.nombre}` || "Nombre de Cliente",
           style: "label",
         },
-
         {
           text:
             `Teléfono: ${this.orderData.cliente.telefono}` ||
@@ -117,7 +145,7 @@ export default {
       ]);
 
       // Detalles del Equipo
-      addSection("Datos del Equipo", [
+      addSection("Datos del equipo", [
         {
           text:
             `Tipo de equipo: ${this.orderData.equipo.modelo.tipoEquipo.nombre}` ||
@@ -133,24 +161,27 @@ export default {
           text: `Modelo: ${this.orderData.equipo.modelo.nombre}` || "Modelo",
           style: "label",
         },
-
         {
-          text:
-            `Número de Serie: ${this.orderData.equipo.n_serie}` || "n de serie",
+          text: `Número de Serie: ${
+            this.orderData.equipo.n_serie !== null &&
+            this.orderData.equipo.n_serie !== undefined
+              ? this.orderData.equipo.n_serie
+              : "N/A"
+          }`,
           style: "label",
         },
       ]);
 
       // Otros detalles
-      addSection("Otros Detalles", [
+      addSection("Detalles del servicio", [
         {
           text:
             `Accesorios: ${
               this.orderData.accesorio !== null &&
-              this.orderData.accesorio !== undefined
+              this.orderData.accesorio !== undefined &&  this.orderData.accesorio !== ""
                 ? this.orderData.accesorio
                 : "N/A"
-            } ` || "Sin Accesorios",
+            } `,
           style: "label",
         },
         {
@@ -182,14 +213,16 @@ export default {
       ]);
 
       // Total a Pagar
-      docDefinition.content.push({
-        text: "Total a Pagar:",
-        style: "total",
-      });
-      docDefinition.content.push({
-        text: `$ ${this.orderData.importe}`,
-        style: "totalValue",
-      });
+      if (this.orderData.importe !== null) {
+        docDefinition.content.push({
+          text: "Total a Pagar:",
+          style: "total",
+        });
+        docDefinition.content.push({
+          text: `$ ${this.orderData.importe}`,
+          style: "totalValue",
+        });
+      }
 
       docDefinition.content.push({
         canvas: [
@@ -202,6 +235,13 @@ export default {
             lineWidth: 2,
           },
         ],
+      });
+
+      // Pie de página
+      docDefinition.content.push({
+        text: "SOAT",
+        style: "footer",
+        alignment: "center",
       });
 
       pdfMake.createPdf(docDefinition).open();
