@@ -99,7 +99,7 @@
               >
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item @click="logout()">
-                <b-icon-power></b-icon-power>Cerrar Sesión</b-dropdown-item
+               Cerrar Sesión</b-dropdown-item
               >
             </div>
           </b-dropdown>
