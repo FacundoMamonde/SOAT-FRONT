@@ -118,7 +118,12 @@ export default {
       this.getAllClients();
     });
   },
-
+  watch: {
+    filtro() {
+      this.filteredClientes();
+      this.totalRows = this.clientes.length;
+    },
+  },
   methods: {
     onRowSelected(item) {
       this.selected = item;
@@ -126,9 +131,10 @@ export default {
 
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
+        this.totalRows = this.clientes.length;
         return this.clientes;
       }
-      return this.clientes.filter((cliente) => {
+      const filteredClientes = this.clientes.filter((cliente) => {
         return (
           cliente.nombre
             .toLowerCase()
@@ -136,6 +142,9 @@ export default {
           cliente.telefono.includes(this.searchQuery)
         );
       });
+      this.currentPage=1;
+      this.totalRows = filteredClientes.length;
+      return filteredClientes;
     },
 
     openAddClient() {

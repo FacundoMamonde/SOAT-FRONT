@@ -22,7 +22,7 @@
             :per-page="perPage"
             :current-page="currentPage"
             striped
-            :items="filteredClientes"
+            :items="filteredClientes()"
             :fields="fields"
             label-sort-asc=""
             label-sort-desc=""
@@ -195,27 +195,36 @@ export default {
       ordenesCliente: Array,
     };
   },
-  computed: {
+
+  created() {
+    bus.$on("cliente-agregado", this.getAllClients);
+    this.getAllClients();
+  },
+  watch: {
+    filtro() {
+      this.filteredClientes();
+      this.totalRows = this.clientes.length;
+    },
+  },
+  methods: {
     filteredClientes() {
       if (this.searchQuery.trim() === "") {
+        this.totalRows = this.clientes.length;
         return this.clientes;
       }
-      return this.clientes.filter((cliente) => {
+      const filteredClientes = this.clientes.filter((cliente) => {
         return (
           cliente.nombre
             .toLowerCase()
             .includes(this.searchQuery.toLowerCase()) ||
           cliente.telefono.includes(this.searchQuery)
-          // Add more fields to search if needed
         );
       });
+      this.currentPage=1;
+      this.totalRows = filteredClientes.length;
+      return filteredClientes;
     },
-  },
-  created() {
-    bus.$on("cliente-agregado", this.getAllClients);
-    this.getAllClients();
-  },
-  methods: {
+
     async getAllClients() {
       await fetch(`${backendData}/cliente`)
         .then((response) => response.json())

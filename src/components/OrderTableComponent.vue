@@ -193,6 +193,7 @@ export default {
         this.ordenes = this.items;
       }
       this.totalRows = this.ordenes.length;
+      this.currentPage=1;
     },
   },
 };
